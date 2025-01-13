@@ -2,26 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+
+.btnLeft{
+  padding: 9px 16px;
+  background-color: #F97316;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.btnLeft:hover{
+  background-color: #FB923C;
+}
+
+.btnRight{
+  padding: 9px 16px;
+  border: 1.5px solid #F97316; 
+  background-color: #FFFFFF;
+  color: #F97316;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 4px;
+}
+.btnRight:hover{
+  background-color: #f3f4f6;
+}
+
+.btnRemove{
+  padding: 4px 6px;
+  background-color: white;
+  color: #3730a3;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  font-size: 10px;
+  border-radius: 4px;
+  border: 1.5px solid indigo;
+}
+
+.btnRemove:hover{
+  background-color: #F0F3F4;
+}
+
+.inputBox{
+  padding: 9px 16px;
+  border: 1.5px solid #FFA500;
+  border-radius: 4px;
+ }
+
+.inputBox:focus {
+  outline: 1.5px solid #FFA500;
+  background-color: #FFEBCC;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: white;
 }
