@@ -25,7 +25,8 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const bthList:BatchType[] = await Batches.find().populate('corId', 'coName coNick');
+      const batchList:BatchType[] = await Batches.find().populate('corId', 'coName coNick');
+      const bthList = batchList.filter((item:any)=> item.isActive === true);
       return NextResponse.json({ bthList, success: true }, {status:200});
   
     } catch (error) {

@@ -23,7 +23,7 @@ export async function PUT(req: NextRequest, {params}:{params:ICatParams}) {
     if(!catById){
       return NextResponse.json({ message: "No category found." }, { status: 404 });
     }else{
-        return NextResponse.json({ catById, success: true }, {status:200});
+        return NextResponse.json({ catById, success: true, msg:"Category updated successfully." }, {status:200});
     }
 
   } catch (error:any) {

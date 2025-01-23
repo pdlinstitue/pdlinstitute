@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "../Loading";
 import toast from "react-hot-toast";
+import { format } from "date-fns";
 
 const AddNewBatch: React.FC = () => {
 
@@ -42,7 +43,8 @@ const AddNewBatch: React.FC = () => {
       if (data.bthLang && data.corId && data.bthStart && data.bthTime) {
         const cor = coList?.filter((item:any)=>item._id === data.corId); 
         if (cor && cor.length > 0) {
-          setBatchTitle(`${cor[0]?.coNick}_${data.bthLang}_ ${data.bthTime}_${data.bthStart}`);
+          const bthStartDate = new Date(data.bthStart); const formattedBthStart = format(bthStartDate, 'MMM do, yyyy'); 
+          setBatchTitle(`${cor[0]?.coNick}-${data.bthLang}-${data.bthTime}-${formattedBthStart}`);
         } else {
           setBatchTitle('');
         }
@@ -122,7 +124,7 @@ const AddNewBatch: React.FC = () => {
               toast.error(post.msg);
           } else {
               toast.success(post.msg);
-              router.push('/account/batchlist');
+              router.push('/account/batch-list');
           }
       } catch (error) {
           toast.error('Error creating course.');
@@ -134,6 +136,7 @@ const AddNewBatch: React.FC = () => {
         <Loading/>
       </div>
     }
+    
   return (
     <div>
       <form className="flex flex-col gap-4 h-auto border-[1.5px] border-orange-500 p-6 rounded-md" onSubmit={handleSubmit}>
@@ -206,8 +209,8 @@ const AddNewBatch: React.FC = () => {
               <label className='text-lg'>Language:</label>
               <select className='inputBox' name="bthLang" value={data.bthLang} onChange={handleChange}>
                   <option className="text-center">--- Select Language ---</option>
-                  <option value="Eng">English</option>
-                  <option value="Hin">Hindi</option>
+                  <option value="ENG">English</option>
+                  <option value="HIN">Hindi</option>
               </select>
             </div>
         </div>
@@ -247,7 +250,7 @@ const AddNewBatch: React.FC = () => {
           <button
             type="button"
             className="btnRight w-full"
-            onClick={() => router.push("/account/batchlist")}
+            onClick={() => router.push("/account/batch-list")}
           >
             Back
           </button>
@@ -257,7 +260,4 @@ const AddNewBatch: React.FC = () => {
   );
 };
 export default AddNewBatch;
-function setIsLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
 

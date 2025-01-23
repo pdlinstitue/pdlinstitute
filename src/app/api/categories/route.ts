@@ -12,9 +12,9 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      let catList:CatType[] = await Categories.find();
-      catList = catList.filter((item:any)=> item.isActive === true);
-      return NextResponse.json({ catList, success: true }, {status:200});
+      const catList:CatType[] = await Categories.find();
+      const categoryList = catList.filter((item:any)=> item.isActive === true);
+      return NextResponse.json({ catList:categoryList, success: true }, {status:200});
   
     } catch (error) {
       return new NextResponse("Error while fetching catData: " + error, {status:500});

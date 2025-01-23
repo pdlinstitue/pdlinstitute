@@ -40,17 +40,13 @@ const AddNewCategory: React.FC = () => {
           method: 'POST',
           body: JSON.stringify({ catName: data.catName }),
         });
-    
-        const post = await response.json();
-        console.log(post);
-    
+        const post = await response.json();    
         if (post.success === false) {
-            toast.error('Category creation failed!');
+            toast.error(post.msg);
         } else {
-            toast.success('Category created successfully!');
-            setData({ ...data, catName: '' }); //clear the prev input data.
-            router.push('/account/categorylist');
-         }
+            toast.success(post.msg);
+            router.push('/account/category-list');
+        }
     } catch (error) {
         toast.error('Error creating category.');
     } 
@@ -58,7 +54,7 @@ const AddNewCategory: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center my-24">
-      <form onSubmit={handleSubmit}  className="flex flex-col gap-4 h-auto border-[1.5px] w-[350px] border-orange-500 p-9 rounded-md shadow-xl">
+      <form onSubmit={handleSubmit}  className="formStyle w-[350px]">
         <div className="flex flex-col gap-2">
           <label className="text-lg">Category Name:</label>
           <input type="text" className="inputBox" name="catName" value={data.catName} onChange={handleChange}  />
@@ -68,7 +64,7 @@ const AddNewCategory: React.FC = () => {
           <button type="submit" className="btnLeft w-full" >
             Save
           </button>
-          <button type="button" className="btnRight w-full" onClick={() => router.push("/account/categorylist")}>
+          <button type="button" className="btnRight w-full" onClick={() => router.push("/account/category-list")}>
             Back
           </button>
         </div>

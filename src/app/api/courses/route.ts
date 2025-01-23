@@ -27,7 +27,8 @@ export async function GET(req:NextRequest){
   
       await dbConnect();
       const coList:CoType[] = await Courses.find().populate('coCat', 'catName');
-      return NextResponse.json({ coList, success: true }, {status:200});
+      const activeCourseList = coList.filter((item:any)=> item.isActive === true);
+      return NextResponse.json({ coList:activeCourseList, success: true }, {status:200});
   
     } catch (error) {
       return new NextResponse("Error while fetching catData: " + error, {status:500});

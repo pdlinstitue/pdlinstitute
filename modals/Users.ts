@@ -1,12 +1,15 @@
 import mongoose from 'mongoose';
 
 const usrSchema = new mongoose.Schema({
-    catName: { 
+    sdkName: { 
         type: String, 
-        required:[true, "Category name is required."]
     },
-    catImage:{
+    sdkImg:{
         type:String
+    },
+    sdkRole:{
+        type:String,
+        default:"Sadhak"
     },
     isActive: {
         type: Boolean,

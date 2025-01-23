@@ -136,7 +136,7 @@ const AddNewCourse: React.FC = () => {
               toast.error(post.msg);
           } else {
               toast.success(post.msg);
-              router.push('/account/courselist');
+              router.push('/account/course-list');
           }
       } catch (error) {
           toast.error('Error creating course.');
@@ -226,7 +226,7 @@ const AddNewCourse: React.FC = () => {
             <label className='text-lg'>Description:</label>
             <textarea name="coDesc" value={data.coDesc} onChange={handleChange} rows={6} className='inputBox'/>
         </div>
-        {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
+        {errorMessage && <p className="text-xs italic text-red-600">{errorMessage}</p>}
         <div className="flex gap-1 w-full">
           <button type="submit" className="btnLeft w-full">
             Save
@@ -234,7 +234,7 @@ const AddNewCourse: React.FC = () => {
           <button
             type="button"
             className="btnRight w-full"
-            onClick={() => router.push("/account/courselist")}
+            onClick={() => router.push("/account/course-list")}
           >
             Back
           </button>

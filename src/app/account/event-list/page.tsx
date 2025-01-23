@@ -1,43 +1,64 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
-import mData from '../../MOCK_DATA.json';
 import { BsCalendarEvent } from "react-icons/bs";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Loading from '../Loading';
+import { useRouter } from 'next/navigation';
+import { BASE_API_URL } from '@/app/utils/constant';
+import { FiEye } from 'react-icons/fi';
+import { BiEditAlt } from 'react-icons/bi';
+import { HiMinus } from 'react-icons/hi';
+import { RxCross2 } from 'react-icons/rx';
 
-interface EventListProps {
-
-  data: { id: number; first_name: string; last_name: string; email: string; gender: string; }[];
-
-  columns: { header: string; accessorKey: string; }[];
-
+interface EventListProps{
+  _id:string,
+  eveName:string,
+  eveCatId:string,
+  eveAud:string,
+  eveType:string,
+  eveMode:string,
+  eveDon:number,
+  eveShort:string,
+  eveStartAt:string,
+  eveEndAt:string,
+  eveDesc: string,
+  eveDate:string,
+  eveLink:string,
+  eveLoc:string,
+  eveSpeak:string,
+  evePer:string,
+  eveCont:string,
+  eveImg?:string,
+  usrId?:string
 }
 
-const EventList : React.FC<EventListProps> = () => {
+const EventList : React.FC = () => {
 
-  const data = React.useMemo(() => mData, []);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [eventData, setEventData] = useState<EventListProps[] | null>([]);
+  const data = React.useMemo(() => eventData ?? [], [eventData]);
   const columns = React.useMemo(() => [
-    {
-      header: 'ID',
-      accessorKey: 'id',
-    },
-    {
-      header: 'First Name',
-      accessorKey: 'first_name',
-    },
-    {
-      header: 'Last Name',
-      accessorKey: 'last_name',
-    },
-    {
-      header: 'Email',
-      accessorKey: 'email',
-    },
-    {
-      header: 'Gender',
-      accessorKey: 'gender',
-    }
+    {header: 'Event', accessorKey: 'eveName'},
+    {header: 'Category', accessorKey: 'eveCatId'},
+    {header: 'Type', accessorKey: 'eveType'},
+    {header: 'Mode', accessorKey: 'eveMode'},
+    {header: 'Audiance', accessorKey: 'eveAud'},
+    {header: 'Donation', accessorKey: 'eveDon'},
+    {header: 'Speaker', accessorKey: 'eveSpeak'},
+    { header: 'Action', accessorKey: 'eveAction', 
+      cell: ({ row }: { row: any }) => ( 
+        <div className='flex items-center gap-3'> 
+          <button type='button' title='View' onClick={()=> router.push(`/account/event-list/${row.original._id}/view-event`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+          <button type='button' title='Edit' onClick={()=> router.push(`/account/event-list/${row.original._id}/edit-event`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>
+          <button type='button' title='Disable' onClick={()=> router.push(`/account/event-list/${row.original._id}/disable-event`)} className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full  hover:border-black'><HiMinus size={12}/></button>
+          <button type='button' title='Delete' onClick={()=> router.push(`/account/event-list/${row.original._id}/delete-event`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>
+        </div> 
+      ), 
+    }, 
+    
   ], []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
@@ -72,6 +93,30 @@ const EventList : React.FC<EventListProps> = () => {
       setPageInput(Number(e.target.value)); 
       table.setPageIndex(page); 
     };
+
+    useEffect(() => {
+    async function fetchEventData() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/events`, { cache: "no-store" });
+        const eveData = await res.json();
+        const updatedEveList = eveData.eveList.map((item:any) => { 
+          return { ...item, eveCatId: item.eveCatId.eveCatName };
+        });
+        setEventData(updatedEveList);
+      } catch (error) {
+        console.error("Error fetching course data:", error);
+      }  finally {
+        setIsLoading(false);
+      }
+    }
+    fetchEventData();
+    }, []);
+
+    if(isLoading){
+      return <div>
+        <Loading/>
+      </div>
+    }
 
   return (
     <div>

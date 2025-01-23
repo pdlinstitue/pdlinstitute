@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import Courses from "./Courses";
 import Users from "./Users";
 
-
 const batchSchema = new mongoose.Schema({
     bthName: {
         type: String,

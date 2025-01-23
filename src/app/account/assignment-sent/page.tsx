@@ -1,77 +1,99 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
-import mData from '../../MOCK_DATA.json';
 import { BsFolderPlus } from "react-icons/bs";
-import React from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { BASE_API_URL } from '@/app/utils/constant';
+import { FiEye } from 'react-icons/fi';
+import { BiEditAlt } from 'react-icons/bi';
+import { HiMinus } from 'react-icons/hi';
+import { RxCross2 } from 'react-icons/rx';
 
-interface AssignmentSentProps {
-
-  data: { id: number; first_name: string; last_name: string; email: string; gender: string; }[];
-
-  columns: { header: string; accessorKey: string; }[];
-
+interface AssignmentListProps {
+  asnName: string, 
+  asnType: string, 
+  asnLink: string, 
+  asnFile: string,
+  asnOrder: string, 
+  corId: string, 
+  usrId?: string
 }
 
-const AssignmentSent : React.FC<AssignmentSentProps> = () => {
+const AssignmentSent : React.FC = () => {
 
-  const data = React.useMemo(() => mData, []);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [asnData, setAsnData] = useState<AssignmentListProps[]>([]);
+  const data = React.useMemo(() => asnData ?? [], [asnData]);
   const columns = React.useMemo(() => [
-    {
-      header: 'ID',
-      accessorKey: 'id',
+    { header: 'Assignment Name', accessorKey: 'asnName',},
+    { header: 'Assignment Type', accessorKey: 'asnType',},
+    { header: 'Order', accessorKey: 'asnOrder',},
+    { header: 'Course', accessorKey: 'corId',},
+    { header: 'Action', accessorKey: 'asnAction', 
+      cell: ({ row }: { row: any }) => ( 
+        <div className='flex items-center gap-3'> 
+          <button type='button' title='View' onClick={()=> router.push(`/account/assignment-sent/${row.original._id}/view-assignment`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+          <button type='button' title='Edit' onClick={()=> router.push(`/account/assignment-sent/${row.original._id}/edit-assignment`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>
+          <button type='button' title='Disable' onClick={()=> router.push(`/account/assignment-sent/${row.original._id}/disable-assignment`)} className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full  hover:border-black'><HiMinus size={12}/></button>
+          <button type='button' title='Delete' onClick={()=> router.push(`/account/assignment-sent/${row.original._id}/delete-assignment`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>
+        </div> 
+      ), 
     },
-    {
-      header: 'First Name',
-      accessorKey: 'first_name',
-    },
-    {
-      header: 'Last Name',
-      accessorKey: 'last_name',
-    },
-    {
-      header: 'Email',
-      accessorKey: 'email',
-    },
-    {
-      header: 'Gender',
-      accessorKey: 'gender',
-    }
   ], []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-    const [filtered, setFiltered] = React.useState('');
-    const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
+  const [filtered, setFiltered] = React.useState('');
+  const [pageInput, setPageInput] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(25);
 
-    const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
-      return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
-    };
-  
-    const table = useReactTable(
-      {
-        data, 
-        columns, 
-        getCoreRowModel: getCoreRowModel(), 
-        getPaginationRowModel: getPaginationRowModel(), 
-        getSortedRowModel: getSortedRowModel(),
-        globalFilterFn: globalFilterFn,
-        state: {
-          sorting: sorting,
-          globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
-        },
-        onSortingChange: setSorting,
-        getFilteredRowModel: getFilteredRowModel(),
-        onGlobalFilterChange: setFiltered
-      }
-    );
-  
-    const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
-      const page = e.target.value ? Number(e.target.value) - 1 : 0; 
-      setPageInput(Number(e.target.value)); 
-      table.setPageIndex(page); 
-    };
+  const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
+    return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
+  };
+
+  useEffect(() => {
+  async function fetchAsnData() {
+    try {
+      const res = await fetch(`${BASE_API_URL}/api/assignments`, { cache: "no-store" });
+      const asnDataList = await res.json();
+      const updatedAsnList = asnDataList.asnList.map((item:any) => { 
+        return { ...item, corId: item.corId.coName };
+      });
+      setAsnData(updatedAsnList);
+    } catch (error) {
+      console.error("Error fetching course data:", error);
+    }  finally {
+      setIsLoading(false);
+    }
+  }
+  fetchAsnData();
+  }, []);
+
+  const table = useReactTable(
+    {
+      data, 
+      columns, 
+      getCoreRowModel: getCoreRowModel(), 
+      getPaginationRowModel: getPaginationRowModel(), 
+      getSortedRowModel: getSortedRowModel(),
+      globalFilterFn: globalFilterFn,
+      state: {
+        sorting: sorting,
+        globalFilter: filtered,
+        pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+      },
+      onSortingChange: setSorting,
+      getFilteredRowModel: getFilteredRowModel(),
+      onGlobalFilterChange: setFiltered
+    }
+  );
+
+  const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    const page = e.target.value ? Number(e.target.value) - 1 : 0; 
+    setPageInput(Number(e.target.value)); 
+    table.setPageIndex(page); 
+  };
 
   return (
     <div>

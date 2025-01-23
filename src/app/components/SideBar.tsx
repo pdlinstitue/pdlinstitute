@@ -1,5 +1,6 @@
 "use client"
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { MdDashboard } from "react-icons/md";
@@ -20,12 +21,15 @@ import AssignMenu from './submenus/AssignMenu';
 import AttendMenu from './submenus/AttendMenu';
 import EventMenu from './submenus/EventMenu';
 import { SiAdblock } from "react-icons/si";
+import DocMenu from './submenus/DocMenu';
+import SadhakMenu from './submenus/SadhakMenu';
 
 
 
 
 const SideBar: React.FC = () => {
 
+  const pathName = usePathname();
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null); 
   
   
@@ -35,21 +39,21 @@ const SideBar: React.FC = () => {
   
   return (
     <div>
-      <div className='flex flex-col w-[230px] bg-orange-500 h-screen p-4'>
-        <div className='flex gap-2 items-center bg-orange-400 rounded-sm'>
+      <div className='flex flex-col w-[230px] bg-orange-600 h-screen p-4'>
+        <div className='flex gap-2 items-center bg-orange-500 rounded-sm'>
           <Image alt='pdlinstitute' src="/images/pdlLogo.jpg" width={52} height={52}/>
           <p className='text-white font-bold'>PDL INSTITUTE</p>
         </div>
-        <div className='flex flex-col'>
-          <Link href='/account/dashboard' className='group flex gap-2 text-white hover:bg-white p-2 rounded-md mt-3'>
-            <MdDashboard size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>DASHBOARD</p>
-          </Link>
-          <button type='button' onClick={() =>handleToggle(1)} className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
-            <MdOutlineAppRegistration size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>ENROLLMENTS</p>
-            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 1 ? 'rotate-180 duration-500' : ''}`} />          
-          </button>
+        <div className='flex flex-col gap-2'>
+        <Link href='/account/dashboard' className={`group flex gap-2 p-2 rounded-sm mt-3 ${pathName === '/account/dashboard' ? 'bg-white text-black' : 'text-white bg-orange-500 hover:bg-white hover:text-black'}`}>
+          <MdDashboard size={24} className={pathName === '/account/dashboard' ? 'text-black' : 'group-hover:text-black'}/>
+          <p className={`font-semibold ${pathName !== '/account/dashboard' && 'group-hover:text-black'}`}>DASHBOARD</p>
+        </Link>
+        <button type='button' onClick={() =>handleToggle(1)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+          <MdOutlineAppRegistration size={24} className=' group-hover:text-black'/>
+          <p className='font-semibold group-hover:text-black'>ENROLLMENTS</p>
+          <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 1 ? 'rotate-180 duration-500' : ''}`} />          
+        </button>
           {
             selectedNumber === 1 && (
               <div className='flex w-full px-[35px]'>
@@ -57,13 +61,21 @@ const SideBar: React.FC = () => {
               </div>
             )
           }
-          <Link href='/account/sadhaklist' className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <button type='button' onClick={() =>handleToggle(0)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <BiSolidUserRectangle size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>SADHAK LIST</p>
-          </Link>
-          <button type='button' onClick={() =>handleToggle(3)} className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 0 ? 'rotate-180 duration-500' : ''}`} />      
+          </button>
+          {
+            selectedNumber === 0 && (
+              <div className='flex w-full px-[35px]'>
+                <SadhakMenu/>
+              </div>
+            )
+          }
+          <button type='button' onClick={() =>handleToggle(3)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <MdCastForEducation size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>TRAINING</p>
+            <p className='font-semibold group-hover:text-black'>COURSE MGM</p>
             <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 3 ? 'rotate-180 duration-500' : ''}`} />        
           </button>
           {
@@ -73,7 +85,7 @@ const SideBar: React.FC = () => {
               </div>
             )
           }
-          <button type='button' onClick={() =>handleToggle(2)} className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <button type='button' onClick={() =>handleToggle(2)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <SiGoogleclassroom size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>CLASSROOM</p>
             <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 2 ? 'rotate-180 duration-500' : ''}`} />      
@@ -85,11 +97,11 @@ const SideBar: React.FC = () => {
               </div>
             )
           }
-          <Link href='/account/studymaterials' className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <Link href='/account/study-materials' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <FaBookReader size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>STUDY MAT</p>
           </Link>
-          <button type='button' onClick={() =>handleToggle(4)} className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <button type='button' onClick={() =>handleToggle(4)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <RxReader size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>ASSIGNMENT</p>
             <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 2 ? 'rotate-180 duration-500' : ''}`} />      
@@ -101,7 +113,7 @@ const SideBar: React.FC = () => {
               </div>
             )
           }
-          <button type='button' onClick={() =>handleToggle(5)} className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <button type='button' onClick={() =>handleToggle(5)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <FaCalendarCheck size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>ATTENDANCE</p>
             <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 5 ? 'rotate-180 duration-500' : ''}`} />      
@@ -113,7 +125,7 @@ const SideBar: React.FC = () => {
               </div>
             )
           }
-          <button type='button' onClick={() =>handleToggle(6)} className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <button type='button' onClick={() =>handleToggle(6)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <BsCalendarEvent  size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>EVENT MGM</p>
             <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 6 ? 'rotate-180 duration-500' : ''}`} />      
@@ -125,15 +137,23 @@ const SideBar: React.FC = () => {
               </div>
             )
           }
-          <Link href='/account/dashboard' className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <button type='button' onClick={() =>handleToggle(7)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <HiOutlineDocumentReport size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>ACCOUNTS</p>
-          </Link>
-          <Link href='/account/dashboard' className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+            <p className='font-semibold group-hover:text-black'>DOCUMENTS</p>
+            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 7 ? 'rotate-180 duration-500' : ''}`} />      
+          </button>
+          {
+            selectedNumber === 7 && (
+              <div className='flex w-full px-[35px]'>
+                <DocMenu/>
+              </div>
+            )
+          }
+          <Link href='/account/dashboard' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <SiAdblock size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>PERMISSION</p>
           </Link>
-          <Link href='/account/dashboard' className='group flex gap-2 text-white hover:bg-white p-2 rounded-md'>
+          <Link href='/account/dashboard' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <HiOutlineDocumentReport size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>REPORTS</p>
           </Link>
@@ -143,4 +163,4 @@ const SideBar: React.FC = () => {
   )
 }
 
-export default SideBar 
+export default SideBar;

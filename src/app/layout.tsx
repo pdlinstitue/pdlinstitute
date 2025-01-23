@@ -20,18 +20,20 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Toaster toastOptions={{ style:
-          { 
-            background: "white", 
-            color:"orrange", 
-            border:"1.5px solid orrange", 
-            borderRadius:"10px",
-            padding:"6px", 
-            width: "auto", 
-            textAlign: "center"
-          }}}
+        <Toaster 
+          toastOptions={{ 
+            duration: 3000, 
+            style: { 
+              background: "white", 
+              border: "1.5px solid orange", 
+              borderRadius: "10px",
+              padding: "6px", 
+              width: "auto", 
+              textAlign: "center"
+            }
+          }} 
         />
-        {children}
+      {children}
       </body>
     </html>  
   );

@@ -29,9 +29,9 @@ const DataTable : React.FC<DataTableProps> = ({table}) => {
             </tr>
             ))}
         </thead> 
-        <tbody className='text-left divide-y'>
+        <tbody className='text-left'>
             {table.getRowModel().rows.map((row: { id: string; getVisibleCells: () => { id: string; column: { columnDef: { cell: any; }; }; getContext: () => any; }[]; }) => (
-            <tr key={row.id} className='hover:bg-gray-100'>
+            <tr key={row.id} className='hover:bg-gray-100 border-b-[1.5px] border-gray-200'>
               {row.getVisibleCells().map((cell: { id: string; column: { columnDef: { cell: any; }; }; getContext: () => any; }) => (
               <td key={cell.id} className='py-2 px-3'>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

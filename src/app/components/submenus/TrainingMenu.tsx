@@ -5,12 +5,12 @@ const TrainingMenu : React.FC = () => {
 
   return (
     <div>
-      <div className='flex flex-col w-full'>    
-        <Link href="/account/categorylist" className='text-white hover:text-black hover:bg-orange-400 py-1 px-2 w-[150px] rounded-md'>- Category</Link> 
-        <Link href="/account/courselist" className='text-white hover:text-black hover:bg-orange-400 py-1 px-2 w-[150px] rounded-md'>- Courses</Link> 
-        <Link href="/account/complete-course" className='text-white hover:text-black hover:bg-orange-400 py-1 px-2 w-[150px] rounded-md'>- Complete</Link>
-        <Link href="/account/practice" className='text-white hover:text-black hover:bg-orange-400 py-1 px-2 w-[150px] rounded-md'>- Practice</Link>       
-        <Link href="/account/couponlist" className='text-white hover:text-black hover:bg-orange-400 py-1 px-2 w-[150px] rounded-md'>- Coupons</Link>
+      <div className='flex flex-col w-auto'>    
+        <Link href="/account/category-list" className='text-white text-xs uppercase font-bold rounded-sm pl-2 pr-3 hover:text-black hover:bg-orange-400 py-1'>- Category</Link> 
+        <Link href="/account/course-list" className='text-white text-xs uppercase font-bold rounded-sm pl-2 pr-3 hover:text-black hover:bg-orange-400 py-1'>- Courses</Link> 
+        <Link href="/account/complete-course" className='text-white text-xs uppercase font-bold rounded-sm pl-2 pr-3 hover:text-black hover:bg-orange-400 py-1'>- Complete</Link>
+        <Link href="/account/course-practice" className='text-white text-xs uppercase font-bold rounded-sm pl-2 pr-3 hover:text-black hover:bg-orange-400 py-1'>- Practice</Link>       
+        <Link href="/account/coupon-list" className='text-white text-xs uppercase font-bold rounded-sm pl-2 pr-3 hover:text-black hover:bg-orange-400 py-1'>- Coupons</Link>
       </div>
     </div>
   )

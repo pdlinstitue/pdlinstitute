@@ -1,39 +1,49 @@
 import mongoose from "mongoose";
-import Users from "./Users";
 import Batches from "./Batches";
 import Courses from "./Courses";
-
+import Users from "./Users";
+ 
 const classSchema = new mongoose.Schema({
-    clsName: [String],
-    clsStart: {
+clsName: [{
+    clsDay: {
         type: String,
-        required: [true, "Class start time is required."]
     },
-    clsEnd: {
+    clsStartAt: {
         type: String,
-        required: [true, "Class end time is required."]
+        },
+    clsEndAt: {
+        type: String,
+        },
+    clsDate: {
+        type: Date,
     },
     clsLink: {
         type: String,
     },
-    corId : {
-        type:mongoose.Schema.Types.ObjectId,
-        ref: Courses
-    },
-    isActive :{
+    isActive: {
         type: Boolean,
-        default:true
+        default: true
     },
-    bthId : {
-        type:mongoose.Schema.Types.ObjectId,
-        ref: Batches
-    },
-    usrId : {
-        type:mongoose.Schema.Types.ObjectId,
-        ref: Users
-    },
-    clsAssign:[String],
-    clsMaterial:[String]
-},{timestamps: true});
+    clsAssignments: [String],
+}],
+clsMaterials: [String],
+bthId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Batches
+},
+corId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Courses
+},
+usrId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Users
+},  
+isActive: {
+    type: Boolean,
+    default: true
+},
+}, {timestamps: true});
+
 const Classes = mongoose.models.Classes || mongoose.model('Classes', classSchema);
 export default Classes;
