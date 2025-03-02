@@ -6,6 +6,7 @@ import { FaTelegram } from "react-icons/fa6";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { BASE_API_URL } from '../utils/constant';
+import Cookies from 'js-cookie';
 
 
 interface INoBatchParams {
@@ -16,13 +17,21 @@ interface NoBatchProps {
   prosMonth:string,
   prosShift:string,
   corId:string,
-  usrId:string
+  prosWeek:number,
+  createdBy:string
 }
 
 const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
 
   const router = useRouter();
-  const [enrData, setEnrData] = useState<NoBatchProps>({prosMonth:'', prosShift:'', corId:'', usrId:''})
+  const [enrData, setEnrData] = useState<NoBatchProps>({prosMonth:'', prosShift:'', corId:'', prosWeek:0, createdBy:''});
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  }; 
 
   const handleChange = (e:any) => {
     const name = e.target.name;
@@ -44,7 +53,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
             prosMonth:enrData.prosMonth,
             prosShift: enrData.prosShift,
             corId: CourseId,
-            // usrId: data.usrId,
+            createdBy: loggedInUser.result._id,
           }),
         });
     
@@ -52,44 +61,48 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
         console.log(post);
     
         if (post.success === false) {
-            toast.error(post.msg);
+          toast.error(post.msg);
         } else {
-            toast.success(post.msg);
-            router.push('/account/my-courses');
+          toast.success(post.msg);
+          router.push('/account/my-courses/elg-courses');
         }
-  
-    } catch (error) {
+      } catch (error) {
         toast.error('Error enrolling parking batch.');
-     } 
+      } 
     };
 
   return (
     <div className='flex justify-center'>
-        <form className="formStyle w-[600px] my-24 items-center" onSubmit={handleSubmit}>
-            <Image alt="ohh" src="/images/ohh.png" width={40} height={40} />
-            <h1 className="text-2xl font-bold text-center text-orange-600 italic">
-                No Batches Available
-            </h1>
-            <div className="text-center text-lg">
-                <p>You can choose your preferred</p>
-                <p>time.</p>
+        <form className="formStyle w-auto my-24" onSubmit={handleSubmit}>
+            <div className='flex flex-col items-center'>
+              <Image alt="ohh" src="/images/ohh.png" width={40} height={40} />
+              <h1 className="text-xl font-bold text-center text-orange-600 italic">
+                  No Batches Available
+              </h1>
+              <div className="text-center text-lg">
+                  <p>You can choose your preferred time.</p>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-1">
-                <div className="flex flex-col items-center gap-1">
-                    <label className="font-bold">MONTH</label>
-                    <input type="month" name='prosMonth' value={enrData.prosMonth} onChange={handleChange} className="inputBox" />
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                    <label className="font-bold">SHIFT</label>
-                    <select className="inputBox h-[46px]" name='prosShift' value={enrData.prosShift} onChange={handleChange}>
-                        <option className="text-center" value="">
-                        --- Select Shift ---
-                        </option>
-                        <option value="Morning">Morning</option>
-                        <option value="Afternoon">Afternoon</option>
-                        <option value="Evening">Evening</option>
-                    </select>
-                </div>
+            
+            <div className="grid grid-cols-3 gap-1">
+              <div className="flex flex-col gap-1">
+                  <label className="font-bold">MONTH</label>
+                  <input type="month" name='prosMonth' value={enrData.prosMonth} onChange={handleChange} className="inputBox" />
+              </div>
+              <div className="flex flex-col gap-1">
+                  <label className="font-bold">WEEK</label>
+                  <input type="number" name='prosWeek' value={enrData.prosWeek} onChange={handleChange} className="inputBox h-[46px]" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="font-bold">SHIFT</label>
+                <select className="inputBox h-[46px]" name='prosShift' value={enrData.prosShift} onChange={handleChange}>
+                    <option className="text-center" value="">--- Select Shift ---</option>
+                    <option value="Any Shift">Any Shift</option>
+                    <option value="Morning">Morning</option>
+                    <option value="Afternoon">Afternoon</option>
+                    <option value="Evening">Evening</option>
+                </select>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-1 mt-4 w-full">
               <button type="submit" className="btnLeft">
@@ -98,7 +111,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
               <button
                 type="button"
                 className="btnRight"
-                onClick={() => router.push("/account/my-courses")}
+                onClick={() => router.push("/account/my-courses/elg-courses")}
               >
                 BACK
               </button>

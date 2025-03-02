@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
             } else if (course.coElgType === "Category") {
                 // Find all courses within this category
                 const categoryCourses = await Courses.find({ coCat: course.coElg }).lean();
-                const categoryCourseIds = categoryCourses.map(catCourse => new mongoose.Types.ObjectId(catCourse._id));
+                const categoryCourseIds = categoryCourses.map((catCourse:any) => new mongoose.Types.ObjectId(catCourse._id));
 
                 // Count how many of the category courses are completed
                 const completedCount = await Enrollments.countDocuments({
@@ -62,7 +62,6 @@ export async function GET(req: NextRequest) {
 
         // Step 3: Filter only active courses
         const activeCourseList = filteredCourses.filter((item) => item.isActive === true);
-
         return NextResponse.json({ coList: activeCourseList, success: true }, { status: 200 });
 
     } catch (error) {

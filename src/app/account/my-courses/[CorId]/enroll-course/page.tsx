@@ -122,13 +122,53 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
           toast.error(post.msg);
       } else {
           toast.success(post.msg);
-          router.push('/account/my-courses');
+          router.push('/account/my-courses/elg-courses');
         }
       } catch (error) {
         toast.error('Error enrolling batch.');
       } 
     };
 
+    const handlePayment = async () => { 
+
+      const response = await fetch("/api/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order_id: `ORD${Date.now()}`,
+          amount: "100.00",
+          customer_email: "test@example.com",
+          customer_phone: "9876543210",
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.encryptedData) {
+        const form = document.createElement("form");
+        form.method = "post";
+        form.action = "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+  
+        const encInput = document.createElement("input");
+        encInput.type = "hidden";
+        encInput.name = "encRequest";
+        encInput.value = data.encryptedData;
+  
+        const accessInput = document.createElement("input");
+        accessInput.type = "hidden";
+        accessInput.name = "access_code";
+        accessInput.value = data.accessCode;
+  
+        form.appendChild(encInput);
+        form.appendChild(accessInput);
+        document.body.appendChild(form);
+  
+        form.submit();
+      }
+    };
+  
   if(isLoading) {
     return <div>
       <Loading />
@@ -184,17 +224,20 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
                       <input type="file" name='enrScnShot' className="inputBox" />
                     </div>
                   </div>
+                  <button type="button" className="py-2 px-2 bg-gray-200 hover:bg-gray-300 rounded-sm italic" onClick={handlePayment}>
+                    Pay through CCAvenue
+                  </button>
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-1 mt-4">
+            <div className="grid grid-cols-2 gap-1">
               <button type="submit" className="btnLeft">
                 SUBMIT
               </button>
               <button
                 type="button"
                 className="btnRight"
-                onClick={() => router.push("/account/my-courses")}
+                onClick={() => router.push("/account/my-courses/elg-courses")}
               >
                 BACK
               </button>

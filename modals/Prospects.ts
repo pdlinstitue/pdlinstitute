@@ -4,20 +4,42 @@ import Courses from './Courses';
 
 const prospectsSchema = new mongoose.Schema({   
     prosMonth:{
-        type:String
+        type:String,
+        required:[true, "Please select month."]
     },
     prosShift:{
-        type:String
+        type:String,
+        required:[true, "Please select shift."]
     },   
+    prosWeek:{
+        type:Number,
+        required:[true, "Please enter week"]
+    },
     isActive: {
         type: Boolean,
         default:true
+    },
+    isDeleted:{
+        type: Boolean,
+        default:false
     },
     corId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:Courses
     },
-    usrId: {
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
+    disabledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
+    deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref:Users
     }
