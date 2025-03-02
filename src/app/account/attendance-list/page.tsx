@@ -1,44 +1,46 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
-import mData from '../../MOCK_DATA.json';
-import { FaCalendarCheck } from "react-icons/fa6";
-import { IoCreateOutline } from "react-icons/io5";
-import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { FiEye } from 'react-icons/fi';
+import { BASE_API_URL } from '@/app/utils/constant';
 
 interface AttendanceListProps {
-
-  data: { id: number; first_name: string; last_name: string; email: string; gender: string; }[];
-
-  columns: { header: string; accessorKey: string; }[];
-
+ _id:string,
+ clsName:string,
+ clsStartAt:string,
+ clsEndAt:string,
+ clsDate:Date,
+ coNick:string,
+ bthId:string,
+ bthName:string,
+ bthJoiners:Number
 }
 
 const AttendanceList : React.FC<AttendanceListProps> = () => {
 
-  const data = React.useMemo(() => mData, []);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [clsData, setClsData] = useState<AttendanceListProps[] | null>([]);
+  const data = React.useMemo(() => clsData ?? [], [clsData]);
   const columns = React.useMemo(() => [
-    {
-      header: 'ID',
-      accessorKey: 'id',
-    },
-    {
-      header: 'First Name',
-      accessorKey: 'first_name',
-    },
-    {
-      header: 'Last Name',
-      accessorKey: 'last_name',
-    },
-    {
-      header: 'Email',
-      accessorKey: 'email',
-    },
-    {
-      header: 'Gender',
-      accessorKey: 'gender',
-    }
+    { header: 'Course', accessorKey: 'coNick'},
+    { header: 'Batch', accessorKey: 'bthName'},
+    { header: 'Class', accessorKey: 'clsName'},
+    { header: 'Date', accessorKey: 'clsDate'},
+    { header: 'Starts At', accessorKey: 'clsStartAt'},
+    { header: 'Ends At', accessorKey: 'clsEndAt'},
+    { header: 'Joiners', accessorKey: 'bthJoiners'},
+    { header: 'Present', accessorKey: 'clsPresent'},
+    { header: 'Absent', accessorKey: 'clsAbsent'},
+    { header: 'Action', accessorKey: 'atdAction', 
+        cell: ({ row }: { row: any }) => ( 
+          <div className='flex items-center justify-center'> 
+            <button type='button' title='View' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/mark-attendance`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+          </div> 
+        ), 
+      },
   ], []);
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -49,6 +51,41 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
     };
+
+    useEffect(() => {
+    async function fetchBatchData() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/classes`, { cache: "no-store" });
+        const classData = await res.json();
+        
+        let updatedClassList: AttendanceListProps[] = classData.clsList.flatMap((item: any) => {
+          const coNick = item.corId?.coNick || "";
+          const bthId = item.bthId?._id || "";
+          const bthName = item.bthId?.bthName || "";
+          
+          return item.clsName.map((clsItem: any) => ({
+            _id: item._id,
+            bthId:bthId,
+            clsName: clsItem.clsDay || "", 
+            clsStartAt: clsItem.clsStartAt || "",
+            clsEndAt: clsItem.clsEndAt || "", 
+            clsDate: clsItem.clsDate ? new Date(clsItem.clsDate) : new Date(),
+            coNick,
+            bthName,
+            bthJoiners: item.bthJoiners || 0, 
+          }));
+        });
+    
+        setClsData(updatedClassList);
+        console.log(updatedClassList);
+      } catch (error) {
+        console.error("Error fetching class data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBatchData();
+    }, []);
   
     const table = useReactTable(
       {

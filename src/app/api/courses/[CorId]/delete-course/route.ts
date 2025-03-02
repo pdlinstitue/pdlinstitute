@@ -7,12 +7,9 @@ interface ICorParams {
   CorId?: string;
 }
 
-interface ICorParams {
-  CorId?: string;
-}
-
 export async function DELETE(req: NextRequest, { params }: { params: ICorParams }) {
-  try 
+
+ try 
   {
     await dbConnect();
     const { CorId } = params;
@@ -25,28 +22,18 @@ export async function DELETE(req: NextRequest, { params }: { params: ICorParams 
     const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0)); //excluding time
 
     // Check if there is any active batch for the given course
-    const isCourseUsed = await Batches.findOne(
-      { corId: CorId, bthEnd: { $gte: startOfDay } }
-    ).lean();
+    const isCourseUsed = await Batches.findOne({ corId: CorId, bthEnd: { $gte: startOfDay }}).lean();
 
     if (isCourseUsed) {
       return NextResponse.json(
         { success: false, msg: "This course has an active batch. Can't be deleted." },
         { status: 400 }
       );
+    } else {
+      //Delete the course
+      const delCourse = await Courses.findByIdAndDelete(params.CorId);
+      return NextResponse.json({delCourse, success:true, msg: "Course deleted successfully." }, { status: 200 });
     }
-    //Disable the course
-    const corById = await Courses.findByIdAndUpdate(
-      CorId,
-      { isActive: false },
-      { runValidators: false, new: true }
-    );
-
-    return NextResponse.json(
-      { corById, success: true, msg: "Course deleted successfully." },
-      { status: 200 }
-    );
-
   } catch (error: any) {
     // Handle validation errors
     if (error.name === "ValidationError") {

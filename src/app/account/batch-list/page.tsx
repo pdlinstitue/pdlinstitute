@@ -40,7 +40,7 @@ const BatchList : React.FC = () => {
   const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\'th\', yyyy'); };
   const columns = React.useMemo(() => [
     { header: 'Batch', accessorKey: 'bthName'},
-    { header: 'Shift', accessorKey: 'bthTime'},
+    { header: 'Shift', accessorKey: 'bthShift'},
     { header: 'Start Date', 
       accessorKey: 'bthStart',
       cell: ({ row }: { row: any }) => formatDate(row.original.bthStart),
@@ -53,6 +53,8 @@ const BatchList : React.FC = () => {
     { header: 'Mode', accessorKey: 'bthMode'},
     { header: 'Lang', accessorKey: 'bthLang'},
     { header: 'Volunteer', accessorKey: 'bthVtr'},
+    { header: 'Created By', accessorKey: 'createdBy'},
+    { header: 'Updated By', accessorKey: 'updatedBy'},
     // { header: 'WhatsApp', accessorKey: 'bthWhatGrp'},
     // { header: 'Telegram', accessorKey: 'bthTeleGrp'},   
     // { header: 'Location', accessorKey: 'bthLoc'},
@@ -84,12 +86,16 @@ const BatchList : React.FC = () => {
       const res = await fetch(`${BASE_API_URL}/api/batches`, { cache: "no-store" });
       const batchData = await res.json();
       const updatedBatchList = batchData.bthList.map((item:any) => { 
-        return { ...item, corId: item.corId.coNick };
+        return { ...item, 
+          corId: item.corId.coNick,
+          createdBy: item.createdBy ? item.createdBy.sdkFstName : 'N/A',
+          updatedBy: item.updatedBy ? item.updatedBy.sdkFstName : 'N/A'  
+        };
       });
       setBatchData(updatedBatchList);
     } catch (error) {
       console.error("Error fetching course data:", error);
-    }  finally {
+    } finally {
       setIsLoading(false);
     }
   }

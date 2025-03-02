@@ -57,8 +57,7 @@ const EventList : React.FC = () => {
           <button type='button' title='Delete' onClick={()=> router.push(`/account/event-list/${row.original._id}/delete-event`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>
         </div> 
       ), 
-    }, 
-    
+    },     
   ], []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
@@ -95,21 +94,21 @@ const EventList : React.FC = () => {
     };
 
     useEffect(() => {
-    async function fetchEventData() {
-      try {
-        const res = await fetch(`${BASE_API_URL}/api/events`, { cache: "no-store" });
-        const eveData = await res.json();
-        const updatedEveList = eveData.eveList.map((item:any) => { 
-          return { ...item, eveCatId: item.eveCatId.eveCatName };
-        });
-        setEventData(updatedEveList);
-      } catch (error) {
-        console.error("Error fetching course data:", error);
-      }  finally {
-        setIsLoading(false);
+      async function fetchEventData() {
+        try {
+          const res = await fetch(`${BASE_API_URL}/api/events`, { cache: "no-store" });
+          const eveData = await res.json();
+          const updatedEveList = eveData.eveList.map((item:any) => { 
+            return { ...item, eveCatId: item.eveCatId.eveCatName };
+          });
+          setEventData(updatedEveList);
+        } catch (error) {
+          console.error("Error fetching course data:", error);
+        }  finally {
+          setIsLoading(false);
+        }
       }
-    }
-    fetchEventData();
+      fetchEventData();
     }, []);
 
     if(isLoading){

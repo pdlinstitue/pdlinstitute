@@ -6,8 +6,9 @@ const batchSchema = new mongoose.Schema({
     bthName: {
         type: String,
     },
-    bthTime: {
+    bthShift: {
         type: String,
+        required: [true, 'Please select shift.']
     },
     bthStart: {
         type: Date,
@@ -26,9 +27,11 @@ const batchSchema = new mongoose.Schema({
     },
     bthLang: {
         type: String,
+        required: [true, 'Please select language.']
     },
     bthMode: {
         type: String,
+        required: [true, 'Please select mode of batch.']
     },
     bthLoc: {
         type: String,
@@ -46,13 +49,30 @@ const batchSchema = new mongoose.Schema({
         type: Boolean,
         default:true
     },
+    isDeleted: {
+        type: Boolean,
+        default:false
+    },
     corId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:Courses
+        ref:Courses,
+        required: [true, 'Please select course.']
     },
-    usrId: {
+    createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:Users
+        ref: Users,
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
+    disabledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
     }
 },{timestamps: true});
 const Batches = mongoose.models.Batches || mongoose.model('Batches', batchSchema);

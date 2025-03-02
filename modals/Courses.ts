@@ -9,7 +9,7 @@ const courseSchema = new mongoose.Schema({
     },
     coNick: { 
         type: String, 
-        required: [true, "Course nick name is required."]
+        required: [true, "Nick name is required."]
     },
     coImg: {
         type: String
@@ -26,6 +26,10 @@ const courseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:Categories,
         required: [true, "Please choose category."]
+    },
+    coElgType: {
+        type: String,
+        required: [true, "Please choose eligibility type."]
     },
     coElg: {
         type: String,
@@ -51,9 +55,6 @@ const courseSchema = new mongoose.Schema({
     coDon: {
         type: Number
     },
-    coAuth: {
-        type: String
-    },
     prodType: {
         type: String
     },
@@ -61,9 +62,25 @@ const courseSchema = new mongoose.Schema({
         type: Boolean,
         default:true
     },
-    usrId: {
+    isDeleted: {
+        type: Boolean,
+        default:false
+    },
+    createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:Users
+        ref: Users,
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
+    disabledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
     }
 },{timestamps: true});
 

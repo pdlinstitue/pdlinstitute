@@ -30,7 +30,7 @@ const ViewPanCard : React.FC<IDocParams> = ({params}) => {
     useEffect(() => {
         const fetchPanData = async () => {
             try {
-                const res = await fetch(`/api/documents/${DocId}/view-doc`);
+                const res = await fetch(`${BASE_API_URL}/api/documents/${DocId}/view-doc`);
                 const data = await res.json();
                 setPanData(data.docById);
             } catch (error) {

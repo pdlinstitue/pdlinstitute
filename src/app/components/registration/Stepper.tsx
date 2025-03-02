@@ -1,5 +1,5 @@
-import React, {useEffect, useState, useRef} from 'react';
-
+"use client";
+import React, { useEffect, useState, useRef } from 'react';
 
 interface StepperProps {
     steps: string[];
@@ -17,11 +17,9 @@ const Stepper: React.FC<StepperProps> = ({steps, currentStep}) => {
         while(count < newSteps.length){
             if(count === stepNumber){
                 newSteps[count] = {...newSteps[count], highlighted:true, selected:true, completed:true};
-                //count++;
-            }else if(count < stepNumber){
+             }else if(count < stepNumber){
                 newSteps[count] = {...newSteps[count], highlighted:false, selected:true, completed:true};
-                //count++;
-            }else{
+             }else{
                 newSteps[count] = {...newSteps[count], highlighted:false, selected:false, completed:false};
             }
             count++;
@@ -47,7 +45,7 @@ const Stepper: React.FC<StepperProps> = ({steps, currentStep}) => {
     },[steps, currentStep]);
 
     const displaySteps = newStep.map((step, index) => {
-       return (
+        return (
             <div key={index} className={index !== newStep.length - 1 ? 'flex items-center w-full' : 'flex items-center'}>
                 <div className='relative flex flex-col items-center text-black'>
                     <div className={`flex items-center justify-center py-3 ${step.selected ? "bg-orange-500 text-white font-bold border border-orange-500" : ""} rounded-full transition duration-500 ease-in-out border-2 border-gray-300 h-12 w-12`}>

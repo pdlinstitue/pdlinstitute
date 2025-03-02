@@ -1,6 +1,21 @@
-import React from 'react'
+"use client";
+import { StepperContext } from '@/app/context/StepperContext';
+import React, { useContext } from 'react';
 
-const CreatePass = () => {
+const CreatePass : React.FC = () => {
+
+  const stepperContext = useContext(StepperContext);
+      
+  if (!stepperContext) {
+    return null; // or handle the null case appropriately
+  }
+  
+  const {userData, setUserData} = stepperContext;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const {name, value} = e.target;
+    setUserData({...userData, [name]: value});
+  }
 
   return (
     <div>
@@ -8,11 +23,11 @@ const CreatePass = () => {
         <div className='grid grid-rows-2 gap-2'>
           <div className='flex flex-col gap-2'>
             <label>Create Password:*</label>
-            <input type='password' name='' className='inputBox' />
+            <input type='password' name='sdkPwd' value={userData.sdkPwd} onChange={handleChange} className='inputBox' />
           </div>
           <div className='flex flex-col gap-2'>
             <label>Confirm Password:*</label>
-            <input type='password' name='' className='inputBox' />
+            <input type='password' name='sdkConfPwd' value={userData.sdkConfPwd} onChange={handleChange} className='inputBox' />
           </div>
         </div>
       </div>

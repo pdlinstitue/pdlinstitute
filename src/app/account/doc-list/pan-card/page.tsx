@@ -63,7 +63,7 @@ const PanCard : React.FC = () => {
     {header: 'Relation', accessorKey: 'sdkDocRel'},
     {header: 'Date: A/R', accessorKey: 'sdkAprDate', cell: DateCell},
     {header: 'Status', accessorKey: 'sdkDocStatus', cell: StatusCell},
-    { header: 'Action', accessorKey: 'docAction', 
+    {header: 'Action', accessorKey: 'docAction', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
           <button type='button' title='View' onClick={()=> router.push(`/account/doc-list/pan-card/${row.original._id}/view-pan-card`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>

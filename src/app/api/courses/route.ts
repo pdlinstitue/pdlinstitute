@@ -7,8 +7,8 @@ type CoType = {
     coNick:string,
     coShort:string, 
     prodType:string, 
-    coAuth: string,
     coCat: string,
+    coElgType: string,
     coElg: string,
     coImg: string,
     coType: string,
@@ -18,7 +18,7 @@ type CoType = {
     coDon:number, 
     durDays:number, 
     durHrs:number, 
-    usrId: string
+    createdBy: string
 }
 
 export async function GET(req:NextRequest){
@@ -26,12 +26,15 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const coList:CoType[] = await Courses.find().populate('coCat', 'catName');
+      const coList:CoType[] = await Courses.find()
+      .populate('coCat', 'catName')
+      .populate('createdBy', 'sdkFstName')
+      .populate('updatedBy', 'sdkFstName');
       const activeCourseList = coList.filter((item:any)=> item.isActive === true);
       return NextResponse.json({ coList:activeCourseList, success: true }, {status:200});
   
     } catch (error) {
-      return new NextResponse("Error while fetching catData: " + error, {status:500});
+      return new NextResponse("Error while fetching coData: " + error, {status:500});
     }
   }
   
@@ -40,9 +43,9 @@ export async function POST(req: NextRequest) {
     try {
   
       await dbConnect();
-      const { coName, coNick, coShort, coType, coAuth, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, usrId }: CoType = await req.json();
+      const { coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, createdBy }: CoType = await req.json();
   
-      const newCourse = new Courses({ coName, coNick, coShort, coType, coAuth, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, usrId});
+      const newCourse = new Courses({ coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, createdBy});
       const savedCourse = await newCourse.save();
 
       if(savedCourse){

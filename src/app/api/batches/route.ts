@@ -4,7 +4,7 @@ import dbConnect from "../../../../dbConnect";
 
 type BatchType = {
     bthName:String, 
-    bthTime:String, 
+    bthShift:String, 
     bthStart:Date, 
     bthEnd:Date, 
     corId:String, 
@@ -17,7 +17,7 @@ type BatchType = {
     bthLoc:String, 
     bthBank:String, 
     bthQr:String,
-    usrId:String
+    createdBy:String
 }
 
 export async function GET(req:NextRequest){
@@ -25,36 +25,40 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const batchList:BatchType[] = await Batches.find().populate('corId', 'coName coNick');
+      const batchList:BatchType[] = await Batches.find()
+      .populate('corId', 'coName coNick')
+      .populate('createdBy', 'sdkFstName')
+      .populate('updatedBy', 'sdkFstName');
+      
       const bthList = batchList.filter((item:any)=> item.isActive === true);
       return NextResponse.json({ bthList, success: true }, {status:200});
   
     } catch (error) {
-      return new NextResponse("Error while fetching catData: " + error, {status:500});
+      return new NextResponse("Error while fetching batchData: " + error, {status:500});
     }
   }
   
 export async function POST(req: NextRequest) {
   
-    try {
-  
-      await dbConnect();
-      const {bthName, bthTime, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, usrId}: BatchType = await req.json();
-  
-      const newBatche = new Batches({ bthName, bthTime, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, usrId});
-      const savedBatch = await newBatche.save();
+  try {
 
-      if(savedBatch){
-        return NextResponse.json({ savedBatch, success: true, msg:"Batch created successfully." }, {status:200});
-      }else{
-        return NextResponse.json({ savedBatch, success: false, msg:"Batch creation failed." }, {status:200});
-      }
-    } catch (error:any) {
-      if (error.name === 'ValidationError') {
-        const messages = Object.values(error.errors).map((val:any) => val.message);
-        return NextResponse.json({ success: false, msg: messages }, {status:400});
-      }else{
-        return new NextResponse ("Error while saving data: " + error, {status: 400});
-      }
+    await dbConnect();
+    const {bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, createdBy}: BatchType = await req.json();
+
+    const newBatche = new Batches({ bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, createdBy});
+    const savedBatch = await newBatche.save();
+
+    if(savedBatch){
+      return NextResponse.json({ savedBatch, success: true, msg:"Batch created successfully." }, {status:200});
+    }else{
+      return NextResponse.json({ savedBatch, success: false, msg:"Batch creation failed." }, {status:200});
     }
+  } catch (error:any) {
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((val:any) => val.message);
+      return NextResponse.json({ success: false, msg: messages }, {status:400});
+    }else{
+      return new NextResponse ("Error while saving data: " + error, {status: 400});
+    }
+  }
 }

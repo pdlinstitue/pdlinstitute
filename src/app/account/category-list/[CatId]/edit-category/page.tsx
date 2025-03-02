@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { use } from "react";
+import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import Loading from "@/app/account/Loading";
 
@@ -14,6 +15,7 @@ interface ICatParams {
 
 interface CatType {
     catName: string;
+    updatedBy: string;
 }
 
 const EditCategory: React.FC<ICatParams> = ({ params }) => {
@@ -21,11 +23,19 @@ const EditCategory: React.FC<ICatParams> = ({ params }) => {
     const { CatId } = use(params);
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState<string>('');
-    const [data, setData] = useState<CatType>({ catName: '' });
+    const [data, setData] = useState<CatType>({ catName: '', updatedBy: '' });
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
+    const loggedInUser = {
+        result:{
+          _id:Cookies.get("loggedInUserId"), 
+          usrName:Cookies.get("loggedInUserName"),
+          usrRole:Cookies.get("loggedInUserRole"),
+        }
+    };
+
     useEffect(() => {
-        async function fetchCatById() {
+    async function fetchCatById() {
         try 
             {
                 const res = await fetch(`${BASE_API_URL}/api/categories/${CatId}/view-category`, { cache: "no-store" });
@@ -48,35 +58,30 @@ const EditCategory: React.FC<ICatParams> = ({ params }) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-        setErrorMessage(''); // Clear the previous error
-        let errMsg: string[] = [];
+        setErrorMessage(''); // Clear the previous error message
 
         if (!data.catName.trim()) {
-            errMsg.push('Category name is required.');
-        }
-
-        if (errMsg.length > 0) {
-            setErrorMessage(errMsg.join(' || '));
-            return;
-        }
-
-        try {
-            const response = await fetch(`${BASE_API_URL}/api/categories/${CatId}/edit-category`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    catName: data.catName
-                }),
-            });
-
-            const post = await response.json();
-            if (post.success === false) {
-                toast.error(post.msg);
-            } else {
-                toast.success(post.msg);
-                router.push('/account/category-list');
+            setErrorMessage('Category name is required.');
+        } else{
+            try {
+                const response = await fetch(`${BASE_API_URL}/api/categories/${CatId}/edit-category`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        catName: data.catName,
+                        updatedBy: loggedInUser.result._id
+                    }),
+                });
+    
+                const post = await response.json();
+                if (post.success === false) {
+                    toast.error(post.msg);
+                } else {
+                    toast.success(post.msg);
+                    router.push('/account/category-list');
+                }
+            } catch (error) {
+                toast.error('Error updating category.');
             }
-        } catch (error) {
-            toast.error('Error updating category.');
         }
     };
 

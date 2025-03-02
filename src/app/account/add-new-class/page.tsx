@@ -1,10 +1,10 @@
-
 "use client";
 import React, { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import Loading from "../Loading";
 import toast from "react-hot-toast";
+import Cookies from "js-cookie";
 import { BASE_API_URL } from "@/app/utils/constant";
 
 type ClassItem = {
@@ -14,14 +14,14 @@ type ClassItem = {
   clsDate: string;
   clsLink: string;
   clsAssignments: string[];
+  createdBy: string | undefined;
 }
 
 interface AddNewClassProps { 
   clsName: ClassItem[];   
   corId: string; 
   bthId: string; 
-  clsMaterials: string[]; 
-  usrId: string;   
+  clsMaterials: string[];    
 }
 
 const AddNewClass: React.FC = () => {
@@ -38,12 +38,19 @@ const AddNewClass: React.FC = () => {
     clsMaterials: [],
     corId: "",
     bthId: "",
-    usrId: "",
-  });
+   });
   const [startDate, setStartDate] = useState('');  
   const [startAt, setStartAt] = useState(""); 
   const [endAt, setEndAt] = useState("");  
   const [meetingLink, setMeetingLink] = useState("");
+
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  };
   
   const handleInputChange = (index: number, field: keyof ClassItem, value: string) => {
     const updatedArray = [...classArray];
@@ -56,25 +63,24 @@ const AddNewClass: React.FC = () => {
       const startDateFrom = new Date(startDate); 
       const newClassArray = Array.from({ length: courseById.durDays }, (_, index) => { 
         const clsDate = new Date(startDateFrom); 
-        clsDate.setDate(startDateFrom.getDate() + index); 
-        
+        clsDate.setDate(startDateFrom.getDate() + index);      
         return { 
           clsDay: `Day ${index + 1}`, 
           clsStartAt: startAt, 
           clsEndAt: endAt, 
           clsDate: clsDate.toISOString().split('T')[0], // Format as YYYY-MM-DD 
           clsLink: meetingLink, 
-          clsAssignments: [] 
+          clsAssignments: [],
+          createdBy:loggedInUser.result?._id
         }; 
-      }); 
-          
+      });        
       setClassArray(newClassArray);
     }
   }, [startAt, endAt, startDate, meetingLink, courseById.durDays]);
 
   useEffect(() => {
   async function fetchCourseData() {
-      try {
+    try {
         const res = await fetch(`${BASE_API_URL}/api/courses`, {
           cache: "no-store",
         });
@@ -97,7 +103,7 @@ const AddNewClass: React.FC = () => {
         });
         const assignmentData = await res.json();
         const asnByCorId = assignmentData.asnList.filter(
-          (a: any) => a.corId._id === data.corId
+          (a: any) => a.corId?._id === data.corId
         );
         setAssignList(asnByCorId);
       } catch (error) {
@@ -385,7 +391,7 @@ const AddNewClass: React.FC = () => {
           <button
             type="button"
             className="btnLeft w-full"
-            onClick={() => router.push("/account/classlist")}
+            onClick={() => router.push("/account/class-list")}
           >
             Back
           </button>

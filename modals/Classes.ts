@@ -24,25 +24,39 @@ clsName: [{
         type: Boolean,
         default: true
     },
+    isDeleted: {
+        type: Boolean,
+        default:false
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
+    disabledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users,
+    },
     clsAssignments: [String],
 }],
 clsMaterials: [String],
 bthId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: Batches
+    ref: Batches,
+    required:[true, 'Please select batch.']
 },
 corId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: Courses
-},
-usrId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: Users
-},  
-isActive: {
-    type: Boolean,
-    default: true
-},
+    ref: Courses,
+    required:[true, 'Please select course.']
+}
 }, {timestamps: true});
 
 const Classes = mongoose.models.Classes || mongoose.model('Classes', classSchema);

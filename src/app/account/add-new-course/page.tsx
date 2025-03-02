@@ -2,14 +2,20 @@
 import React, { FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-// import Cookies from "js-cookie";
+import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { BASE_API_URL } from "@/app/utils/constant";
+import Loading from "../Loading";
 
-type CatType = {
+type CatListType = {
     _id:string,
     catName:string
+}
+
+type CoListType = {
+    _id:string,
+    coNick:string
 }
 
 interface AddNewCourseProps{
@@ -17,8 +23,8 @@ interface AddNewCourseProps{
     coNick: string,
     coShort:string, 
     prodType:string, 
-    coAuth: string,
     coCat: string,
+    coElgType: string,
     coElg: string,
     coImg: string,
     coType: string,
@@ -28,30 +34,54 @@ interface AddNewCourseProps{
     coDon:number, 
     durDays:number, 
     durHrs:number, 
-    usrId: string
+    createdBy: string
 }
 
 const AddNewCourse: React.FC = () => {
 
     const router = useRouter();
-    const [cat, setCat] = useState<CatType[]>([]); 
+    const [cat, setCat] = useState<CatListType[]>([]);
+    const [courseList, setCourseList] = useState<CoListType[]>([]); 
     const [errorMessage, setErrorMessage] = useState('');
-    // const loggedInUser = {result:{_id:Cookies.get("loggedInUserId"),usrRole:Cookies.get("loggedInUserRole")}};
-    const [data, setData] = useState<AddNewCourseProps>({coName:'', coNick:'', coShort:'', coType:'', coAuth:'', coDon:0, coDesc:'', prodType:'Courses', coCat:'', coElg:'', coWhatGrp:'', coTeleGrp:'', durDays:0, durHrs:0, coImg:'', usrId:''})    
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [data, setData] = useState<AddNewCourseProps>({coName:'', coNick:'', coShort:'', coType:'', coDon:0, coDesc:'', prodType:'Courses', coCat:'', coElgType:'', coElg:'', coWhatGrp:'', coTeleGrp:'', durDays:0, durHrs:0, coImg:'', createdBy:''})    
     
+    const loggedInUser = {
+        result:{
+          _id:Cookies.get("loggedInUserId"), 
+          usrName:Cookies.get("loggedInUserName"),
+          usrRole:Cookies.get("loggedInUserRole"),
+        }
+    };
 
     useEffect(() =>{
-      async function fetchData() {
+      async function fetchCatData() {
         try {
             const catdata = await fetch(`${BASE_API_URL}/api/categories` , {cache: "no-store"});
             const catValues = await catdata.json();
             setCat(catValues.catList);
         } catch (error) {
             console.error("Error fetching category data: ", error);
+        } finally {
+            setIsLoading(false);
         }
       }
-      fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      fetchCatData();
+     },[]);
+
+    useEffect(() =>{
+        async function fetchCourseData() {
+          try {
+              const courseData = await fetch(`${BASE_API_URL}/api/courses` , {cache: "no-store"});
+              const corList = await courseData.json();
+              setCourseList(corList.coList);
+          } catch (error) {
+              console.error("Error fetching course data: ", error);
+          } finally {
+            setIsLoading(false);
+          }
+        }
+    fetchCourseData();
     },[]);
 
     const handleChange = (e:any) => {
@@ -67,45 +97,27 @@ const AddNewCourse: React.FC = () => {
   const handleSubmit = async (e:FormEvent<HTMLFormElement>):Promise<void> => {
     e.preventDefault();
     setErrorMessage(''); // Clear the previous error
-    let errMsg: string[] = [];
         
     if (!data.coName.trim()) {
-        errMsg.push('Course title is must.');    
-    }
-    if (!data.coNick.trim()) {
-        errMsg.push('Course nick name is must.');    
-    }
-    
-    if (!data.coCat.trim()) {
-        errMsg.push('Please select category.');    
-    }
-
-    if (!data.coType.trim()) {
-        errMsg.push('Please select Type.');    
-    }
-
-    if (!data.coElg.trim()) {
-        errMsg.push('Please select elegibility.');    
-    }
-
-    if (data.durDays <= 1) {
-        errMsg.push('Please enter number of days.');    
-    }
-
-    if (data.durHrs <= 1) {
-        errMsg.push('Please enter number of hours.');    
-    }
-
-    if (!data.coShort.trim()) {
-        errMsg.push('Please enter course introduction.');    
-    } 
-
-    if(errMsg.length>0){
-        setErrorMessage(errMsg.join(' || '));
-        return;
-    }
-      
-    try 
+        setErrorMessage('Course title is must.');    
+    } else if (!data.coNick.trim()) {
+        setErrorMessage('Nick name is must.');    
+    } else if (!data.coCat.trim()) {
+        setErrorMessage('Please select category.');    
+    } else if (!data.coType.trim()) {
+        setErrorMessage('Please select course type.');    
+    } else if (!data.coElgType.trim()) {
+        setErrorMessage('Please select elegibility type.');    
+    } else if (!data.coElg.trim()) {
+        setErrorMessage('Please select elegibility.');    
+    } else if (data.durDays <= 1) {
+        setErrorMessage('Please duration days.');    
+    } else if (data.durHrs <= 1) {
+        setErrorMessage('Please duration hours.');    
+    } else if (!data.coShort.trim()) {
+        setErrorMessage('Please enter course introduction.');    
+    } else {
+        try 
       {
           const response = await fetch(`${BASE_API_URL}/api/courses`, {
             method: 'POST',
@@ -114,10 +126,10 @@ const AddNewCourse: React.FC = () => {
                 coNick: data.coNick,
                 coShort:data.coShort, 
                 prodType:"Courses", 
-                coAuth: data.coAuth,
                 coCat: data.coCat,
                 coElg: data.coElg,
                 coImg: data.coImg,
+                coElgType: data.coElgType,
                 coType: data.coType,
                 coWhatGrp: data.coWhatGrp,
                 coTeleGrp: data.coTeleGrp,
@@ -125,13 +137,12 @@ const AddNewCourse: React.FC = () => {
                 coDon:data.coDon, 
                 durDays:data.durDays, 
                 durHrs:data.durHrs, 
-                // usrId: loggedInUser.result._id
+                createdBy: loggedInUser.result._id
             }),
           });
       
           const post = await response.json();
-          console.log(post);
-      
+       
           if (post.success === false) {
               toast.error(post.msg);
           } else {
@@ -140,8 +151,17 @@ const AddNewCourse: React.FC = () => {
           }
       } catch (error) {
           toast.error('Error creating course.');
-      } 
-    };  
+      }
+    } 
+ };  
+
+ if (isLoading) {
+    return (
+        <div>
+            <Loading />
+        </div>
+    );
+};
 
   return (
     <div>
@@ -176,15 +196,33 @@ const AddNewCourse: React.FC = () => {
                     <label className='text-lg'>Short Intro:</label>
                     <textarea name="coShort" value={data.coShort} onChange={handleChange} rows={3} className='inputBox'/>
                 </div>
-                <div className="flex flex-col gap-2">
-                    <label className='text-lg'>Elegibility:</label>
-                    <select name="coElg" value={data.coElg} onChange={handleChange} className='inputBox'>
-                        <option className="text-center">--- Select Elegibility ---</option>
-                        <option value="None">None</option>
-                        <option value="Basic Education - 2">BSK-1</option>
-                        <option value="Basic Education - 3">BSK-2</option>
-                        <option value="Higher Education">BASIC EDC-1</option>
-                    </select>
+                <div className="grid grid-cols-2 gap-1">
+                    <div className="flex flex-col gap-2">
+                        <label className='text-lg'>Elg Type:</label>
+                        <select name="coElgType" value={data.coElgType} onChange={handleChange} className='inputBox'>
+                            <option className="text-center">--- Select Elg Type ---</option>
+                            <option value="Course">Course</option>
+                            <option value="Category">Category</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <label className='text-lg'>Elegibility:</label>
+                        <select name="coElg" value={data.coElg} onChange={handleChange} className='inputBox'>
+                            <option className="text-center">--- Select Elegibility ---</option>
+                            <option value="None">None</option>
+                            {
+                                data.coElgType === "Course" ? (
+                                    courseList.map((item) => (
+                                        <option key={item._id} value={item._id}>{item.coNick}</option>
+                                    ))
+                                ) : data.coElgType === "Category" ? (
+                                    cat.map((item) => (
+                                        <option key={item._id} value={item._id}>{item.catName}</option>
+                                    ))
+                                ) : null
+                            }
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

@@ -24,19 +24,19 @@ const DelCategory: React.FC<DelCatParams> = ({ params }): JSX.Element => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     
     useEffect(() => {
-        async function fetchCatById() {
-            try 
-            {
-                const res = await fetch(`${BASE_API_URL}/api/categories/${CatId}/view-category`, { cache: "no-store" });
-                const catData = await res.json();
-                setData(catData.catById);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            } finally {
-                setIsLoading(false);
-            }
+    async function fetchCatById() {
+        try 
+        {
+            const res = await fetch(`${BASE_API_URL}/api/categories/${CatId}/view-category`, { cache: "no-store" });
+            const catData = await res.json();
+            setData(catData.catById);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
         }
-        fetchCatById();
+    }
+    fetchCatById();
     }, [CatId]);
     
     const handleDelCat = async (): Promise<void> => {
@@ -62,8 +62,8 @@ const DelCategory: React.FC<DelCatParams> = ({ params }): JSX.Element => {
             <div>
                 <Loading />
             </div>
-        );
-    }
+        )
+    };
 
     return (
         <div className="flex justify-center items-center">

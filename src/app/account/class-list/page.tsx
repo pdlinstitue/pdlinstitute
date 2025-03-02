@@ -11,8 +11,10 @@ import { BiEditAlt } from 'react-icons/bi';
 import { HiMinus } from 'react-icons/hi';
 import { RxCross2 } from 'react-icons/rx';
 import { BASE_API_URL } from '@/app/utils/constant';
+import { format } from 'date-fns';
 
 type ClassItem = {
+  _id:string;
   clsDay: string;
   clsStartAt: string;
   clsEndAt: string;
@@ -27,6 +29,7 @@ interface ClassListProps {
   bthId: string; 
   clsMaterials: string[]; 
   usrId: string;   
+  _id:string;
 }
 
 const ClassList : React.FC = () => {
@@ -34,28 +37,62 @@ const ClassList : React.FC = () => {
 const router = useRouter();
 const [classData, setClassData] = useState<ClassListProps[] | null>([]);
 const [isLoading, setIsLoading] = useState<boolean>(true);
-//const data = React.useMemo(() => classData ?? [], [classData]);
-
-const data = React.useMemo(() => classData?.flatMap(cls => cls.clsName.map(clsDetail => ({ clsName: clsDetail.clsDay, clsDate: clsDetail.clsDate, clsLink: clsDetail.clsLink, clsStartsAt: clsDetail.clsStartAt, clsEndsAt: clsDetail.clsEndAt, bthId: cls.bthId, corId: cls.corId }))) ?? [], [classData]);
+const data = React.useMemo(() => classData?.flatMap(cls => cls.clsName.map(clsDetail => ({ dayId: clsDetail._id, clsName: clsDetail.clsDay, clsDate: clsDetail.clsDate, clsLink: clsDetail.clsLink, clsStartsAt: clsDetail.clsStartAt, clsEndsAt: clsDetail.clsEndAt, bthId: cls.bthId, corId: cls.corId, clsId:cls._id }))) ?? [], [classData]);
 
 const columns = React.useMemo(() => [ 
   { header: 'Class', accessorKey: 'clsName'},
   { header: 'Batch', accessorKey: 'bthId.bthName'},
-  { header: 'Course', accessorKey: 'corId.coName'},
+  { header: 'Course', accessorKey: 'corId.coNick'},
   { header: 'Starts At', accessorKey: 'clsStartsAt'},
   { header: 'Ends At', accessorKey: 'clsEndsAt'},
   { header: 'Date', accessorKey: 'clsDate'},
-  { header: 'Zoom', accessorKey: 'clsLink'}, 
-  { header: 'Action', accessorKey: 'clsAction', 
+  { header: 'Link', accessorKey: 'clsLink',
     cell: ({ row }: { row: any }) => ( 
       <div className='flex items-center gap-3'> 
-        <button type='button' title='View' onClick={()=> router.push(`/account/class-list/${row.original._id}/view-class`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
-        <button type='button' title='Edit' onClick={()=> router.push(`/account/class-list/${row.original._id}/edit-class`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>
-        <button type='button' title='Disable' onClick={()=> router.push(`/account/class-list/${row.original._id}/disable-class`)} className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full  hover:border-black'><HiMinus size={12}/></button>
-        <button type='button' title='Delete' onClick={()=> router.push(`/account/class-list/${row.original._id}/delete-class`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>
+        <button type='button' title='Join' onClick={()=> router.push(`/account/class-list/${row.original._id}/view-class`)} className='bg-orange-600 py-1 px-2 font-semibold rounded-sm text-white text-sm'>JOIN</button>
       </div> 
-    ), 
+    ),
   }, 
+  {
+    header: 'Action',
+    accessorKey: 'clsAction',
+    cell: ({ row }: { row: any }) => {
+      const clsId = row.original.clsId;
+      const dayId = row.original.dayId; // Access the _id inside clsName array
+      return (
+        <div className='flex items-center gap-3'>
+          <button
+            type='button'
+            title='View'
+            onClick={() => router.push(`/account/class-list/${clsId}/${dayId}/view-class`)}
+            className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'>
+            <FiEye size={12} />
+          </button>
+          <button
+            type='button'
+            title='Edit'
+            onClick={() => router.push(`/account/class-list/${clsId}/${dayId}/edit-class`)}
+            className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full hover:border-black'>
+            <BiEditAlt size={12} />
+          </button>
+          <button
+            type='button'
+            title='Disable'
+            onClick={() => router.push(`/account/class-list/${clsId}/${dayId}/disable-class`)}
+            className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full hover:border-black'>
+            <HiMinus size={12} />
+          </button>
+          <button
+            type='button'
+            title='Delete'
+            onClick={() => router.push(`/account/class-list/${clsId}/${dayId}/delete-class`)}
+            className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full hover:border-black'>
+            <RxCross2 size={12} />
+          </button>
+        </div>
+      );
+    },
+  } 
 ], []);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -92,20 +129,19 @@ const columns = React.useMemo(() => [
     table.setPageIndex(page); 
   };
 
-  useEffect(() => { 
-  async function fetchClassData() { 
-  try 
-    { 
-      const res = await fetch(`${BASE_API_URL}/api/classes`, {cache: "no-store"}); 
-      const classList = await res.json();    
-      setClassData(classList.clsList); 
-      
-    } catch (error) { 
-        console.error("Error fetching data:", error); 
-    } finally { 
-        setIsLoading(false); 
-      } 
-    } fetchClassData(); 
+  useEffect(() => {
+  async function fetchClassData() {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/classes`, { cache: "no-store" });
+        const classList = await res.json();
+        setClassData(classList.clsList);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  fetchClassData();
   }, []);
 
   if(isLoading){

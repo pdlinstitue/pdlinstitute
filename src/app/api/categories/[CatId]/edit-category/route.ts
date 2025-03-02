@@ -9,6 +9,7 @@ interface ICatParams{
 type CatType = {
   _id?: string;
   catName:string;
+  updatedBy?:string;
 }
 
 export async function PUT(req: NextRequest, {params}:{params:ICatParams}) {
@@ -17,8 +18,8 @@ export async function PUT(req: NextRequest, {params}:{params:ICatParams}) {
   {
     await dbConnect();
     
-    const { catName }: CatType = await req.json();
-    const catById = await Categories.findByIdAndUpdate(params.CatId, {catName}, {runValidators:true});
+    const { catName, updatedBy }: CatType = await req.json();
+    const catById = await Categories.findByIdAndUpdate(params.CatId, {catName, updatedBy}, {runValidators:true});
 
     if(!catById){
       return NextResponse.json({ message: "No category found." }, { status: 404 });
@@ -31,7 +32,7 @@ export async function PUT(req: NextRequest, {params}:{params:ICatParams}) {
       const messages = Object.values(error.errors).map((val:any) => val.message);
       return NextResponse.json({ success: false, msg: messages }, {status:400});
     }else{
-      return new NextResponse ("Error while saving data: " + error, {status: 400});
+      return new NextResponse ("Error while saving catData: " + error, {status: 500});
     }
   }
 }

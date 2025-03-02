@@ -46,7 +46,8 @@ const ViewEvent: React.FC<IEveParams> = ({params}) => {
   const [data, setData] = useState<EditEventProps>({ eveName: "", eveCatId: "", eveAud: "", eveType: "", eveMode: "", eveDon:0, eveShort: "", eveStartAt: "", eveEndAt: "", eveDesc: "", eveDate: "", eveLink: "", eveLoc: "", eveSpeak: "", evePer: "", eveCont: "", eveImg: "", usrId: ""});
   
 
-  useEffect(() => { async function fetchEventById() { 
+  useEffect(() => { 
+  async function fetchEventById() { 
     try 
       { 
         const res = await fetch(`${BASE_API_URL}/api/events/${EveId}/view-event`, {cache: "no-store"}); 
@@ -82,7 +83,7 @@ const ViewEvent: React.FC<IEveParams> = ({params}) => {
         ...prev, [name]:value
       }
     });
-  }
+  };
 
   if(isLoading){
     return <div>

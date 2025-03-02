@@ -38,7 +38,7 @@ export async function PATCH(req: NextRequest, {params}:{params:IDocParams}) {
     const docById = await Documents.findByIdAndUpdate(params.DocId, {sdkDocStatus, sdkRemarks, sdkPanNbr, sdkIdNbr, sdkAdsNbr, sdkAprDate});
 
     if (sdkDocStatus === "Rejected") { 
-      return NextResponse.json({ docById, success: true, msg: "Document dis-approved." }, { status: 200 }); 
+      return NextResponse.json({ docById, success: true, msg: "Document rejected." }, { status: 200 }); 
     } else {
       return NextResponse.json({ docById, success: true, msg: "Document approved." }, { status: 200 });
     } 

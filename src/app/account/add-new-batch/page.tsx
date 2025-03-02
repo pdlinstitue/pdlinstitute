@@ -4,25 +4,41 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "../Loading";
+import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 
+interface AddNewBatchProps {
+  bthName: string;
+  bthShift: string;
+  bthStart: string;
+  bthEnd: string;
+  corId: string;
+  bthVtr: string;
+  bthWhatGrp: string;
+  bthTeleGrp: string;
+  bthLang: string;
+  bthMode: string;
+  bthLink: string;
+  bthLoc: string;
+  bthBank: string;
+  bthQr: string;
+  createdBy: string;
+}
 const AddNewBatch: React.FC = () => {
 
   const router = useRouter();
-  const [data, setData] = useState({bthName:'', bthTime:'', bthStart:'', bthEnd:'', corId:'', bthVtr:'', bthWhatGrp:'', bthTeleGrp:'', bthLang:'', bthMode:'', bthLink:'', bthLoc:'', bthBank:'', bthQr:''});
+  const [data, setData] = useState<AddNewBatchProps>({bthName:'', bthShift:'', bthStart:'', bthEnd:'', corId:'', bthVtr:'', bthWhatGrp:'', bthTeleGrp:'', bthLang:'', bthMode:'', bthLink:'', bthLoc:'', bthBank:'', bthQr:'', createdBy:''});
   const [isLoading, setIsLoading] = useState(true);
   const [batchMode, setBatchMode] = React.useState<string>("");
 
-  const handleBatchMode = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if(e.target.value === "Online") {
-      setBatchMode("Online");
-    } else if(e.target.value === "Offline without accommodation") {
-      setBatchMode("Offline without accommodation");
-    } else if(e.target.value === "Offline with accommodation") {
-      setBatchMode("Offline with accommodation");
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
     }
-  }
+  }; 
 
   const [errorMessage, setErrorMessage] = useState('');
   const [coList, setCoList] = useState<{ _id: string; coNick: string; coName: string }[] | null>([]); 
@@ -39,23 +55,22 @@ const AddNewBatch: React.FC = () => {
   }
   
   useEffect(()=>{
-    const updateBatchTitle = () => { 
-      if (data.bthLang && data.corId && data.bthStart && data.bthTime) {
-        const cor = coList?.filter((item:any)=>item._id === data.corId); 
-        if (cor && cor.length > 0) {
-          const bthStartDate = new Date(data.bthStart); const formattedBthStart = format(bthStartDate, 'MMM do, yyyy'); 
-          setBatchTitle(`${cor[0]?.coNick}-${data.bthLang}-${data.bthTime}-${formattedBthStart}`);
-        } else {
-          setBatchTitle('');
-        }
-      } 
-      else{
+  const updateBatchTitle = () => { 
+    if (data.bthLang && data.corId && data.bthStart && data.bthShift) {
+      const cor = coList?.filter((item:any)=>item._id === data.corId); 
+      if (cor && cor.length > 0) {
+        const bthStartDate = new Date(data.bthStart); const formattedBthStart = format(bthStartDate, 'MMM do, yyyy'); 
+        setBatchTitle(`${cor[0]?.coNick}_${data.bthLang}_${data.bthShift}_${formattedBthStart}`);
+      } else {
         setBatchTitle('');
       }
-    };
-
-    updateBatchTitle();
-  },[data.corId,data.bthStart,data.bthTime,data.bthLang])
+    } 
+    else{
+      setBatchTitle('');
+    }
+  };
+  updateBatchTitle();
+  },[data.corId,data.bthStart,data.bthShift,data.bthLang])
   
 
   useEffect(() => {
@@ -76,66 +91,62 @@ const AddNewBatch: React.FC = () => {
   const handleSubmit = async (e:FormEvent<HTMLFormElement>):Promise<void> => {
     e.preventDefault();
     setErrorMessage(''); // Clear the previous error
-    let errMsg: string[] = [];
-        
-    if (!data.bthTime.trim()) {
-        errMsg.push('Please select shift.');    
-    }
-    
-    if (!data.corId.trim()) {
-        errMsg.push('Please select course.');    
-    }
-
-    if (!batchMode.trim()) {
-        errMsg.push('Please select mode.');    
-    }
-
-    if(errMsg.length>0){
-        setErrorMessage(errMsg.join(' || '));
-        return;
-    }
-      
-    try 
+         
+    if (!data.bthShift.trim()) {
+        setErrorMessage('Please select shift.');    
+    } else if (!data.corId.trim()) {
+        setErrorMessage('Please select course.');    
+    } else if (!data.bthMode.trim()) {
+        setErrorMessage('Please select mode.');    
+    } else if (!data.bthLang.trim()) {
+        setErrorMessage('Please select language.');    
+    } else if (data.bthMode === "Online" && !data.bthLink.trim()) {
+        setErrorMessage('Please provide meeting link.');
+    } else if (data.bthMode !== "Online" && !data.bthLoc.trim()) {
+        setErrorMessage('Please provide location details.');
+    } else {
+      try 
       {
-          const response = await fetch(`${BASE_API_URL}/api/batches`, {
-            method: 'POST',
-            body: JSON.stringify({
-              bthName:batchTitle, 
-              bthTime:data.bthTime, 
-              bthStart:data.bthStart, 
-              bthEnd:data.bthEnd, 
-              corId:data.corId, 
-              bthVtr:data.bthVtr, 
-              bthWhatGrp:data.bthWhatGrp, 
-              bthTeleGrp:data.bthTeleGrp, 
-              bthLang:data.bthLang, 
-              bthMode:batchMode, 
-              bthLink:data.bthLink, 
-              bthLoc:data.bthLink, 
-              bthBank:data.bthBank, 
-              bthQr:data.bthQr
-            }),
-          });
-      
-          const post = await response.json();
-          console.log(post);
-      
-          if (post.success === false) {
-              toast.error(post.msg);
-          } else {
-              toast.success(post.msg);
-              router.push('/account/batch-list');
-          }
+        const response = await fetch(`${BASE_API_URL}/api/batches`, {
+          method: 'POST',
+          body: JSON.stringify({
+            bthName:batchTitle, 
+            bthShift:data.bthShift, 
+            bthStart:data.bthStart, 
+            bthEnd:data.bthEnd, 
+            corId:data.corId, 
+            bthVtr:data.bthVtr, 
+            bthWhatGrp:data.bthWhatGrp, 
+            bthTeleGrp:data.bthTeleGrp, 
+            bthLang:data.bthLang, 
+            bthMode:data.bthMode, 
+            bthLink:data.bthLink, 
+            bthLoc:data.bthLink, 
+            bthBank:data.bthBank, 
+            bthQr:data.bthQr,
+            createdBy: loggedInUser.result._id
+          }),
+        });
+    
+        const post = await response.json();
+    
+        if (post.success === false) {
+            toast.error(post.msg);
+        } else {
+            toast.success(post.msg);
+            router.push('/account/batch-list');
+        }
       } catch (error) {
-          toast.error('Error creating course.');
+          toast.error('Error creating batch.');
       } 
-    };  
-  
-    if(isLoading){
-      return<div>
-        <Loading/>
-      </div>
     }
+  };  
+  
+  if(isLoading){
+    return<div>
+      <Loading/>
+    </div>
+  };
     
   return (
     <div>
@@ -148,7 +159,7 @@ const AddNewBatch: React.FC = () => {
                 </div>
                 <div className="flex flex-col gap-2">
                     <label className='text-lg'>Batch Shift:</label>
-                    <select className='inputBox' name="bthTime" value={data.bthTime} onChange={handleChange}>
+                    <select className='inputBox' name="bthShift" value={data.bthShift} onChange={handleChange}>
                         <option className="text-center">--- Select Shift ---</option>
                         <option value="AM">AM</option>
                         <option value="PM">PM</option>
@@ -196,37 +207,37 @@ const AddNewBatch: React.FC = () => {
             </div>
         </div>
         <div className="grid grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-                <label className='text-lg'>Mode Of Batch:</label>
-                <select className='inputBox'  value={batchMode} onChange={handleBatchMode}>
-                    <option className="text-center">--- Select Mode ---</option>
-                    <option value="Online">Online</option>
-                    <option value="Offline without accommodation">Offline without accommodation</option>
-                    <option value="Offline with accommodation">Offline with accommodation</option>
-                </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className='text-lg'>Language:</label>
-              <select className='inputBox' name="bthLang" value={data.bthLang} onChange={handleChange}>
-                  <option className="text-center">--- Select Language ---</option>
-                  <option value="ENG">English</option>
-                  <option value="HIN">Hindi</option>
+          <div className="flex flex-col gap-2">
+              <label className='text-lg'>Mode Of Batch:</label>
+              <select className='inputBox' name='bthMode'  value={data.bthMode} onChange={handleChange}>
+                  <option className="text-center">--- Select Mode ---</option>
+                  <option value="Online">Online</option>
+                  <option value="Offline w/o acc">Offline w/o acc</option>
+                  <option value="Offline w acc">Offline w acc</option>
               </select>
-            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className='text-lg'>Language:</label>
+            <select className='inputBox' name="bthLang" value={data.bthLang} onChange={handleChange}>
+                <option className="text-center">--- Select Language ---</option>
+                <option value="ENG">English</option>
+                <option value="HIN">Hindi</option>
+            </select>
+          </div>
         </div>
-        {batchMode === "Online" && (
+        {data.bthMode === "Online" && (
         <div className="flex flex-col gap-2">
             <label className='text-lg'>Meeting Link:</label>
             <input type='text' className='inputBox' name="bthLink" value={data.bthLink} onChange={handleChange}/>
         </div>
         )}
-        {batchMode === "Offline with accommodation" && (
+        {data.bthMode === "Offline w acc" && (
         <div className="flex flex-col gap-2">
             <label className='text-lg'>Location:</label>
             <textarea rows={3} className='inputBox' name="bthLoc" value={data.bthLoc} onChange={handleChange}/>
         </div>
         )}
-        {batchMode === "Offline without accommodation" && (
+        {data.bthMode === "Offline w/o acc" && (
         <div className="flex flex-col gap-2">
             <label className='text-lg'>Location:</label>
             <textarea rows={3} className='inputBox' name="bthLoc" value={data.bthLoc} onChange={handleChange}/>
@@ -242,7 +253,7 @@ const AddNewBatch: React.FC = () => {
                 <textarea rows={3} className='inputBox' name="bthQr" value={data.bthQr} onChange={handleChange}/>
             </div>
         </div>
-        {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
+        {errorMessage && <p className="text-sm text-red-600 italic">{errorMessage}</p>}
         <div className="flex gap-1 w-full">
           <button type="submit" className="btnLeft w-full">
             Save

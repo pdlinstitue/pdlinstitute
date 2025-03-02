@@ -44,7 +44,8 @@ const CourseList : React.FC = () => {
       { header: 'Type', accessorKey: 'coType'}, 
       { header: 'Elegibility', accessorKey: 'coElg'}, 
       { header: 'Donation', accessorKey: 'coDon'},    
-      { header: 'User Id', accessorKey: 'usrId'}, 
+      { header: 'Created By', accessorKey: 'createdBy'},
+      { header: 'Updated By', accessorKey: 'updatedBy'}, 
       { header: 'Action', accessorKey: 'coAction', 
         cell: ({ row }: { row: any }) => ( 
           <div className='flex items-center gap-3'> 
@@ -72,7 +73,11 @@ const CourseList : React.FC = () => {
         const res = await fetch(`${BASE_API_URL}/api/courses`, { cache: "no-store" });
         const coData = await res.json();
         const updatedCoList = coData.coList.map((item:any) => { 
-          return { ...item, coCat: item.coCat.catName };
+          return { ...item, 
+            coCat: item.coCat.catName,
+            createdBy: item.createdBy ? item.createdBy.sdkFstName : 'N/A',
+            updatedBy: item.updatedBy ? item.updatedBy.sdkFstName : 'N/A' 
+          };
         });
         setCoData(updatedCoList);
       } catch (error) {

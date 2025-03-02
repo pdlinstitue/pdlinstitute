@@ -7,18 +7,23 @@ interface ICatParams{
     CatId?: string;
 }
 
+type CatType = {
+  isActive:boolean;
+  disabledBy:string;
+}
+
 export async function PATCH(req: NextRequest, {params}:{params:ICatParams}) {
 
     try 
     {
       await dbConnect();
+      const { disabledBy }: CatType = await req.json();
       const isCategoryUsed = await Courses.findOne({ coCat: params.CatId });
 
       if (isCategoryUsed) {
           return NextResponse.json({success:false, msg: "Category is being used. Can't be disabled." }, { status: 400 });
       }else{
-
-        const catById = await Categories.findByIdAndUpdate(params.CatId, {isActive:false}, {runValidators:false});
+        const catById = await Categories.findByIdAndUpdate(params.CatId, {isActive:false, disabledBy}, {runValidators:false});
         return NextResponse.json({ catById, success: true, msg:"Category disabled successfully." }, {status:200});   
       }
     } catch (error:any) {
@@ -26,7 +31,7 @@ export async function PATCH(req: NextRequest, {params}:{params:ICatParams}) {
         const messages = Object.values(error.errors).map((val:any) => val.message);
         return NextResponse.json({ success: false, msg: messages }, {status:400});
       }else{
-        return new NextResponse ("Error while saving data: " + error, {status: 400});
+        return new NextResponse ("Error while disabling category: " + error, {status: 500});
       }
     }
   }

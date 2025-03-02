@@ -7,7 +7,7 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '@/app/account/Loading';
 
 interface CorNameProps {
-    coName:string
+    coNick:string
 }
 
 interface ICorParams {
@@ -21,7 +21,7 @@ const DeleteCourse : React.FC <ICorParams>= ({params}) => {
   const router = useRouter();
   const { CorId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
-  const [courseName, setCourseName] = useState<CorNameProps>({coName:''});
+  const [courseName, setCourseName] = useState<CorNameProps>({coNick:''});
   
     useEffect(() => { 
     async function fetchCourseById() { 
@@ -72,7 +72,7 @@ const DeleteCourse : React.FC <ICorParams>= ({params}) => {
                 <div className="flex flex-col items-center gap-2">
                     <h1 className="text-3xl p-3 text-red-600 font-semibold">Alert !</h1>
                     <p className="text-center">Won't be able to restore. Are you sure to delete?</p>
-                    <p className="font-bold text-xl text-green-600">{courseName.coName}</p>
+                    <p className="font-bold text-xl text-green-600">{courseName.coNick}</p>
                 </div>
                 <div className="flex gap-1">
                     <button type="submit"  className="btnLeft w-full">CONFIRM</button>

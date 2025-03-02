@@ -209,7 +209,7 @@ const AddNewEvent: React.FC = () => {
                 <select className='inputBox' name="eveAud" value={data.eveAud} onChange={handleChange}>
                     <option className="text-center">--- Select Audience ---</option>
                     <option value="Public">Public</option>
-                    <option value="Sadhak">Sadhak</option>
+                    <option value="Private">Private</option>
                 </select>
             </div>
         </div>

@@ -8,6 +8,7 @@ interface DataTableProps {
 
 const DataTable : React.FC<DataTableProps> = ({table}) => {
 
+
   return (
     <div>
       <table className='table-auto w-full'>

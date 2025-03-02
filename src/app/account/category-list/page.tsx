@@ -9,6 +9,7 @@ import { FiEye } from "react-icons/fi";
 import { BiEditAlt } from "react-icons/bi";
 import { HiMinus } from "react-icons/hi";
 import Loading from '../Loading';
+import { Tooltip } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -25,7 +26,9 @@ const CategoryList : React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const data = React.useMemo(() => catData ?? [], [catData]);
   const columns = React.useMemo(() => [ 
-    { header: 'Category', accessorKey: 'catName', }, 
+    { header: 'Category', accessorKey: 'catName'},
+    { header: 'Created By', accessorKey: 'createdBy'},
+    { header: 'Updated By', accessorKey: 'updatedBy'},
     { header: 'Action', accessorKey: 'catAction', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
@@ -47,28 +50,28 @@ const CategoryList : React.FC = () => {
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
     };
                            
-  useEffect(() => { 
-  async function fetchCatData() { 
-  try 
-    { 
-        const res = await fetch(`${BASE_API_URL}/api/categories`, {cache: "no-store"}); 
-        if (!res.ok) { 
-          throw new Error("Failed to fetch data"); 
-        } const catData = await res.json(); 
-
-        if (catData.catList && catData.catList.length > 0) { 
-          setCatData(catData.catList); 
-        } else { 
-          setCatData([]);  
-        } 
-    } catch (error) { 
-        console.error("Error fetching data:", error); 
-        setCatData([]);  // Set an empty array if there is an error
-    } finally { 
-        setIsLoading(false); 
-      } 
-    } fetchCatData(); 
-  }, []);
+    useEffect(() => {
+      async function fetchCatData() {
+        try {
+          const res = await fetch(`${BASE_API_URL}/api/categories`, { cache: "no-store" });
+          const catData = await res.json();
+          const updatedCatList = catData.catList.map((item: any) => {
+            return {
+              ...item,
+              createdBy: item.createdBy ? item.createdBy.sdkFstName : 'N/A',
+              updatedBy: item.updatedBy ? item.updatedBy.sdkFstName : 'N/A'
+            };
+          });
+          setCatData(updatedCatList);
+          console.log( updatedCatList);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      fetchCatData();
+    }, []);
   
     const table = useReactTable(
       {

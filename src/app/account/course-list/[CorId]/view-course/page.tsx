@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, use } from 'react';
-import { IoMdArrowDropleft } from "react-icons/io";
 import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '@/app/account/Loading';
 import { useRouter } from 'next/navigation';
@@ -44,14 +43,16 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
         {
             const coData = await fetch(`${BASE_API_URL}/api/courses/${CorId}/view-course` , {cache: "no-store"});
             const courseById = await coData.json();
-            const fullCourseData = { ...courseById.corById, coCat: courseById.catName }; 
+            const fullCourseData = { 
+                ...courseById.corById, 
+                coCat: courseById.catName 
+            }; 
             setData(fullCourseData);
         } catch (error) {
             console.error("Error fetching category data: ", error);
         } finally {
             setIsLoading(false);
-        }
-    
+        } 
     }
     fetchCourseData();
     },[]);
@@ -89,18 +90,14 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
                 <p><span className='font-semibold uppercase mr-3'>Hrs:</span>{data.durHrs}</p>
             </div>
         </div>
-        <button type='button' className='p-2 bg-gray-200 hover:bg-gray-100 uppercase font-semibold'>
-            View Batches
-        </button>
-        <div className='flex gap-1 w-auto'>
-            <button type='button' className='btnLeft w-full'>
+        <div className='grid grid-cols-2 gap-1'>
+            <button type='button' className='btnLeft'>
                 Read More
             </button>
-            <button type='button' className='btnRight w-full'>
-                Enroll
+            <button type='button' className='btnRight' onClick={()=> router.push('/account/course-list')}>
+                Back
             </button>
         </div>
-        <IoMdArrowDropleft  size={24} className='text-orange-500 cursor-pointer' onClick={()=> router.push('/account/course-list')} />
       </div>
     </div>
   )

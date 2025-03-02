@@ -2,6 +2,8 @@
 import { use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
+import Loading from '@/app/account/Loading';
 import React, { FormEvent, useState } from 'react';
 import { BASE_API_URL } from '@/app/utils/constant';
 
@@ -17,32 +19,42 @@ interface ICatParams {
 
 const DisableCategory : React.FC <ICatParams>= ({params}) => {
 
-  const router = useRouter();
-  const { CatId } = use(params);
-  const [isLoading, setIsLoading] = useState(true);
-  const [catName, setCatName] = useState<CatNameProps>({catName:''});
+    const router = useRouter();
+    const { CatId } = use(params);
+    const [isLoading, setIsLoading] = useState(true);
+    const [catName, setCatName] = useState<CatNameProps>({catName:''});
+    const loggedInUser = {
+        result:{
+          _id:Cookies.get("loggedInUserId"), 
+          usrName:Cookies.get("loggedInUserName"),
+          usrRole:Cookies.get("loggedInUserRole"),
+        }
+    };
   
     useEffect(() => { 
-    async function fetchEventById() { 
-        try 
-            { 
-                const res = await fetch(`${BASE_API_URL}/api/categories/${CatId}/view-category`, {cache: "no-store"}); 
-                const catData = await res.json(); 
-                setCatName(catData.catById);      
-            } catch (error) { 
-                console.error("Error fetching eventData:", error); 
-            } finally {
-                setIsLoading(false);
-            }
-        } fetchEventById(); 
+    async function fetchCatById() { 
+    try 
+        { 
+            const res = await fetch(`${BASE_API_URL}/api/categories/${CatId}/view-category`, {cache: "no-store"}); 
+            const catData = await res.json(); 
+            setCatName(catData.catById);      
+        } catch (error) { 
+            console.error("Error fetching eventData:", error); 
+        } finally {
+            setIsLoading(false);
+        }
+    } fetchCatById(); 
     }, []);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    try 
+        try 
         {
             const response = await fetch(`${BASE_API_URL}/api/categories/${CatId}/disable-category`, {
-                method: 'PATCH'
+                method: 'PATCH',
+                body: JSON.stringify({
+                    disabledBy: loggedInUser.result._id
+                })
             });
 
             const post = await response.json();
@@ -56,6 +68,12 @@ const DisableCategory : React.FC <ICatParams>= ({params}) => {
         } catch (error) {
             toast.error('Error updating category.');
         }
+    };
+
+    if(isLoading){
+        return <div>
+            <Loading/>
+        </div>
     };
 
   return (

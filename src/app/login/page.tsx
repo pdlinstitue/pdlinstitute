@@ -12,8 +12,8 @@ import NavMenu from '../components/navbar/navBar'
 
 
 interface LoginType {
-    usrName: string;
-    usrPass: string;
+    sdkCred: string;
+    sdkPwd: string;
 }
 
 
@@ -21,8 +21,8 @@ const LoginPage : NextPage = () => {
 
     const router = useRouter();
     const [navigate, setNavigate] = useState<string | null>(null); 
-    const [errorMessage, setErrorMessage] = useState('');
-    const [user, setUser] = useState<LoginType>({usrName:'', usrPass:''});
+    const [errorMessage,setErrorMessage] = useState<string>("");
+    const [user, setUser] = useState<LoginType>({sdkCred:'', sdkPwd:''});
 
     useEffect(()=>{
       if (typeof window !== 'undefined' && window.location) {
@@ -46,23 +46,14 @@ const LoginPage : NextPage = () => {
     }
     
     const handleSubmit = async (e:React.FormEvent) => {
-      e.preventDefault();
-      setErrorMessage(''); //Clear the previous error
-      let errMsg=[];
-      
-      if (!user.usrName?.trim() || '') {
-        errMsg.push('User name is required.');    
-      }
-      
-      if (!user.usrPass?.trim() || '') {
-        errMsg.push('Password is required.');    
-      }
+    e.preventDefault();
+    setErrorMessage(''); //Clear the previous erro
     
-      if(errMsg.length>0){
-        setErrorMessage(errMsg.join(' || '));
-        return;
-      }
-    
+    if (!user.sdkCred?.trim() || '') {
+        setErrorMessage('Please enter email or phone.');    
+    } else if (!user.sdkPwd?.trim() || '') {
+        setErrorMessage('Please enter password.');    
+    } else {
       try
       {
         const result = await fetch (`${BASE_API_URL}/api/login`, 
@@ -71,28 +62,28 @@ const LoginPage : NextPage = () => {
           headers:{
             'Content-Type':'application/json'
           },
-          body:JSON.stringify({usrName: user.usrName, usrPass:user.usrPass}),
+          body:JSON.stringify({
+            sdkCred: user.sdkCred, 
+            sdkPwd:user.sdkPwd
+          }),
         });    
+
         const post = await result.json();        
         if(post.success === false){   
-            toast.error("Invalid username or password!");    
+            toast.error(post.msg);    
           }else{  
-            Cookies.set("loggedInUserId", post.result.id); 
-            Cookies.set("loggedInUserRole", post.result.role);
-            Cookies.set("token", post.result.userToken);
-            
-            if(navigate && navigate==="checkout"){
-              router.push('/cart');  
-            }
-            else{
+              Cookies.set("loggedInUserId", post.result.id);
+              Cookies.set("loggedInUserName", post.result.usrName); 
+              Cookies.set("loggedInUserRole", post.result.usrRole);
+              Cookies.set("token", post.result.usrToken);
               toast.success("Logged in successfully."); 
-              router.push('/dashboard/home');
-            }            
-          }
-      }catch(error){
-          console.log(error);    
-        }    
-      }
+              router.push('/account/dashboard');
+          }            
+      } catch (error) {
+        toast.error('Error while logging in.');
+      } 
+    }  
+  }
 
   return (
     <div>
@@ -102,12 +93,12 @@ const LoginPage : NextPage = () => {
         <div className="flex max-w-[400px] p-6 mx-auto my-20 items-center justify-center">
           <form className="flex flex-col w-full p-9 gap-3 border-[1.5px] border-orange-500 shadow-lg rounded-md" onSubmit={handleSubmit}>
               <div className="flex flex-col">
-                  <label htmlFor="usrName" className="text-sm mb-2">Email/Phone:*</label>
-                  <input type="text" className="inputBox" name="usrName" value={user.usrName} onChange={handleChange} placeholder="kartik@gmail.com"></input>
+                  <label className="text-sm mb-2">Email/Phone:*</label>
+                  <input type="text" className="inputBox" name="sdkCred" value={user.sdkCred} onChange={handleChange} placeholder="kartik@gmail.com"></input>
               </div>
               <div className="flex flex-col">
-                  <label htmlFor="passWord" className="text-sm mb-2">Password:*</label>
-                  <input type="password" className="inputBox" name="usrPass" value={user.usrPass} onChange={handleChange} placeholder="password"></input>
+                  <label className="text-sm mb-2">Password:*</label>
+                  <input type="password" className="inputBox" name="sdkPwd" value={user.sdkPwd} onChange={handleChange} placeholder="password"></input>
               </div>
               {errorMessage && <p className='text-red-600 italic text-sm'>{errorMessage}</p>}
               <button type="submit" className="btnLeft w-full rounded-sm" >

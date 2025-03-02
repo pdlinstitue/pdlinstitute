@@ -12,7 +12,7 @@ type CoType = {
     coNick:string,
     coShort:string, 
     prodType:string, 
-    coAuth: string,
+    coElgType: string,
     coCat: string,
     coElg: string,
     coImg: string,
@@ -23,7 +23,7 @@ type CoType = {
     coDon:number, 
     durDays:number, 
     durHrs:number, 
-    usrId: string
+    updatedBy: string
 }
 
 export async function PUT(req: NextRequest, {params}:{params:ICorParams}) {
@@ -31,9 +31,8 @@ export async function PUT(req: NextRequest, {params}:{params:ICorParams}) {
   try 
   {
     await dbConnect();
-    
-    const { coName, coNick, coShort, coType, coAuth, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, usrId }: CoType = await req.json();
-    const corById = await Courses.findByIdAndUpdate(params.CorId, {coName, coNick, coShort, coType, coAuth, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, usrId}, {runValidators:true});
+    const { coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }: CoType = await req.json();
+    const corById = await Courses.findByIdAndUpdate(params.CorId, {coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }, {runValidators:true});
 
     if(!corById){
       return NextResponse.json({ success:false, msg: "No course found." }, { status: 404 });
