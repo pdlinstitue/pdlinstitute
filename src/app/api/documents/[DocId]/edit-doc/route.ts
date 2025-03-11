@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import Documents from "../../../../../../modals/Documents";
 import dbConnect from "../../../../../../dbConnect";
 
-
 interface IDocParams{
     DocId?: string;
 }
@@ -18,7 +17,7 @@ type DocType = {
     sdkIdNbr: string;
     sdkAdsProof: string;
     sdkAdsNbr : string;
-    usrId: string;
+    updatedBy: string;
   };
 
 export async function PUT(req: NextRequest, {params}:{params:IDocParams}) {
@@ -26,8 +25,8 @@ export async function PUT(req: NextRequest, {params}:{params:IDocParams}) {
   try 
   {
     await dbConnect();
-    const { sdkDocOwnr, sdkUpldDate, sdkDocRel, sdkPan, sdkPanNbr, sdkIdProof, sdkIdNbr, sdkAdsProof, sdkAdsNbr, usrId }: DocType = await req.json();
-    const docById = await Documents.findByIdAndUpdate(params.DocId, {sdkDocOwnr, sdkUpldDate, sdkDocRel, sdkPan, sdkPanNbr, sdkIdProof, sdkIdNbr, sdkAdsProof, sdkAdsNbr, usrId});
+    const { sdkDocOwnr, sdkUpldDate, sdkDocRel, sdkPan, sdkPanNbr, sdkIdProof, sdkIdNbr, sdkAdsProof, sdkAdsNbr, updatedBy }: DocType = await req.json();
+    const docById = await Documents.findByIdAndUpdate(params.DocId, {sdkDocOwnr, sdkUpldDate, sdkDocRel, sdkPan, sdkPanNbr, sdkIdProof, sdkIdNbr, sdkAdsProof, sdkAdsNbr, updatedBy});
     return NextResponse.json({ docById, success: true, msg:"Document updated successfully." }, {status:200});
 
   } catch (error:any) {

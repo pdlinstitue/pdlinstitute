@@ -31,6 +31,7 @@ interface AddNewSadhakProps {
   sdkParAdds: string;
   sdkImg: string;
   sdkRole: string;
+  isVolunteer:string;
   sdkPwd: string;
   sdkConfPwd: string;
   createdBy: string;
@@ -56,6 +57,8 @@ const AddNewSadhak: React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [image, setImage] = useState<File | string | null>(null);
+  const [preview, setPreview] = useState<string>('');
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
@@ -82,6 +85,7 @@ const AddNewSadhak: React.FC = () => {
     sdkParAdds: "",
     sdkImg: "",
     sdkRole: "",
+    isVolunteer:"",
     sdkPwd: "",
     sdkConfPwd: "",
     createdBy: "",
@@ -150,6 +154,42 @@ const AddNewSadhak: React.FC = () => {
     setSdkData((prevData) => (
       { ...prevData, [name]: value }
     ));
+  };
+
+  const handleFileChange = (e:any) => {
+    const file = e.target.files[0];
+    if (file) {
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+
+    if (!image) {
+        toast.error("Please select an image!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("profileImage", image);
+
+    try {
+      const res = await fetch("/api/profile-upload", {
+          method: "POST",
+          body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+          toast.success("Image uploaded successfully!");            
+          setImage(data.imageUrl);
+      } else {
+          throw new Error(data.error || "Upload failed");
+      }
+    } catch (error:any) {
+        toast.error(error.message);
+    }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -318,8 +358,9 @@ const AddNewSadhak: React.FC = () => {
               sdkEmail: sdkData.sdkEmail,
               sdkComAdds: sdkData.sdkComAdds,
               sdkParAdds: sdkData.sdkParAdds,
-              sdkImg: sdkData.sdkImg,
+              sdkImg: image,
               sdkRole: sdkData.sdkRole,
+              isVolunteer:sdkData.isVolunteer,
               sdkPwd: sdkData.sdkPwd,
               sdkConfPwd: sdkData.sdkConfPwd,
               createdBy: loggedInUser.result?._id,
@@ -352,18 +393,21 @@ const AddNewSadhak: React.FC = () => {
 
   return (
     <div>
-      <form
-        className="flex flex-col gap-4 h-auto border-[1.5px] border-orange-500 p-9 rounded-md"
-        onSubmit={handleSubmit}
-      >
+      <form className="formStyle w-full" onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-6">
-          <div className="w-full h-[250px]">
-            <Image
-              src="/images/sadhak.jpg"
-              alt="sadhak"
-              width={600}
-              height={250}
-            />
+          <div className="flex flex-col gap-1">
+            <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
+              <Image
+                src={preview}
+                alt="sadhak"
+                width={600}
+                height={350}
+              />
+            </div>
+            <div className="flex items-center gap-1">
+                <input type="file" accept="image/*"  className="inputBox w-full h-[45px]" onChange={handleFileChange}></input>
+                <button type="button" className="btnLeft" onClick={handleUpload} >UPLOAD</button>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-3 gap-2">
@@ -590,7 +634,7 @@ const AddNewSadhak: React.FC = () => {
               <option className="text-center"> --- Select --- </option>
               <option value="Admin">Admin</option>
               <option value="Sadhak">Sadhak</option>
-              <option value="Volunteer">Volunteer</option>
+              <option value="View-Admin">View-Admin</option>
             </select>
           </div>
         </div>
@@ -616,7 +660,7 @@ const AddNewSadhak: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Profile Image:</label>
             <input type="file" className="inputBox" />
@@ -641,6 +685,33 @@ const AddNewSadhak: React.FC = () => {
                   name="isMedIssue"
                   value="No"
                   checked={sdkData.isMedIssue !== "Yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                No
+              </label>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Is Volunteer?</label>
+            <div className="flex gap-4 mt-3">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isVolunteer"
+                  value="Yes"
+                  checked={sdkData.isVolunteer === "Yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Yes
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isVolunteer"
+                  value="No"
+                  checked={sdkData.isVolunteer !== "Yes"}
                   onChange={handleChange}
                   className="mr-2"
                 />

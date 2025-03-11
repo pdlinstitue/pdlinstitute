@@ -1,17 +1,19 @@
 import { NextResponse, NextRequest } from "next/server";
-import Classes from "../../../../../../modals/Classes";
-import dbConnect from "../../../../../../dbConnect";
+import Classes from "../../../../../../../modals/Classes";
+import dbConnect from "../../../../../../../dbConnect";
 
-interface IBthParams{
+interface IClassParams{
     ClsId?: string;
+    DayId:string;
 }
 
-export async function GET(req:NextRequest, {params}:{params:IBthParams}){
+export async function GET(req:NextRequest, {params}:{params:IClassParams}){
 
     try {
   
       await dbConnect();
-      const clsById = await Classes.findById(params.ClsId);
+      const clsData = await Classes.findById(params.ClsId);
+      let clsById = clsData.clsName?.filter((a: any) => a._id.toString() === params.DayId)[0];
 
       if(!clsById){
         return NextResponse.json({ msg: "No class found." }, { status: 404 });

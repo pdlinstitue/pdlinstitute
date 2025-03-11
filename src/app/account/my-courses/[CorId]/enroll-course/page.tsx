@@ -31,6 +31,7 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
   const { CorId } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [payThrough, setPaythrough] = useState<string>('QR');
   const [corData, setCorData] = useState<{ [key: string]: string }>({coDon:'', coType:''});
   const [enrData, setEnrData] = useState<BatchDataProps>({enrSrnShot:'', enrTnsNo:'', corId:'', bthId:'', usrId:''})
   const [bthData, setBthData] = useState<{ [key: string]: string }>({id: '', bthBank:'', bthQr:''});
@@ -52,6 +53,14 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
         ...prev, [name]:value
       }
     });
+  }
+
+  const handlePayThrough = (item:any) => {
+      if(item === "QR"){
+        setPaythrough('QR');
+      } else {
+        setPaythrough('CCA');
+      }
   }
 
   useEffect(() => {
@@ -121,53 +130,83 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
       if (post.success === false) {
           toast.error(post.msg);
       } else {
+        if(payThrough==="CCA"){
+          handlePayment(post.savedEnr._id);
+        }
+        else{
           toast.success(post.msg);
           router.push('/account/my-courses/elg-courses');
+        }
         }
       } catch (error) {
         toast.error('Error enrolling batch.');
       } 
     };
 
-    const handlePayment = async () => { 
-
-      const response = await fetch("/api/payment", {
+    const handlePayment = async (enrId: any) => { 
+      debugger;
+      const response = await fetch(`/api/payment?enrId=${enrId}&corId=${CorId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           order_id: `ORD${Date.now()}`,
-          amount: "100.00",
+          amount: corData.coDon,
           customer_email: "test@example.com",
           customer_phone: "9876543210",
         }),
       });
-  
+    
+      debugger;
       const data = await response.json();
-  
+    
       if (data.encryptedData) {
         const form = document.createElement("form");
-        form.method = "post";
-        form.action = "https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
-  
+        form.method = "POST";
+        form.action = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+    
+        // Required Fields
         const encInput = document.createElement("input");
         encInput.type = "hidden";
         encInput.name = "encRequest";
         encInput.value = data.encryptedData;
-  
+        form.appendChild(encInput);
+    
         const accessInput = document.createElement("input");
         accessInput.type = "hidden";
         accessInput.name = "access_code";
         accessInput.value = data.accessCode;
-  
-        form.appendChild(encInput);
         form.appendChild(accessInput);
+    
+        const commandInput = document.createElement("input");
+        commandInput.type = "hidden";
+        commandInput.name = "command";
+        commandInput.value = "initiateTransaction"; // Required Command
+        form.appendChild(commandInput);
+    
+        const requestTypeInput = document.createElement("input");
+        requestTypeInput.type = "hidden";
+        requestTypeInput.name = "request_type";
+        requestTypeInput.value = "JSON"; // Change to XML or String if needed
+        form.appendChild(requestTypeInput);
+    
+        const responseTypeInput = document.createElement("input");
+        responseTypeInput.type = "hidden";
+        responseTypeInput.name = "response_type";
+        responseTypeInput.value = "JSON"; // Optional
+        form.appendChild(responseTypeInput);
+    
+        const versionInput = document.createElement("input");
+        versionInput.type = "hidden";
+        versionInput.name = "version";
+        versionInput.value = "1.1"; // Required API Version
+        form.appendChild(versionInput);
+    
         document.body.appendChild(form);
-  
         form.submit();
       }
-    };
+    };    
   
   if(isLoading) {
     return <div>
@@ -204,16 +243,12 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
                     <span className='font-bold'>DONATION:</span>
                     <p>{corData.coDon ? corData.coDon : corData.coType}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                 
                     <div className="flex flex-col gap-2">
                       <label className="font-bold">BANK DETAILS:</label>
                       <p>{bthData.bthBank}</p>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="font-bold">QR CODE:</label>
-                      <p>{bthData.bthQr}</p>
-                    </div>
-                  </div>
+                  
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col gap-2">
                       <label className="font-bold">TRANSACTION NO.</label>
@@ -224,9 +259,28 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
                       <input type="file" name='enrScnShot' className="inputBox" />
                     </div>
                   </div>
-                  <button type="button" className="py-2 px-2 bg-gray-200 hover:bg-gray-300 rounded-sm italic" onClick={handlePayment}>
-                    Pay through CCAvenue
-                  </button>
+                  <div className='flex flex-col gap-2'>
+                    <label className='font-semibold'>PAY THROUGH</label>
+                    <div className='flex gap-2'>
+                      <input type='radio' name='payThrough'  onClick={()=>handlePayThrough('QR')} defaultChecked/>QR Code
+                      <input type='radio' name='payThrough' onClick={()=>handlePayThrough('CCA')} />CCAvenue
+                    </div>
+                  </div>
+                  {
+                    payThrough === "QR" && (
+                      <div className="flex flex-col gap-2">
+                        <label className="font-bold">QR CODE:</label>
+                        <p>{bthData.bthQr}</p>
+                      </div>
+                    )
+                  }
+                  {/* {
+                    payThrough === "CCA" && (
+                      <button type="button" className="py-2 px-2 bg-gray-200 hover:bg-gray-300 rounded-sm italic" onClick={handlePayment}>
+                          Pay through CCAvenue
+                      </button>
+                    )
+                  }                  */}
                 </div>
               )}
             </div>

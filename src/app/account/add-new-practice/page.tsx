@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { BASE_API_URL } from '@/app/utils/constant';
+import Cookies from 'js-cookie';
 
 interface AddNewPracticeProps {
   prcName:string,
@@ -24,6 +25,14 @@ const AddNewPractice = () => {
   const [pracDays, setPracDays] = useState<string[] | null>([])
   const [data, setData] = useState<AddNewPracticeProps>({prcName:'', prcLang:'', prcDays:'', prcStartsAt:'', prcEndsAt:'', prcLink:'', prcWhatLink:'',  prcImg:'', usrId:''});
   const practiceDays : string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
+
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  };
 
 
   const handleChange = (e:any) => {
@@ -51,34 +60,19 @@ const AddNewPractice = () => {
     const handleSubmit = async (e:FormEvent<HTMLFormElement>):Promise<void> => {
     e.preventDefault();
     setErrorMessage(''); // Clear the previous error
-    let errMsg: string[] = [];
         
     if (!data.prcName.trim()) {
-        errMsg.push('Class name is must.');    
-    }
-    
-    if (!data.prcStartsAt.trim()) {
-        errMsg.push('Please fix start time.');    
-    }
-
-    if (!data.prcEndsAt.trim()) {
-        errMsg.push('Please fix end time.');    
-    }
-
-    if (!data.prcLang.trim()) {
-      errMsg.push('Please Choose language.');    
-    }
-
-    if (!data.prcLink.trim()) {
-      errMsg.push('Please provide meeting link.');    
-    }
-
-    if(errMsg.length>0){
-        setErrorMessage(errMsg.join(' || '));
-        return;
-    }
-  
-    try 
+        setErrorMessage('Class name is must.');    
+    } else if (!data.prcStartsAt.trim()) {
+        setErrorMessage('Please provide start time.');    
+    } else if (!data.prcEndsAt.trim()) {
+        setErrorMessage('Please provide end time.');    
+    } else if (!data.prcLang.trim()) {
+        setErrorMessage('Please Choose language.');    
+    } else if (!data.prcLink.trim()) {
+        setErrorMessage('Please provide meeting link.');    
+    } else {
+      try 
       {
         const response = await fetch(`${BASE_API_URL}/api/course-practice`, {
         method: 'POST',
@@ -91,7 +85,7 @@ const AddNewPractice = () => {
           prcEndsAt:data.prcEndsAt,
           prcLink:data.prcLink,
           prcWhatLink: data.prcWhatLink,
-            // usrId: loggedInUser.result._id
+          createdBy: loggedInUser.result._id
         }),
       });
   
@@ -103,10 +97,11 @@ const AddNewPractice = () => {
       } else {
           toast.success(post.msg);
           router.push('/account/course-practice');
-      }
-    } catch (error) {
-      toast.error('Error creating practice class.');
-    } 
+        }
+      } catch (error) {
+        toast.error('Error creating practice class.');
+      } 
+    }
   };
 
   return (

@@ -17,9 +17,16 @@ const enrollmentSchema = new mongoose.Schema({
         type: String,
         default:"Pending"
     },
+    isDeleted:{
+        type:Boolean,
+        default:false
+    },
     isCompleted: {
         type: Boolean,
         default:false
+    },
+    enrPaymentStatus:{
+        type:String,
     },
     enrRemarks:{
         type: String
@@ -41,6 +48,10 @@ const enrollmentSchema = new mongoose.Schema({
         ref:Users
     },
     disabledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
+    deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref:Users
     }

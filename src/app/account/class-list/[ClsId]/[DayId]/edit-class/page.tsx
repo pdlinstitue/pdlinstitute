@@ -78,17 +78,15 @@ const EditClass: React.FC<IClsParams> = ({ params }) => {
   useEffect(() => {
     async function fetchClassDataById() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/classes/${ClsId}/view-class`,{ cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/classes/${ClsId}/${DayId}/view-class`,{ cache: "no-store" });
 
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
         }
 
         const result = await res.json();
-        let clsData = result.clsById.clsName?.filter((a: any) => a._id.toString() === DayId)[0];
-
         setCorId(result.clsById.corId);
-        setData(clsData);
+        setData(result.clsById);
       } catch (error) {
           console.error("Error fetching class data:", error);
       } finally {

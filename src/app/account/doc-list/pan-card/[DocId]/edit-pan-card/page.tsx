@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "@/app/account/Loading";
 import toast from "react-hot-toast";
-import { format } from "date-fns";
-
+import Cookies from "js-cookie";
+ 
 
 interface IDocParams {
   params:Promise <{
@@ -20,29 +20,37 @@ interface EditPanCardProps  {
     sdkDocRel: string;
     sdkPan: string;
     sdkPanNbr: string;
-    usrId?: string;
+    updatedBy?: string;
   };
 
 const EditPanCard: React.FC <IDocParams> = ({params}) => {
 
   const router = useRouter();
   const {DocId} = use(params);
-  const [data, setData] = useState<EditPanCardProps>({sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkPan:'', sdkPanNbr:'', usrId:''});
+  const [data, setData] = useState<EditPanCardProps>({sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkPan:'', sdkPanNbr:'', updatedBy:''});
   const [isLoading, setIsLoading] = useState(true);
+
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  };
   
 
   useEffect(() => {
-    const fetchPanData = async () => {
-      try {
-          const res = await fetch(`/api/documents/${DocId}/view-doc`);
-          const data = await res.json();
-          setData(data.docById);
-      } catch (error) {
-          console.error("Error fetching panData: ", error);
-      } finally {
-          setIsLoading(false);
-      }
+  const fetchPanData = async () => {
+    try {
+        const res = await fetch(`/api/documents/${DocId}/view-doc`);
+        const data = await res.json();
+        setData(data.docById);
+    } catch (error) {
+        console.error("Error fetching panData: ", error);
+    } finally {
+        setIsLoading(false);
     }
+  }
   fetchPanData();
   },[]);
 
@@ -68,7 +76,7 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
                 sdkDocRel: data.sdkDocRel, 
                 sdkPan: data.sdkPan, 
                 sdkPanNbr: data.sdkPanNbr,
-                // usrId: data.usrId
+                updatedBy: loggedInUser.result._id
             }),
           });
       
@@ -76,15 +84,15 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
           console.log(post);
       
           if (post.success === false) {
-              toast.error(post.msg);
+            toast.error(post.msg);
           } else {
-              toast.success(post.msg);
-              router.push('/account/doc-list/pan-card');
+            toast.success(post.msg);
+            router.push('/account/doc-list/pan-card');
           }
-      } catch (error) {
-          toast.error('Error updating pan.');
-      } 
-    };  
+        } catch (error) {
+            toast.error('Error updating pan.');
+          } 
+      };  
   
     if(isLoading){
       return<div>

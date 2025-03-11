@@ -27,6 +27,7 @@ export async function GET(req:NextRequest){
       await dbConnect();
       const batchList:BatchType[] = await Batches.find()
       .populate('corId', 'coName coNick')
+      .populate('bthVtr', 'sdkFstName')
       .populate('createdBy', 'sdkFstName')
       .populate('updatedBy', 'sdkFstName');
       

@@ -6,8 +6,12 @@ type ProsType = {
     _id:string,
     prosMonth: string, 
     prosShift:string,
+    prosWeek:number,
+    prosOptMonth: string, 
+    prosOptShift:string,
+    prosOptWeek:number,
     corId:string, 
-    usrId:string
+    createdBy:string
 }
 
 export async function GET(req:NextRequest){
@@ -17,7 +21,8 @@ export async function GET(req:NextRequest){
       await dbConnect();
       const prosList:ProsType[] = await Prospects.find()
       .populate('corId', 'coName')
-      .populate('usrId', 'sdkName');
+      .populate('createdBy', 'sdkFstName')
+      .populate('updatedBy', 'sdkFstName');
 
       if(prosList && prosList.length > 0){
         const activeProsList = prosList.filter((item:any)=> item.isActive === true);

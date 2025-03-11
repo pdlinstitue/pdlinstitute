@@ -1,7 +1,6 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
-import { BsCalendarEvent } from "react-icons/bs";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Loading from '../../Loading';
@@ -12,6 +11,7 @@ import { BiEditAlt } from 'react-icons/bi';
 import { HiMinus } from 'react-icons/hi';
 import { RxCross2 } from 'react-icons/rx';
 import { format } from 'date-fns';
+import Cookies from 'js-cookie';
 
 interface DocTypeProps  {
     _id?: string;
@@ -24,7 +24,6 @@ interface DocTypeProps  {
     sdkPan: string;
     sdkIdProof: string;
     sdkAddProof: string;
-    usrId?: string;
   };
 
 const PanCard : React.FC = () => {
@@ -33,6 +32,14 @@ const PanCard : React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [panData, setPanData] = useState<DocTypeProps[] | null>([]);
   const data = React.useMemo(() => panData ?? [], [panData]);
+
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  };
 
   //changing the status color as per the status
   const StatusCell = ({ row }: { row: any }) => {
@@ -55,9 +62,9 @@ const PanCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'Sadhak', accessorKey: 'sdkName'},
-    {header: 'Sdk Id', accessorKey: 'sdkId'},
-    {header: 'Phone', accessorKey: 'sdkPhone'},
+    {header: 'Sadhak', accessorKey: 'createdBy.sdkFstName'},
+    {header: 'Sdk Id', accessorKey: 'createdBy._id'},
+    {header: 'Phone', accessorKey: 'createdBy.sdkPhone'},
     {header: 'PAN', accessorKey: 'sdkPanNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
     {header: 'Relation', accessorKey: 'sdkDocRel'},
@@ -75,7 +82,8 @@ const PanCard : React.FC = () => {
     }, 
     
   ], []);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  
+    const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
     const [pageSize, setPageSize] = React.useState(25);
@@ -113,11 +121,8 @@ const PanCard : React.FC = () => {
     async function fetchPanData() {
     try 
       {
-        const res = await fetch(`${BASE_API_URL}/api/documents`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.result._id}`, { cache: "no-store" });
         const docData = await res.json();
-        // const updatedEveList = docData.docList.map((item:any) => { 
-        //   return { ...item, eveCatId: item.eveCatId.eveCatName };
-        // });
         setPanData(docData.panList);
       } catch (error) {
           console.error("Error fetching doc data:", error);
@@ -139,11 +144,6 @@ const PanCard : React.FC = () => {
       <div>
         <div className='flex mb-2 items-center justify-between'>
           <div className='flex gap-2 items-center'>
-          {data.length === 0 && (
-            <Link href="/account/add-new-pan" title="Upload Pan" className="btnLeft">
-              UPLOAD PAN
-            </Link>)
-          }
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
           </div>
         </div>

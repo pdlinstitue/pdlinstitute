@@ -1,27 +1,32 @@
 import mongoose from "mongoose";
-import Courses from "./Courses";
 import Batches from "./Batches";
-import Enrollments from "./Enrollments";
 import Classes from "./Classes";
+import Users from "./Users";
 
 const attendanceSchema = new mongoose.Schema({    
+    bthId:{
+        type: mongoose.Types.ObjectId,
+        ref: Batches
+    },
     clsId:{
         type: mongoose.Types.ObjectId,
         ref: Classes
     },
-    isPresent:{
-        type:Boolean
-    },
-    enrId:{
+    sdkId:{
         type:mongoose.Types.ObjectId,
-        ref:Enrollments
+        ref:Users
+    },
+    status:{
+        type:String,
+        default:"Pending"
     },
     absRemarks:{
         type:String
     },
-    atdScreenShot:[],
-    usrId:{
-        type:String  //a loggedin admin user who marks the attendance
+    atdSrnShot:[String],
+    markedBy:{
+        type:mongoose.Types.ObjectId,
+        ref:Users
     }
 },{timestamps: true});
 const Attendance = mongoose.models.Attendance || mongoose.model('Attendance', attendanceSchema);

@@ -15,7 +15,7 @@ type PrcType = {
   prcEndsAt:string,
   prcLink:string,
   prcWhatLink: string,
-  usrId?:string
+  updatedBy?:string
 }
 
 export async function PUT(req: NextRequest, {params}:{params:IPrcParams}) {
@@ -23,8 +23,8 @@ export async function PUT(req: NextRequest, {params}:{params:IPrcParams}) {
   try 
   {
     await dbConnect();
-    const { prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink,  prcImg, usrId }: PrcType = await req.json();
-    const prcById = await Practices.findByIdAndUpdate(params.PrcId, {prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink,  prcImg, usrId}, {runValidators:true});
+    const { prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink,  prcImg, updatedBy }: PrcType = await req.json();
+    const prcById = await Practices.findByIdAndUpdate(params.PrcId, {prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink,  prcImg, updatedBy}, {runValidators:true});
     return NextResponse.json({ prcById, success: true, msg:"Practice class updated successfully." }, {status:200});
 
   } catch (error:any) {

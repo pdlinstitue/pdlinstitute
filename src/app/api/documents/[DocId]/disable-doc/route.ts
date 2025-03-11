@@ -7,15 +7,21 @@ interface IDocParams{
     DocId: string;
 }
 
+type DocType = {
+  isActive:Boolean,
+  disabledBy:string
+}
+
 export async function PATCH(req: NextRequest, {params}:{params:IDocParams}) {
 
     try 
     {
       await dbConnect();
-      const docById = await Documents.findByIdAndUpdate(params.DocId, {isActive:false});
+      const {disabledBy} : DocType = await req.json();
+      const docById = await Documents.findByIdAndUpdate(params.DocId, {isActive:false, disabledBy});
 
       if (!docById) { 
-        return new NextResponse("Document not found", { status: 404 }); 
+        return  NextResponse.json({success:false, msg:"Document not found"}, { status: 404 }); 
       } else {
         return NextResponse.json({ docById, success: true, msg: "Document disabled successfully." }, { status: 200 });
       } 

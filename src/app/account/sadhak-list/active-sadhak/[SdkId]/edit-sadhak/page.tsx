@@ -13,8 +13,6 @@ interface ISadhakParams {
   }>;
 }
 interface EditSadhakProps {
-  sdkPwd: string 
-  sdkConfPwd: string 
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
@@ -37,6 +35,7 @@ interface EditSadhakProps {
   sdkParAdds: string;
   sdkImg: string;
   sdkRole: string;
+  isVolunteer:string,
   updatedBy: string;
 }
 
@@ -61,6 +60,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [image, setImage] = useState<File | string | null>(null);
+  const [preview, setPreview] = useState<string>('');
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
@@ -87,8 +88,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     sdkParAdds: "",
     sdkImg: "",
     sdkRole: "",
-    sdkPwd: "",
-    sdkConfPwd: "",
+    isVolunteer:"",
     updatedBy: "",
   });
 
@@ -100,21 +100,18 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
   };
 
   useEffect(() => {
-    async function fetchSdkById() {
-      try {
-        const res = await fetch(
-          `${BASE_API_URL}/api/users/${SdkId}/view-sadhak`,
-          { cache: "no-store" }
-        );
-        const sadhakData = await res.json();
-        setSdkData(sadhakData.sdkById);
-      } catch (error) {
+  async function fetchSdkById() {
+    try {
+      const res = await fetch(`${BASE_API_URL}/api/users/${SdkId}/view-sadhak`, { cache: "no-store" });
+      const sadhakData = await res.json();
+      setSdkData(sadhakData.sdkById);
+    } catch (error) {
         console.error("Error fetching sadhak data:", error);
-      } finally {
+    } finally {
         setIsLoading(false);
-      }
     }
-    fetchSdkById();
+  }
+  fetchSdkById();
   }, []);
 
   useEffect(() => {
@@ -124,7 +121,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         const countryData = await res.json();
         setCountryList(countryData.ctrList);
       } catch (error) {
-        console.error("Error fetching country data:", error);
+          console.error("Error fetching country data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -177,6 +174,43 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     ));
   };
 
+  const handleFileChange = (e:any) => {
+    const file = e.target.files[0];
+    if (file) {
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+
+    if (!image) {
+        toast.error("Please select an image!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("profileImage", image);
+    formData.append("profileImageFileName", sdkData.sdkImg);
+
+    try {
+        const res = await fetch("/api/profile-upload", {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            toast.success("Image uploaded successfully!");            
+            setImage(data.imageUrl);
+        } else {
+            throw new Error(data.error || "Upload failed");
+        }
+    } catch (error:any) {
+        toast.error(error.message);
+    }
+ };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (
@@ -197,7 +231,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
       !sdkData ||
       !("sdkBthDate" in sdkData) ||
       sdkData.sdkBthDate === null ||
-      sdkData.sdkBthDate.trim() === ""
+      sdkData.sdkBthDate.toString().trim() === ""
     ) {
       setErrorMessage("DOB name is required.");
     } else if (
@@ -305,10 +339,9 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkEmail: sdkData.sdkEmail,
               sdkComAdds: sdkData.sdkComAdds,
               sdkParAdds: sdkData.sdkParAdds,
-              sdkImg: sdkData.sdkImg,
+              sdkImg: image,
               sdkRole: sdkData.sdkRole,
-              sdkPwd: sdkData.sdkPwd,
-              sdkConfPwd: sdkData.sdkConfPwd,
+              isVolunteer:sdkData.isVolunteer,
               updatedBy: loggedInUser.result?._id,
             }),
           }
@@ -341,13 +374,21 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     <div>
       <form className="formStyle w-full" onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-6">
-          <div className="w-full h-[250px]">
-            <Image
-              src="/images/sadhak.jpg"
-              alt="sadhak"
-              width={600}
-              height={250}
-            />
+          <div className="flex flex-col gap-1">
+            <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
+              <Image src={preview || sdkData?.sdkImg}  alt="sadhakImage" width={600} height={350} />
+            </div>
+            <div className="flex items-center gap-1">
+              <input
+                type="file"
+                accept="image/*"
+                className="inputBox w-full h-[45px]"
+                onChange={handleFileChange}
+              ></input>
+              <button type="button" className="btnLeft" onClick={handleUpload}>
+                UPLOAD
+              </button>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-3 gap-2">
@@ -409,13 +450,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
                   type="date"
                   className="inputBox"
                   name="sdkBthDate"
-                  value={
-                    sdkData.sdkBthDate
-                      ? new Date(sdkData.sdkBthDate)
-                          .toISOString()
-                          .substring(0, 10)
-                      : ""
-                  }
+                  value={sdkData.sdkBthDate}
                   onChange={handleChange}
                 />
               </div>
@@ -574,7 +609,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               <option className="text-center"> --- Select --- </option>
               <option value="Admin">Admin</option>
               <option value="Sadhak">Sadhak</option>
-              <option value="Volunteer">Volunteer</option>
+              <option value="View-Admin">View-Admin</option>
             </select>
           </div>
         </div>
@@ -600,7 +635,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Profile Image:</label>
             <input type="file" className="inputBox" />
@@ -632,6 +667,33 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               </label>
             </div>
           </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Is Volunteer?</label>
+            <div className="flex gap-4 mt-3">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isVolunteer"
+                  value="Yes"
+                  checked={sdkData.isVolunteer === "Yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Yes
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isVolunteer"
+                  value="No"
+                  checked={sdkData.isVolunteer !== "Yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                No
+              </label>
+            </div>
+          </div>
         </div>
         {
           sdkData.isMedIssue === "Yes" && (
@@ -647,28 +709,6 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </div>
           )
         }
-        <div className="grid grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Change Password:</label>
-            <input
-              type="password"
-              className="inputBox"
-              name="sdkPwd"
-              value={sdkData.sdkPwd}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Confirm Password:</label>
-            <input
-              type="password"
-              className="inputBox"
-              name="sdkConfPwd"
-              value={sdkData.sdkConfPwd}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
         {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
         <div className="grid grid-cols-2 gap-1">
           <button type="submit" className="btnLeft">

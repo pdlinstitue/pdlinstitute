@@ -88,6 +88,7 @@ const BatchList : React.FC = () => {
       const updatedBatchList = batchData.bthList.map((item:any) => { 
         return { ...item, 
           corId: item.corId.coNick,
+          bthVtr:item.bthVtr.sdkFstName,
           createdBy: item.createdBy ? item.createdBy.sdkFstName : 'N/A',
           updatedBy: item.updatedBy ? item.updatedBy.sdkFstName : 'N/A'  
         };

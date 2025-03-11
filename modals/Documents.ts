@@ -49,10 +49,26 @@ const documentsSchema = new mongoose.Schema({
         type: Boolean,
         default:true
     },
-    usrId: {
+    createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref:Users
     },
+    updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
+    disabledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
+    deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
+    isDeleted :{
+        type:Boolean,
+        default:false
+    }
 },{timestamps: true});
 
 const Documents = mongoose.models.Documents || mongoose.model('Documents', documentsSchema);

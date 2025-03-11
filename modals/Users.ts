@@ -108,9 +108,17 @@ const usrSchema = new mongoose.Schema({
         type: String,
         default: "Sadhak"
     },
+    isVolunteer:{
+        type:String,
+        default: "No"
+    },
     isActive: {
         type: Boolean,
         default: true
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
     createdBy: {
         type: String
@@ -121,9 +129,14 @@ const usrSchema = new mongoose.Schema({
     deletedBy: {
         type: String
     },
+    disabledBy: {
+        type: String
+    },
     sdkCourseDone: [String],
     pwdResetToken: String,
-    pwdResetTokenExpires: Date
+    pwdResetTokenExpires: Date,
+    sdkRegPwd:String,
+    sdkRegPwdExpiry:String
 }, { timestamps: true });
 
 const Users = mongoose.models.Users || mongoose.model('Users', usrSchema);

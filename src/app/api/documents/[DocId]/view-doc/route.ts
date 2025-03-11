@@ -14,6 +14,7 @@ type DocType = {
   sdkPanNbr: string;
   sdkIdNbr:string;
   sdkAdsNbr:string;
+  updatedBy:string
 };
 
 export async function GET(req:NextRequest, {params}:{params:IDocParams}){
@@ -34,8 +35,8 @@ export async function PATCH(req: NextRequest, {params}:{params:IDocParams}) {
   try 
   {
     await dbConnect();
-    const { sdkDocStatus, sdkRemarks, sdkPanNbr, sdkIdNbr, sdkAdsNbr, sdkAprDate } : DocType = await req.json();
-    const docById = await Documents.findByIdAndUpdate(params.DocId, {sdkDocStatus, sdkRemarks, sdkPanNbr, sdkIdNbr, sdkAdsNbr, sdkAprDate});
+    const { sdkDocStatus, sdkRemarks, sdkPanNbr, sdkIdNbr, sdkAdsNbr, sdkAprDate, updatedBy } : DocType = await req.json();
+    const docById = await Documents.findByIdAndUpdate(params.DocId, {sdkDocStatus, sdkRemarks, sdkPanNbr, sdkIdNbr, sdkAdsNbr, sdkAprDate, updatedBy});
 
     if (sdkDocStatus === "Rejected") { 
       return NextResponse.json({ docById, success: true, msg: "Document rejected." }, { status: 200 }); 

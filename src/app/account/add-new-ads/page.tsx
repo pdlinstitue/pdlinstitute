@@ -1,6 +1,7 @@
 "use client";
 import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { BASE_API_URL } from "@/app/utils/constant";
 import toast from "react-hot-toast";
 
@@ -12,14 +13,22 @@ interface AddNewAdsProps  {
     sdkDocRel: string;
     sdkAdsProof: string;
     sdkAdsNbr: string;
-    usrId?: string;
+    createdBy?: string;
   };
 
 const AddNewAds: React.FC = () => {
 
   const router = useRouter();
-  const [data, setData] = useState<AddNewAdsProps>({sdkDocType:'', sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkAdsProof:'', sdkAdsNbr:'', usrId:''});
+  const [data, setData] = useState<AddNewAdsProps>({sdkDocType:'', sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkAdsProof:'', sdkAdsNbr:'', createdBy:''});
    
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  };
+
   const handleChange = (e:any) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -43,7 +52,7 @@ const AddNewAds: React.FC = () => {
                 sdkAdsNbr: data.sdkAdsNbr,
                 sdkDocRel: data.sdkDocRel, 
                 sdkAdsProof: data.sdkAdsProof,   
-                // usrId: data.usrId
+                createdBy: loggedInUser.result._id
             }),
           });
       

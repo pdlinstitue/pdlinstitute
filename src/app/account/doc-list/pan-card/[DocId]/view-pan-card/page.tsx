@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { BASE_API_URL } from '@/app/utils/constant';
 import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 interface IDocParams{
     params: Promise<{
@@ -17,6 +18,7 @@ interface ViewPanCardProps {
     sdkPan: string;
     sdkPanNbr: string;
     sdkRemarks: string;
+    updatedBy:string
 }
 
 const ViewPanCard : React.FC<IDocParams> = ({params}) => {
@@ -24,8 +26,16 @@ const ViewPanCard : React.FC<IDocParams> = ({params}) => {
     const router = useRouter();
     const {DocId} = use(params);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [panData, setPanData] = useState<ViewPanCardProps>({sdkPan:"", sdkPanNbr:"", sdkRemarks:""});
+    const [panData, setPanData] = useState<ViewPanCardProps>({sdkPan:"", sdkPanNbr:"", sdkRemarks:"", updatedBy:""});
     const [status, setStatus] = useState('');
+
+    const loggedInUser = {
+        result:{
+          _id:Cookies.get("loggedInUserId"), 
+          usrName:Cookies.get("loggedInUserName"),
+          usrRole:Cookies.get("loggedInUserRole"),
+        }
+    };
 
     useEffect(() => {
         const fetchPanData = async () => {
@@ -63,8 +73,10 @@ const ViewPanCard : React.FC<IDocParams> = ({params}) => {
                     sdkRemarks: panData.sdkRemarks,
                     sdkPanNbr: panData.sdkPanNbr,
                     sdkAprDate: new Date(),
+                    updatedBy:loggedInUser.result._id
                 }),
             });
+            
             const post = await response.json();
             console.log(post);
             

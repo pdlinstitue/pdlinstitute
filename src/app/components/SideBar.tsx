@@ -27,6 +27,7 @@ import { RiCoupon3Line } from "react-icons/ri";
 import Cookies from 'js-cookie';
 import MyCourseMenu from './submenus/MyCourseMenu';
 import { GiMeditation } from "react-icons/gi";
+import MyDocMenu from './submenus/MyDocMenu';
 
 
 
@@ -74,23 +75,27 @@ const SideBar: React.FC = () => {
              </div>
            )
          }
-         <Link href='/account/coupon-list' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+         <Link href='/account/my-coupons' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
            <RiCoupon3Line size={24} className=' group-hover:text-black'/>
            <p className='font-semibold group-hover:text-black'>MY COUPONS</p>
          </Link>
-         <Link href='/account/course-practice' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+         <Link href='/account/my-practice-class' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
            <GiMeditation size={24} className=' group-hover:text-black'/>
-           <p className='font-semibold group-hover:text-black'>PRACTICE</p>
+           <p className='font-semibold group-hover:text-black'>MY PRACTICE</p>
          </Link>
-         <button type='button' onClick={() =>handleToggle(7)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+         <Link href='/account/my-attendance' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+           <GiMeditation size={24} className=' group-hover:text-black'/>
+           <p className='font-semibold group-hover:text-black'>MY ATTENDANCE</p>
+         </Link>
+         <button type='button' onClick={() =>handleToggle(9)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
            <HiOutlineDocumentReport size={24} className=' group-hover:text-black'/>
            <p className='font-semibold group-hover:text-black'>MY DOCS</p>
-           <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 7 ? 'rotate-180 duration-500' : ''}`} />      
+           <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 9 ? 'rotate-180 duration-500' : ''}`} />      
          </button>
          {
-           selectedNumber === 7 && (
+           selectedNumber === 9 && (
              <div className='flex w-full px-[35px]'>
-               <DocMenu/>
+                <MyDocMenu/>
              </div>
            )
          }

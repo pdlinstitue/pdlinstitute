@@ -3,6 +3,7 @@ import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import toast from "react-hot-toast";
+import Cookies from "js-cookie";
 
 
 interface AddNewPanProps  {
@@ -12,14 +13,22 @@ interface AddNewPanProps  {
     sdkDocRel: string;
     sdkPan: string;
     sdkPanNbr: string;
-    usrId?: string;
+    createdBy?: string;
   };
 
 const AddNewPan: React.FC = () => {
 
   const router = useRouter();
-  const [data, setData] = useState<AddNewPanProps>({sdkDocType:'', sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkPan:'', sdkPanNbr:'', usrId:''});
+  const [data, setData] = useState<AddNewPanProps>({sdkDocType:'', sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkPan:'', sdkPanNbr:'', createdBy:''});
    
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  };
+
   const handleChange = (e:any) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -37,13 +46,13 @@ const AddNewPan: React.FC = () => {
           const response = await fetch(`${BASE_API_URL}/api/documents`, {
             method: 'POST',
             body: JSON.stringify({
-                sdkDocType: 'Pan',
-                sdkDocOwnr: data.sdkDocOwnr, 
-                sdkUpldDate: new Date(), 
-                sdkPanNbr: data.sdkPanNbr,
-                sdkDocRel: data.sdkDocRel, 
-                sdkPan: data.sdkPan,   
-                // usrId: data.usrId
+              sdkDocType: 'Pan',
+              sdkDocOwnr: data.sdkDocOwnr, 
+              sdkUpldDate: new Date(), 
+              sdkPanNbr: data.sdkPanNbr,
+              sdkDocRel: data.sdkDocRel, 
+              sdkPan: data.sdkPan,   
+              createdBy: loggedInUser.result._id
             }),
           });
       
@@ -54,7 +63,7 @@ const AddNewPan: React.FC = () => {
               toast.error(post.msg);
           } else {
               toast.success(post.msg);
-              router.push('/account/doc-list/pan-card');
+              router.push('/account/my-docs/pan-card');
           }
       } catch (error) {
           toast.error('Error uploading document.');
@@ -80,7 +89,7 @@ const AddNewPan: React.FC = () => {
           <div className="flex flex-col gap-2">
               <label className='text-lg'>Pan Image:</label>
               <div className="flex gap-1">
-                  <input type='file' className='inputBox w-full' name="sdkPan" value={data.sdkPan} onChange={handleChange} required/>
+                  <input type='file' className='inputBox w-full' name="sdkPan" value={data.sdkPan} onChange={handleChange}/>
                   <button type='button' className='btnRight'>Upload</button>
               </div>
           </div>                        
@@ -92,7 +101,7 @@ const AddNewPan: React.FC = () => {
           <button
             type="button"
             className="btnRight w-full"
-            onClick={() => router.push("/account/doc-list/pan-card")}
+            onClick={() => router.push("/account/my-docs/pan-card")}
           >
             Back
           </button>

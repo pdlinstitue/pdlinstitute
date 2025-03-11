@@ -18,6 +18,7 @@ const batchSchema = new mongoose.Schema({
     },
     bthVtr: {
         type: String,
+        ref: Users
     },
     bthWhatGrp: {
         type: String,

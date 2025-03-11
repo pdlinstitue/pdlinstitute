@@ -23,6 +23,7 @@ type SdkType = {
     sdkConfPwd?: string,
     sdkImg:string,
     sdkRole:string,
+    isVolunteer:string,
     createdBy?:string
 }
 
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
         sdkConfPwd,
         sdkImg,
         sdkRole,
+        isVolunteer,
         createdBy
     }: SdkType = await req.json();
 
@@ -90,6 +92,7 @@ export async function POST(req: NextRequest) {
             sdkPwd:hashedPwd,
             sdkImg,
             sdkRole,
+            isVolunteer,
             createdBy
         });
         const savedUser = await newUser.save();

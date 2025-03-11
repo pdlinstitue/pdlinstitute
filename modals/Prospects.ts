@@ -15,6 +15,15 @@ const prospectsSchema = new mongoose.Schema({
         type:Number,
         required:[true, "Please enter week"]
     },
+    prosOptMonth:{
+        type:String,
+    },
+    prosOptShift:{
+        type:String,
+    },   
+    prosOptWeek:{
+        type:Number,
+    },
     isActive: {
         type: Boolean,
         default:true

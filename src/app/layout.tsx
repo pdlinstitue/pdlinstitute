@@ -22,7 +22,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className={inter.className}>
         <Toaster 
           toastOptions={{ 
-            duration: 4000, 
+            duration: 3000, 
             style: { 
               background: "white", 
               border: "1.5px solid orange", 

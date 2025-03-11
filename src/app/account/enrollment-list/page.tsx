@@ -5,7 +5,6 @@ import Loading from '../Loading';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiEye } from 'react-icons/fi';
-import { BiEditAlt } from 'react-icons/bi';
 import { BASE_API_URL } from '@/app/utils/constant';
 import { format } from 'date-fns';
 
@@ -39,9 +38,9 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
   };
 
   const columns = React.useMemo(() => [
-    { header: 'Sadhak', accessorKey: 'sdkFstName'},
-    { header: 'SDK Id', accessorKey: 'usrId'},
-    { header: 'Phone',  accessorKey: 'sdkPhone'},
+    { header: 'Sadhak', accessorKey: 'createdBy.sdkFstName'},
+    { header: 'SDK Id', accessorKey: 'createdBy._id'},
+    { header: 'Phone',  accessorKey: 'createdBy.sdkPhone'},
     { header: 'Course', accessorKey: 'corId'},
     { header: 'Type',   accessorKey: 'coType'},
     { header: 'Batch Name',  accessorKey: 'bthId'},
@@ -77,8 +76,8 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
             corId: item.corId.coName, 
             coType: item.corId.coType,  
             bthId: item.bthId.bthName, 
-            sdkFstName: item.usrId.sdkFstName,
-            sdkPhone: item.usrId.sdkPhone,
+            sdkFstName: item.createdBy.sdkFstName,
+            sdkPhone: item.createdBy.sdkPhone,
             bthStart: format(new Date(item.bthId.bthStart), 'dd MMM, yyyy'),  
             createdAt: format(new Date(item.createdAt), 'dd MMM, yyyy')   
           };

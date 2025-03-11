@@ -10,6 +10,7 @@ import { BiEditAlt } from 'react-icons/bi';
 import { HiMinus } from 'react-icons/hi';
 import { RxCross2 } from 'react-icons/rx';
 import Loading from '../../Loading';
+import { TbPasswordFingerprint } from "react-icons/tb";
 import { BASE_API_URL } from '@/app/utils/constant';
 
 interface SadhakListProps {
@@ -48,6 +49,7 @@ const ActiveSadhakList : React.FC = () => {
             cell: ({ row }: { row: any }) => ( 
               <div className='flex items-center gap-3'> 
                 <button type='button' title='View' onClick={()=> router.push(`/account/sadhak-list/active-sadhak/${row.original._id}/view-sadhak`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+                <button type='button' title='Re-Generate Password' onClick={()=> router.push(`/account/sadhak-list/active-sadhak/${row.original._id}/re-generate-pwd`)} className='text-blue-700 border-[1.5px] border-blue-700 p-1 rounded-full  hover:border-black'><TbPasswordFingerprint size={12}/></button>
                 <button type='button' title='Edit' onClick={()=> router.push(`/account/sadhak-list/active-sadhak/${row.original._id}/edit-sadhak`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>
                 <button type='button' title='Disable' onClick={()=> router.push(`/account/sadhak-list/active-sadhak/${row.original._id}/disable-sadhak`)} className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full  hover:border-black'><HiMinus size={12}/></button>
                 <button type='button' title='Delete' onClick={()=> router.push(`/account/sadhak-list/active-sadhak/${row.original._id}/delete-sadhak`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>
@@ -91,27 +93,27 @@ const ActiveSadhakList : React.FC = () => {
     };
 
     useEffect(() => {
-      async function fetchSadhakData() {
-        try {
+    async function fetchSadhakData() {
+      try {
           const res = await fetch(`${BASE_API_URL}/api/users/list`, {
-            method: "GET", // Explicitly specify the HTTP method
-            cache: "no-store",
-          });
+          method: "GET", // Explicitly specify the HTTP method
+          cache: "no-store",
+        });
 
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-  
-          const sadhakData = await res.json();
-          setActiveSdk(sadhakData.activeSdkList);
-          console.log(sadhakData.activeSdkList);         
-        } catch (error) {
-          console.error("Error fetching sadhak data:", error);
-        } finally {
-          setIsLoading(false);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
         }
+
+        const sadhakData = await res.json();
+        setActiveSdk(sadhakData.activeSdkList);
+        console.log(sadhakData.activeSdkList);         
+      } catch (error) {
+        console.error("Error fetching sadhak data:", error);
+      } finally {
+        setIsLoading(false);
       }
-      fetchSadhakData();
+    }
+    fetchSadhakData();
     }, []);
 
     if(isLoading){

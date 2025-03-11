@@ -22,7 +22,7 @@ const ProspectsList : React.FC = () => {
   const [prosData, setProsData] = useState<ProspectsListProps[] | null>([]);
   const data = React.useMemo(() => prosData ?? [], [prosData]);
   const columns = React.useMemo(() => [
-    { header: 'Name', accessorKey: 'sdkName'},
+    { header: 'Name', accessorKey: 'sdkFstName'},
     { header: 'SDK Id', accessorKey: 'usrId'},
     { header: 'Phone',  accessorKey: 'sdkPhone'},
     { header: 'Course', accessorKey: 'corId'},
@@ -98,14 +98,8 @@ const ProspectsList : React.FC = () => {
 
   return (
     <div>
-      <div>
-        <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center'>
-            <select className='inputBox w-[300px]'>--- Select Course ---</select>
-            <select className='inputBox w-[300px]'>--- Select Batch ---</select>
-          </div>
-          <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
-        </div>
+      <div className='flex mb-2 items-center justify-between'>
+          <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>  
       </div>
       <div className='overflow-auto max-h-[412px]'>
         <DataTable  table={table}/>

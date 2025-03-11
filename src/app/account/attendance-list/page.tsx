@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { FiEye } from 'react-icons/fi';
 import { BASE_API_URL } from '@/app/utils/constant';
+import Loading from '../Loading';
 
 interface AttendanceListProps {
  _id:string,
@@ -37,7 +38,7 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
     { header: 'Action', accessorKey: 'atdAction', 
         cell: ({ row }: { row: any }) => ( 
           <div className='flex items-center justify-center'> 
-            <button type='button' title='View' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/mark-attendance`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+            <button type='button' title='View' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attendees`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
           </div> 
         ), 
       },
@@ -62,8 +63,9 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
           const coNick = item.corId?.coNick || "";
           const bthId = item.bthId?._id || "";
           const bthName = item.bthId?.bthName || "";
+          const joiners=item.joinersCount;
           
-          return item.clsName.map((clsItem: any) => ({
+          return item.clsName.filter((a:any) => a.isActive).map((clsItem: any) => ({
             _id: item._id,
             bthId:bthId,
             clsName: clsItem.clsDay || "", 
@@ -72,7 +74,7 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
             clsDate: clsItem.clsDate ? new Date(clsItem.clsDate) : new Date(),
             coNick,
             bthName,
-            bthJoiners: item.bthJoiners || 0, 
+            bthJoiners: joiners || 0, 
           }));
         });
     
@@ -111,6 +113,12 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
       setPageInput(Number(e.target.value)); 
       table.setPageIndex(page); 
     };
+
+    if(isLoading){
+      return <div>
+        <Loading/>
+      </div>
+    }
 
   return (
     <div>

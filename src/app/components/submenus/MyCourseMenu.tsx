@@ -16,8 +16,8 @@ const MyCourseMenu : React.FC = () => {
     <div>
       <div className='flex flex-col w-auto'>    
         <Link href="/account/my-courses/elg-courses" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- ELEGIBLE</Link>      
-        <Link href="/account/my-courses/all-courses" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- AVAILABLE</Link> 
         <Link href="/account/my-courses/done-courses" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- COMPLETED</Link>
+        <Link href="/account/my-courses/all-courses" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- ALL COURSES</Link> 
       </div>
     </div>
   )

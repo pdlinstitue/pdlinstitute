@@ -21,7 +21,7 @@ export async function GET(req:NextRequest){
     let enrList: EnrType[] = await Enrollments.find() 
       .populate("corId", "coName coType")
       .populate("bthId", "bthName bthStart")
-      .populate("usrId", "sdkFstName sdkPhone")
+      .populate("createdBy", "sdkFstName sdkPhone")
       .lean() as unknown as EnrType[]; // Convert to plain objects for modification
 
     // Compute ttlJoiners asynchronously

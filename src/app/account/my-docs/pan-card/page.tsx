@@ -1,46 +1,83 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
-import mData from '../../MOCK_DATA.json';
-import { FaCalendarCheck } from "react-icons/fa6";
-import { IoCreateOutline } from "react-icons/io5";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Loading from '../../Loading';
+import { useRouter } from 'next/navigation';
+import { BASE_API_URL } from '@/app/utils/constant';
+import { FiEye } from 'react-icons/fi';
+import { BiEditAlt } from 'react-icons/bi';
+import { format } from 'date-fns';
+import Cookies from 'js-cookie';
 
-interface MarkAttendanceProps {
+interface DocTypeProps  {
+    _id?: string;
+    sdkDocOwnr: string;
+    sdkUpldDate: Date;
+    sdkDocStatus: string;
+    sdkAprDate: Date;
+    sdkRemarks: string;
+    sdkDocRel: string;
+    sdkPan: string;
+    sdkIdProof: string;
+    sdkAddProof: string;
+  };
 
-  data: { id: number; first_name: string; last_name: string; email: string; gender: string; }[];
+const MyPanCard : React.FC = () => {
 
-  columns: { header: string; accessorKey: string; }[];
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [panData, setPanData] = useState<DocTypeProps[] | null>([]);
+  const data = React.useMemo(() => panData ?? [], [panData]);
 
-}
-
-const MarkAttendance : React.FC<MarkAttendanceProps> = () => {
-
-  const data = React.useMemo(() => mData, []);
-  const columns = React.useMemo(() => [
-    {
-      header: 'ID',
-      accessorKey: 'id',
-    },
-    {
-      header: 'First Name',
-      accessorKey: 'first_name',
-    },
-    {
-      header: 'Last Name',
-      accessorKey: 'last_name',
-    },
-    {
-      header: 'Email',
-      accessorKey: 'email',
-    },
-    {
-      header: 'Gender',
-      accessorKey: 'gender',
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
     }
-  ], []);
+  };
 
+  //changing the status color as per the status
+  const StatusCell = ({ row }: { row: any }) => {
+    const statusClass = (value: string) => 
+      value === 'Approved' ? 'text-green-500 italic'
+      : 
+      value === 'Rejected' ? 'text-red-500 italic'
+      : 
+      value === 'Pending' ? 'text-orange-500 italic' : 'text-black';
+      return <span className={statusClass(row.original.sdkDocStatus)}>
+            {row.original.sdkDocStatus}
+        </span>;
+  };
+
+  //changing the date format using date-fns library
+  const DateCell = ({ row }: { row: any }) => {
+    const sdkAprDate = row.original?.sdkAprDate;
+    const formattedDate = sdkAprDate ? format(new Date(sdkAprDate), "MMM do, yyyy") : "N/A"; // Fallback for null/undefined
+    return <span>{formattedDate}</span>;
+  };
+  
+  const columns = React.useMemo(() => [
+    {header: 'Sadhak', accessorKey: 'createdBy.sdkFstName'},
+    {header: 'Sdk Id', accessorKey: 'createdBy._id'},
+    {header: 'Phone', accessorKey: 'createdBy.sdkPhone'},
+    {header: 'PAN', accessorKey: 'sdkPanNbr'},
+    {header: 'Owner', accessorKey: 'sdkDocOwnr'},
+    {header: 'Relation', accessorKey: 'sdkDocRel'},
+    {header: 'Date: A/R', accessorKey: 'sdkAprDate', cell: DateCell},
+    {header: 'Status', accessorKey: 'sdkDocStatus', cell: StatusCell},
+    {header: 'Action', accessorKey: 'docAction', 
+      cell: ({ row }: { row: any }) => ( 
+        <div className='flex items-center gap-3'> 
+          <button type='button' title='Edit' onClick={()=> router.push(`/account/my-docs/pan-card/${row.original._id}/edit-pan-card`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>
+        </div> 
+      ), 
+    }, 
+    
+  ], []);
+  
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
@@ -49,7 +86,7 @@ const MarkAttendance : React.FC<MarkAttendanceProps> = () => {
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
     };
-  
+
     const table = useReactTable(
       {
         data, 
@@ -75,15 +112,38 @@ const MarkAttendance : React.FC<MarkAttendanceProps> = () => {
       table.setPageIndex(page); 
     };
 
+    useEffect(() => {
+    async function fetchPanData() {
+    try 
+      {
+        const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.result._id}`, { cache: "no-store" });
+        const docData = await res.json();
+        setPanData(docData.panList);
+      } catch (error) {
+          console.error("Error fetching doc data:", error);
+      } finally {
+          setIsLoading(false);
+      }
+    }
+    fetchPanData();
+    }, []);
+
+    if(isLoading){
+      return <div>
+        <Loading/>
+      </div>
+    }
+
   return (
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
           <div className='flex gap-2 items-center'>
-            <select className='inputBox w-[300px]'>--- Select Course ---</select>
-            <select className='inputBox w-[300px]'>--- Select Batch ---</select>
-          </div>
-          <div className='flex gap-2 items-center'>
+          {data.length === 0 && (
+            <Link href="/account/add-new-pan" title="Upload Pan" className="btnLeft">
+              UPLOAD PAN
+            </Link>)
+          }
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
           </div>
         </div>
@@ -113,4 +173,4 @@ const MarkAttendance : React.FC<MarkAttendanceProps> = () => {
   )
 }
 
-export default MarkAttendance;
+export default MyPanCard;

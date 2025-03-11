@@ -5,9 +5,11 @@ import toast from 'react-hot-toast';
 import React, { FormEvent, useState } from 'react';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '@/app/account/Loading';
+import Cookies from 'js-cookie';
 
 interface SdkNameProps {
-    sdkFstName:string
+    sdkFstName:string;
+    disabledBy:string;
 }
 
 interface ISdkParams {
@@ -21,21 +23,29 @@ const DisableSadhak : React.FC <ISdkParams>= ({params}) => {
   const router = useRouter();
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
-  const [sadhakName, setSadhakName] = useState<SdkNameProps>({sdkFstName:''});
+  const [sadhakName, setSadhakName] = useState<SdkNameProps>({sdkFstName:'', disabledBy:''});
+
+  const loggedInUser = {
+    result:{
+      _id:Cookies.get("loggedInUserId"), 
+      usrName:Cookies.get("loggedInUserName"),
+      usrRole:Cookies.get("loggedInUserRole"),
+    }
+  };
   
     useEffect(() => { 
     async function fetchSadhakById() { 
-        try 
-            { 
-                const res = await fetch(`${BASE_API_URL}/api/users/${SdkId}/view-sadhak`, {cache: "no-store"}); 
-                const sadhakData = await res.json(); 
-                setSadhakName(sadhakData.sdkById);      
-            } catch (error) { 
-                console.error("Error fetching SadhakData:", error); 
-            } finally {
-                setIsLoading(false);
-            }
-        } fetchSadhakById(); 
+    try 
+        { 
+            const res = await fetch(`${BASE_API_URL}/api/users/${SdkId}/view-sadhak`, {cache: "no-store"}); 
+            const sadhakData = await res.json(); 
+            setSadhakName(sadhakData.sdkById);      
+        } catch (error) { 
+            console.error("Error fetching SadhakData:", error); 
+        } finally {
+            setIsLoading(false);
+        }
+    } fetchSadhakById(); 
     }, []);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -43,7 +53,10 @@ const DisableSadhak : React.FC <ISdkParams>= ({params}) => {
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/users/${SdkId}/disable-sadhak`, {
-                method: 'PATCH'
+                method: 'PATCH',
+                body: JSON.stringify({
+                    disabledBy:loggedInUser.result._id
+                })
             });
 
             const post = await response.json();

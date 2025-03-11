@@ -7,8 +7,12 @@ import Prospects from "../../../../../../modals/Prospects";
 type ProsType = {
   prosMonth:string,
   prosShift:string,
+  prosWeek:number,
+  prosOptMonth:string,
+  prosOptShift:string,
+  prosOptWeek:number,
   corId:string,
-  usrId:string
+  createdBy:string
 }
 
 export async function GET(req:NextRequest){
@@ -39,9 +43,9 @@ export async function POST(req: NextRequest) {
     try {
   
       await dbConnect();
-      const { prosMonth, prosShift, corId, usrId }: ProsType = await req.json();
+      const { prosMonth, prosShift, prosWeek, prosOptMonth, prosOptShift, prosOptWeek, corId, createdBy }: ProsType = await req.json();
   
-      const newPros = new Prospects({ prosMonth, prosShift, corId, usrId});
+      const newPros = new Prospects({ prosMonth, prosShift, prosWeek, prosOptMonth, prosOptShift, prosOptWeek, corId, createdBy});
       const savedPros = await newPros.save();
 
       if(savedPros){

@@ -177,12 +177,12 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
     <div>
       <form className="flex flex-col gap-4 h-auto border-[1.5px] border-orange-500 p-9 rounded-md">
         <div className="grid grid-cols-2 gap-6">
-          <div className="w-full h-[250px]">
+          <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
             <Image
-              src="/images/sadhak.jpg"
+              src={sdkData.sdkImg}
               alt="sadhak"
               width={600}
-              height={250}
+              height={350}
             />
           </div>
           <div className="flex flex-col gap-2">

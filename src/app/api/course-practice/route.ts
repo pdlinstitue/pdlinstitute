@@ -11,7 +11,7 @@ type PrcType = {
   prcEndsAt: String,
   prcLink: String,
   prcWhatLink: String,
-  usrId: String 
+  createdBy: String 
 }
 
 export async function GET(req:NextRequest){
@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
     try {
   
       await dbConnect();
-      const { prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink,  prcImg, usrId }: PrcType = await req.json();
+      const { prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink,  prcImg, createdBy }: PrcType = await req.json();
   
-      const newPractices = new Practices({ prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink, prcImg, usrId});
+      const newPractices = new Practices({ prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink, prcImg, createdBy});
       const savedPractice = await newPractices.save();
 
       if(savedPractice){

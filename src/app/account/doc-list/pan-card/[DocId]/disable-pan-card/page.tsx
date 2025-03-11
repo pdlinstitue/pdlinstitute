@@ -5,9 +5,11 @@ import toast from 'react-hot-toast';
 import React, { FormEvent, useState } from 'react';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '@/app/account/Loading';
+import Cookies from 'js-cookie';
 
 interface PanNumberProps {
-    sdkPanNbr:string
+    sdkPanNbr:string;
+    disabledBy:string
 }
 
 interface IDocParams {
@@ -21,21 +23,29 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
     const router = useRouter();
     const { DocId } = use(params);
     const [isLoading, setIsLoading] = useState(true);
-    const [panNumber, setPanNumber] = useState<PanNumberProps>({sdkPanNbr:''});
+    const [panNumber, setPanNumber] = useState<PanNumberProps>({sdkPanNbr:'', disabledBy:''});
   
+    const loggedInUser = {
+        result:{
+          _id:Cookies.get("loggedInUserId"), 
+          usrName:Cookies.get("loggedInUserName"),
+          usrRole:Cookies.get("loggedInUserRole"),
+        }
+    };
+
     useEffect(() => { 
     async function fetchPanById() { 
-        try 
-            { 
-                const res = await fetch(`${BASE_API_URL}/api/documents/${DocId}/view-doc`, {cache: "no-store"}); 
-                const panData = await res.json(); 
-                setPanNumber(panData.docById);      
-            } catch (error) { 
-                console.error("Error fetching panData:", error); 
-            } finally {
-                setIsLoading(false);
-            }
-        } fetchPanById(); 
+    try 
+        { 
+            const res = await fetch(`${BASE_API_URL}/api/documents/${DocId}/view-doc`, {cache: "no-store"}); 
+            const panData = await res.json(); 
+            setPanNumber(panData.docById);      
+        } catch (error) { 
+            console.error("Error fetching panData:", error); 
+        } finally {
+            setIsLoading(false);
+        }
+    } fetchPanById(); 
     }, []);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -43,11 +53,13 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/documents/${DocId}/disable-doc`, {
-                method: 'PATCH'
+                method: 'PATCH',
+                body: JSON.stringify({
+                    disabledBy:loggedInUser.result._id
+                })
             });
 
             const post = await response.json();
-
             if (post.success === false) {
                 toast.error(post.msg);
             } else {

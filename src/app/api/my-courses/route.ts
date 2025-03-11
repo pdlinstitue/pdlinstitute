@@ -22,38 +22,40 @@ export async function GET(req: NextRequest) {
         const filteredCourses = [];
 
         for (const course of allCourses) {
+            // Check if the user is already enrolled in this course
+            const enrollment = await Enrollments.findOne({
+                createdBy: sdkObjectId,
+                corId: course._id,
+            });
+
+            // Skip the course if the user is enrolled and has completed it
+            if (enrollment && enrollment.isCompleted) {
+                continue;
+            }
+
             if (course.coElg === "None") {
                 filteredCourses.push(course);
                 continue;
             }
 
             if (course.coElgType === "Course") {
-                // Convert course eligibility ID to ObjectId
                 const coElgId = new mongoose.Types.ObjectId(course.coElg);
-
-                // Check if user has completed the required course
                 const isCompleted = await Enrollments.exists({
                     createdBy: sdkObjectId,
                     corId: coElgId,
                     isCompleted: true,
                 });
-
                 if (isCompleted) {
                     filteredCourses.push(course);
                 }
             } else if (course.coElgType === "Category") {
-                // Find all courses within this category
                 const categoryCourses = await Courses.find({ coCat: course.coElg }).lean();
-                const categoryCourseIds = categoryCourses.map((catCourse:any) => new mongoose.Types.ObjectId(catCourse._id));
-
-                // Count how many of the category courses are completed
+                const categoryCourseIds = categoryCourses.map((catCourse) => new mongoose.Types.ObjectId(catCourse._id as string));
                 const completedCount = await Enrollments.countDocuments({
                     createdBy: sdkObjectId,
                     corId: { $in: categoryCourseIds },
                     isCompleted: true,
                 });
-
-                // If all category courses are completed, allow access
                 if (completedCount === categoryCourses.length) {
                     filteredCourses.push(course);
                 }

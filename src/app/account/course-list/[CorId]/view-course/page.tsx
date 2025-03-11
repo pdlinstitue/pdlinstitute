@@ -66,7 +66,7 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
   return (
     <div className='flex items-center justify-center'>
       <div className='formStyle my-3 w-[400px]'>
-        <Image alt="course" src="/images/sadhak.jpg" width={400} height={200}/>
+        <Image alt="course" src={data.coImg} width={400} height={200}/>
         <h2 className='font-semibold text-lg text-center text-white p-2 bg-orange-500'>{data.coName}</h2>
         <div className='grid grid-cols-2 gap-1 text-sm font-semibold'>
             <div>

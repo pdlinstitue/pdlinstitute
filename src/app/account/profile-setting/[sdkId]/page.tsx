@@ -57,6 +57,8 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
   const router = useRouter();
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [image, setImage] = useState<File | string | null>(null);
+  const [preview, setPreview] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
@@ -165,13 +167,46 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
     fetchCityList();
   }, [sdkData.sdkState]);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ): void => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
     const { name, value } = e.target;
     setSdkData((prevData) => ({ ...prevData, [name]: value }));
+  };
+  
+  const handleFileChange = (e:any) => {
+    const file = e.target.files[0];
+    if (file) {
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+
+    if (!image) {
+        toast.error("Please select an image!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("profileImage", image);
+    formData.append("profileImageFileName", sdkData.sdkImg);
+
+    try {
+        const res = await fetch("/api/profile-upload", {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            toast.success("Image uploaded successfully!");            
+            setImage(data.imageUrl);
+        } else {
+            throw new Error(data.error || "Upload failed");
+        }
+    } catch (error:any) {
+        toast.error(error.message);
+    }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -302,7 +337,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               sdkEmail: sdkData.sdkEmail,
               sdkComAdds: sdkData.sdkComAdds,
               sdkParAdds: sdkData.sdkParAdds,
-              sdkImg: sdkData.sdkImg,
+              sdkImg: image,
               sdkRole: sdkData.sdkRole,
               updatedBy: loggedInUser.result?._id,
             }),
@@ -339,13 +374,21 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         onSubmit={handleSubmit}
       >
         <div className="grid grid-cols-2 gap-6">
-          <div className="w-full h-[250px]">
-            <Image
-              src="/images/sadhak.jpg"
-              alt="sadhak"
-              width={600}
-              height={250}
-            />
+          <div className="flex flex-col gap-1">
+            <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
+              <Image src={preview || sdkData.sdkImg}  alt="sadhakImage" width={600} height={350} />
+            </div>
+            <div className="flex items-center gap-1">
+              <input
+                type="file"
+                accept="image/*"
+                className="inputBox w-full h-[45px]"
+                onChange={handleFileChange}
+              />
+              <button type="button" className="btnLeft" onClick={handleUpload}>
+                UPLOAD
+              </button>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-3 gap-2">
