@@ -66,7 +66,7 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
           const joiners=item.joinersCount;
           
           return item.clsName.filter((a:any) => a.isActive).map((clsItem: any) => ({
-            _id: item._id,
+            _id: clsItem._id,
             bthId:bthId,
             clsName: clsItem.clsDay || "", 
             clsStartAt: clsItem.clsStartAt || "",
@@ -75,15 +75,17 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
             coNick,
             bthName,
             bthJoiners: joiners || 0, 
+            clsPresent:clsItem.presentCount,
+            clsAbsent:clsItem.absentCount
           }));
         });
     
         setClsData(updatedClassList);
         console.log(updatedClassList);
       } catch (error) {
-        console.error("Error fetching class data:", error);
+          console.error("Error fetching class data:", error);
       } finally {
-        setIsLoading(false);
+          setIsLoading(false);
       }
     }
     fetchBatchData();

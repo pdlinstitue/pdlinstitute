@@ -8,16 +8,39 @@ import { RiProfileLine } from "react-icons/ri";
 import { MdSettingsBrightness } from "react-icons/md";
 import { PiFolderLockFill } from "react-icons/pi";
 import { MdLogout } from "react-icons/md";
+import { useEffect, useState } from 'react';
+import Loading from '@/app/account/Loading';
 
 const ProfMenu = () => {
 
   const router = useRouter();
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName")
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
 
   const handleLogOut = () => {
     Cookies.remove("loggedInUserId");
@@ -26,6 +49,12 @@ const ProfMenu = () => {
     Cookies.remove("token");
     toast.success('Logged out successfully');
     router.push('/login');
+  }
+
+  if(isLoading){
+    return <div>
+      <Loading/>
+    </div>
   }
 
   return (

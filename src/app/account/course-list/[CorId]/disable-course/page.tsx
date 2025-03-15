@@ -23,14 +23,32 @@ const DisableCourse : React.FC <ICorParams>= ({params}) => {
     const { CorId } = use(params);
     const [isLoading, setIsLoading] = useState(true);
     const [courseName, setCourseName] = useState<CorNameProps>({coNick:''});
-
-    const loggedInUser = {
-        result:{
-          _id:Cookies.get("loggedInUserId"), 
-          usrName:Cookies.get("loggedInUserName"),
-          usrRole:Cookies.get("loggedInUserRole"),
+    const [loggedInUser, setLoggedInUser] = useState({
+        result: {
+          _id: '',
+          usrName: '',
+          usrRole: '',
+        },
+      });
+       
+    useEffect(() => {
+    try {
+        const userId = Cookies.get("loggedInUserId") || '';
+        const userName = Cookies.get("loggedInUserName") || '';
+        const userRole = Cookies.get("loggedInUserRole") || '';
+        setLoggedInUser({
+            result: {
+                _id: userId,
+                usrName: userName,
+                usrRole: userRole,
+            },
+         });
+        } catch (error) {
+            console.error("Error fetching loggedInUserData.");
+        } finally {
+            setIsLoading(false);
         }
-    }; 
+    }, []); 
   
     useEffect(() => { 
     async function fetchCourseById() { 

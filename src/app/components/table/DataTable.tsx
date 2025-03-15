@@ -1,11 +1,10 @@
+
 "use client";
 import React from "react";
 import { flexRender } from "@tanstack/react-table";
-
 interface DataTableProps {
   table: any;
 }
-
 const DataTable: React.FC<DataTableProps> = ({ table }) => {
   return (
     <div>
@@ -80,5 +79,4 @@ const DataTable: React.FC<DataTableProps> = ({ table }) => {
     </div>
   );
 };
-
 export default DataTable;

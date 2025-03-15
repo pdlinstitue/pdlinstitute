@@ -354,7 +354,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
           router.push("/account/dashboard");
         }
       } catch (error) {
-        toast.error("Error updating profile.");
+          toast.error("Error updating profile.");
       }
     }
   };

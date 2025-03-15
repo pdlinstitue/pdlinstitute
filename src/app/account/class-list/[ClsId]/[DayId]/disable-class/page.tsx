@@ -24,14 +24,33 @@ const DisableClass : React.FC <IClassParams>= ({params}) => {
     const { ClsId, DayId } = use(params);
     const [isLoading, setIsLoading] = useState(true);
     const [className, setClassName] = useState<ClassNameProps>({clsDay:''});
-    const loggedInUser = {
-        result:{
-          _id:Cookies.get("loggedInUserId"), 
-          usrName:Cookies.get("loggedInUserName"),
-          usrRole:Cookies.get("loggedInUserRole"),
+    const [loggedInUser, setLoggedInUser] = useState({
+        result: {
+          _id: '',
+          usrName: '',
+          usrRole: '',
+        },
+      });
+       
+    useEffect(() => {
+        try {
+            const userId = Cookies.get("loggedInUserId") || '';
+            const userName = Cookies.get("loggedInUserName") || '';
+            const userRole = Cookies.get("loggedInUserRole") || '';
+            setLoggedInUser({
+            result: {
+                _id: userId,
+                usrName: userName,
+                usrRole: userRole,
+            },
+            });
+        } catch (error) {
+            console.error("Error fetching loggedInUserData.");
+        } finally {
+            setIsLoading(false);
         }
-    };
-  
+    }, []);
+
     useEffect(() => { 
     async function fetchClassById() { 
     try 

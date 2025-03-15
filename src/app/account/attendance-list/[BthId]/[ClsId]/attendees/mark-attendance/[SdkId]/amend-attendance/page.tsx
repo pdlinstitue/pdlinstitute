@@ -3,8 +3,8 @@ import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import React, { FormEvent, use, useEffect, useState } from 'react';
-import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '@/app/account/Loading';
+import { BASE_API_URL } from '@/app/utils/constant';
 
 
 interface IAttdParams {
@@ -18,15 +18,15 @@ interface IAttdParams {
 interface MarkAttendanceProps {
   status:string,
   absRemarks:string,
-  markedBy:string
+  updatedBy:string
 }
 
-const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
+const AmendAttendance : React.FC<IAttdParams> = ({params}) => {
 
   const router = useRouter();
   const {BthId, ClsId, SdkId} = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [attdStatus, setAttdStatus] = useState<MarkAttendanceProps>({status:'', absRemarks:'', markedBy:''});
+  const [attdStatus, setAttdStatus] = useState<MarkAttendanceProps>({status:'', absRemarks:'', updatedBy:''});
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
       _id: '',
@@ -53,7 +53,7 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
         setIsLoading(false);
     }
   }, []);
-
+   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setAttdStatus((prev) => ({
@@ -69,18 +69,46 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
     }));
   };
 
+  useEffect(() => {
+    async function fetchAttdData() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/mark-attendance/${BthId}/${ClsId}/${SdkId}`, {
+          cache: "no-store",
+        });
+  
+        if (!res.ok) throw new Error("Failed to fetch attendance data");
+  
+        const attData = await res.json();
+  
+        setAttdStatus({
+          status: attData.attendance[0]?.status || "", // ✅ Use optional chaining & fallback values
+          absRemarks: attData.attendance[0]?.absRemarks || "",
+          updatedBy: attData.attendance[0]?.updatedBy || "", // ✅ Ensure `updatedBy` is handled
+        });
+      } catch (error) {
+        console.error("Error fetching attendance data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  
+    if (BthId && ClsId && SdkId) { // ✅ Ensure IDs are valid before fetching
+      fetchAttdData();
+    }
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
 
-      const response = await fetch(`${BASE_API_URL}/api/mark-attendance/${BthId}/${ClsId}/${SdkId}`, {
+      const response = await fetch(`${BASE_API_URL}/api/mark-attendance/${BthId}/${ClsId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          sdkIds:[SdkId],
           status:attdStatus.status,
           absRemarks:attdStatus.absRemarks,
-          markedBy:loggedInUser.result._id
+          updatedBy:loggedInUser.result._id
         }),
       });
 
@@ -99,10 +127,10 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
   };
 
   if(isLoading){
-    return<div>
+    return <div>
       <Loading/>
     </div>
-  }
+  };
 
   return (
     <div className='flex justify-center items-center'>
@@ -114,8 +142,8 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
           <div className='flex items-center gap-4'>
             <input
               type="radio"
-              name="status"
-              defaultChecked
+              name="status"   
+              checked={attdStatus?.status === "Present"}
               onClick={()=>handleMarkAttd("Present")}
             />
             <span>Present</span>
@@ -124,6 +152,7 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
             <input
               type="radio"
               name="status"
+              checked={attdStatus?.status === "Absent"}
               onClick={()=>handleMarkAttd("Absent")}
             />
             <span>Absent</span>
@@ -151,4 +180,4 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
   )
 }
 
-export default MarkAttendance;
+export default AmendAttendance;

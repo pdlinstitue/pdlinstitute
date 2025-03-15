@@ -1,27 +1,48 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
-import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
+import {
+  useReactTable, 
+  getCoreRowModel, 
+  getFilteredRowModel,FilterFn,
+  getPaginationRowModel, 
+  getSortedRowModel, 
+  SortingState,
+} from '@tanstack/react-table';
 import Loading from '../Loading';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiEye } from 'react-icons/fi';
 import { BASE_API_URL } from '@/app/utils/constant';
 import { format } from 'date-fns';
-
 interface EnrollmentListProps {
   enrBthName:string,
   enrTnsNo:string,
   enrSrnShot:string,
   corId:string,
   bthId:string,
-  usrId?:string
+  createdBy?:string
+}
+interface SelectedCourseProps {
+  _id:string,
+  coName:string
+}
+interface SelectedBatchProps {
+  _id:string,
+  bthName:string
 }
 
 const EnrollmentList : React.FC<EnrollmentListProps> = () => {
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
+  const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
   const [enrData, setEnrData] = useState<EnrollmentListProps[] | null>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [selectedCourse, setSelectedCourse] = useState<string>(''); 
+  const [selectedBatch, setSelectedBatch] = useState<string>('')
+  const [filtered, setFiltered] = React.useState('');
+  const [pageInput, setPageInput] = React.useState(1);
   const data = React.useMemo(() => enrData ?? [], [enrData]);
 
   //changing the status color as per the status
@@ -41,7 +62,7 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
     { header: 'Sadhak', accessorKey: 'createdBy.sdkFstName'},
     { header: 'SDK Id', accessorKey: 'createdBy._id'},
     { header: 'Phone',  accessorKey: 'createdBy.sdkPhone'},
-    { header: 'Course', accessorKey: 'corId'},
+    { header: 'Course', accessorKey: 'coNick'},
     { header: 'Type',   accessorKey: 'coType'},
     { header: 'Batch Name',  accessorKey: 'bthId'},
     { header: 'Batch Date', accessorKey: 'bthStart'},
@@ -56,10 +77,6 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
           ), 
         },
   ], []);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [filtered, setFiltered] = React.useState('');
-  const [pageInput, setPageInput] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(25);
 
   const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
     return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
@@ -68,12 +85,12 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
   useEffect(()=>{
     async function fetchEnrollmentData(){
       try {
-        const res = await fetch(`${BASE_API_URL}/api/enrollments`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
         const enrDataList = await res.json();
         const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
           return { 
             ...item, 
-            corId: item.corId.coName, 
+            coNick: item.corId.coNick, 
             coType: item.corId.coType,  
             bthId: item.bthId.bthName, 
             sdkFstName: item.createdBy.sdkFstName,
@@ -90,7 +107,7 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
       }
     }
     fetchEnrollmentData();
-  },[])
+  },[selectedCourse, selectedBatch])
 
   const table = useReactTable(
     {
@@ -107,7 +124,7 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
       },
       onSortingChange: setSorting,
       getFilteredRowModel: getFilteredRowModel(),
-      onGlobalFilterChange: setFiltered
+      onGlobalFilterChange: setFiltered,   
     }
   );
 
@@ -116,6 +133,51 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
     setPageInput(Number(e.target.value)); 
     table.setPageIndex(page); 
   };
+
+  useEffect(() => {
+  async function fetchCourseData() {
+    try {
+        const res = await fetch(`${BASE_API_URL}/api/courses`, {cache: "no-store"});
+        const coData = await res.json();
+        setCourseList(coData.coList);
+    } catch (error) {
+        console.error("Error fetching course data:", error);
+    } finally {
+        setIsLoading(false);
+    }
+  }
+  fetchCourseData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBatchesByCorId() {
+      if (!selectedCourse) {
+        setBatchList([]); // Reset batch list if no course is selected
+        return;
+      }
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/batches`, { cache: 'no-store' });
+        const batchData = await res.json();
+        const filteredBatches = batchData.bthList.filter((batch: any) => batch.corId._id === selectedCourse);
+        setBatchList(filteredBatches);
+      } catch (error) {
+        console.error('Error fetching batch data:', error);
+      }
+    }
+    fetchBatchesByCorId();
+  }, [selectedCourse]); 
+
+  // Handle course change
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCourse(e.target.value);
+    setSelectedBatch(''); // Reset batch selection when course changes
+  };
+
+  // Handle batch change
+  const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedBatch(e.target.value);
+  };
+
 
   if(isLoading){
     return <div>
@@ -127,9 +189,27 @@ const EnrollmentList : React.FC<EnrollmentListProps> = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center'>
-            <select className='inputBox w-[300px]'>--- Select Course ---</select>
-            <select className='inputBox w-[300px]'>--- Select Batch ---</select>
+          <div className="flex gap-2 items-center w-[600px]">
+            <select className="inputBox w-full" name="corId" value={selectedCourse} onChange={handleCourseChange}>
+              <option value="" className='text-center'>--- Select Course ---</option>
+              {courseList?.map((item: any) => {
+              return (
+                <option key={item._id} value={item._id}>
+                  {item.coName}
+                </option>
+              );
+             })}
+            </select>
+            <select className="inputBox w-full" name="corId" value={selectedBatch} onChange={handleBatchChange}>
+              <option value="" className='text-center'>--- Select Batch ---</option>
+              {batchList?.map((item: any) => {
+              return (
+                <option key={item._id} value={item._id}>
+                  {item.bthName}
+                </option>
+              );
+             })}
+            </select>
           </div>
           <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
         </div>

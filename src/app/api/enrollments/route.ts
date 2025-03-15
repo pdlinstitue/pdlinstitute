@@ -12,36 +12,48 @@ type EnrType = {
   ttlJoiners?:number
 }
 
-export async function GET(req:NextRequest){
-
+export async function GET(req: NextRequest) {
   try {
-
     await dbConnect();
-    // Fetch enrollments and populate required fields
-    let enrList: EnrType[] = await Enrollments.find() 
-      .populate("corId", "coName coType")
+
+    // Extract query params correctly
+    const corId = req.nextUrl.searchParams.get("corId");
+    const bthId = req.nextUrl.searchParams.get("bthId");
+
+    // Fetch enrollments with population
+    let enrList: EnrType[] = await Enrollments.find()
+      .populate("corId", "coName coNick coType")
       .populate("bthId", "bthName bthStart")
       .populate("createdBy", "sdkFstName sdkPhone")
-      .lean() as unknown as EnrType[]; // Convert to plain objects for modification
+      .lean() as unknown as EnrType[];
+
+    // Apply filtering correctly
+    if (corId || bthId) {
+      enrList = enrList.filter((enr) => 
+        (!corId || enr.corId._id.toString() === corId) && 
+        (!bthId || enr.bthId._id.toString() === bthId)
+      );
+    }
 
     // Compute ttlJoiners asynchronously
     enrList = await Promise.all(
       enrList.map(async (doc) => {
         const ttlJoiners = await Enrollments.countDocuments({
-          bthId: doc.bthId,
           corId: doc.corId,
+          bthId: doc.bthId,
         });
         return { ...doc, ttlJoiners };
       })
     );
 
-    if (enrList && enrList.length > 0){
-      return NextResponse.json({ enrList, success: true }, {status:200});     
-    }else {
+    if (enrList.length > 0) {
+      return NextResponse.json({ enrList, success: true }, { status: 200 });
+    } else {
       return NextResponse.json({ msg: "No enrollments found", success: false }, { status: 404 });
-    }      
-  } catch (error) {
-    return new NextResponse("Error while fetching enrData: " + error, {status:500});
+    }
+  } catch (error: any) {
+    console.error("Error fetching enrollments:", error);
+    return new NextResponse(`Error fetching enrollments: ${error.message}`, { status: 500 });
   }
 }
   

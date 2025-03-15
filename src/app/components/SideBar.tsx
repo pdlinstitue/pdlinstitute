@@ -1,7 +1,7 @@
 "use client"
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { MdDashboard } from "react-icons/md";
 import { MdOutlineAppRegistration } from "react-icons/md";
@@ -28,25 +28,51 @@ import Cookies from 'js-cookie';
 import MyCourseMenu from './submenus/MyCourseMenu';
 import { GiMeditation } from "react-icons/gi";
 import MyDocMenu from './submenus/MyDocMenu';
+import Loading from '../account/Loading';
 
 
 
 const SideBar: React.FC = () => {
 
   const pathName = usePathname();
-  const [selectedNumber, setSelectedNumber] = useState<number | null>(null); 
-
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
     }
-  }; 
+  }, []);
   
   const handleToggle = (number: number) => { 
     setSelectedNumber(number === selectedNumber ? null : number); 
   };
+
+  if(isLoading){
+    return <div>
+      <Loading/>
+    </div>
+  }
   
   return (
     <div>

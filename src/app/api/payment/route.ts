@@ -6,13 +6,9 @@ export async function POST(req: NextRequest) {
   const corId = req.nextUrl.searchParams.get("corId");
   const { order_id, amount, customer_email, customer_phone } = await req.json();
 
-  const merchantId = process.env.CCAVENUE_MERCHANT_ID;
-  const accessCode = process.env.CCAVENUE_ACCESS_CODE;
-  const workingKey = process.env.CCAVENUE_WORKING_KEY?.substring(0,16);
-
-  if (!workingKey) {
-    throw new Error("CCAVENUE_WORKING_KEY is not defined");
-  }
+  const merchantId = process.env.CCAVENUE_MERCHANT_ID || "";
+  const accessCode = process.env.CCAVENUE_ACCESS_CODE || "";
+  const workingKey = process.env.CCAVENUE_WORKING_KEY || "";
 
   const redirectUrl = encodeURIComponent(`http://www.localhost:3000/my-courses/${corId}/enroll-course/${enrId}/payment-success`);
   const cancelUrl = encodeURIComponent(`http://www.localhost:3000/my-courses/${corId}/enroll-course/${enrId}/payment-failed`);
@@ -20,20 +16,25 @@ export async function POST(req: NextRequest) {
   // 🔹 Construct the request string
   const data = `merchant_id=${merchantId}&order_id=${order_id}&currency=INR&amount=${amount}&redirect_url=${redirectUrl}&cancel_url=${cancelUrl}&billing_email=${customer_email}&billing_tel=${customer_phone}`;
 
-  // 🔹 Encryption function with proper key formatting
-  const encrypt = (plainText: string, key: string) => {
-    const keyHash = Crypto.createHash("md5").update(key).digest("hex"); // Ensure 16-byte key
-    const formattedKey = Buffer.from(keyHash, "hex").subarray(0, 16); // Convert to 16-byte key buffer
-    const iv = Buffer.alloc(16, 0); // AES-128-CBC requires 16-byte IV (zeroed out)
+  const IV = Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]); // Correct IV format
 
-    const cipher = Crypto.createCipheriv("aes-128-cbc", formattedKey, iv);
+  // Generate 32-byte key using MD5 hash (as in the provided function)
+  const key = Crypto.createHash("md5").update(workingKey).digest();
+  
+  // Validate key length
+  if (key.length !== 16) {
+    throw new Error("Invalid derived key length. It must be 16 bytes for AES-128-CBC.");
+  }
+  
+  // 🔹 Encryption function with proper key formatting
+  const encrypt = (plainText: string): string => {
+    const cipher = Crypto.createCipheriv("aes-128-cbc", key, IV);
     let encrypted = cipher.update(plainText, "utf8", "hex");
     encrypted += cipher.final("hex");
-
     return encrypted;
-  };
+  };  
 
-  const encryptedData = encrypt(data, workingKey);
+  const encryptedData = encrypt(data);
 
   return NextResponse.json({ encryptedData, accessCode });
 }

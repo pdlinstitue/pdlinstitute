@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState, use } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
@@ -11,6 +11,12 @@ import { format } from "date-fns";
 interface VolunteerListProps {
   _id: string;
   sdkFstName: string;
+}
+
+interface IBthParam {
+  params:Promise<{
+    BthId:string
+  }>
 }
 interface EditBatchProps {
   bthName: string;
@@ -27,10 +33,13 @@ interface EditBatchProps {
   bthLoc: string;
   bthBank: string;
   bthQr: string;
-  createdBy: string;
+  updatedBy: string;
 }
-const EditBatch: React.FC = () => {
+
+const EditBatch: React.FC <IBthParam>= ({params}) => {
+
   const router = useRouter();
+  const {BthId} = use(params);
   const [image, setImage] = useState<File | string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [data, setData] = useState<EditBatchProps>({
@@ -48,24 +57,39 @@ const EditBatch: React.FC = () => {
     bthLoc: "",
     bthBank: "",
     bthQr: "",
-    createdBy: "",
+    updatedBy: "",
   });
   const [volunteer, setVolunteer] = useState<VolunteerListProps[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const loggedInUser = {
-    result: {
-      _id: Cookies.get("loggedInUserId"),
-      usrName: Cookies.get("loggedInUserName"),
-      usrRole: Cookies.get("loggedInUserRole"),
-    },
-  };
-
   const [errorMessage, setErrorMessage] = useState("");
-  const [coList, setCoList] = useState<
-    { _id: string; coNick: string; coName: string }[] | null
-  >([]);
+  const [coList, setCoList] = useState<{ _id: string; coNick: string; coName: string }[] | null>([]);
   const [batchTitle, setBatchTitle] = useState("");
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleChange = (e: any) => {
     const name = e.target.name;
@@ -167,6 +191,23 @@ const EditBatch: React.FC = () => {
     fetchVolUsers();
   }, []);
 
+  useEffect(() => {
+  async function fetchBatchDataById() {
+    try {
+      const res = await fetch(`${BASE_API_URL}/api/batches/${BthId}/view-batch`, {
+        cache: "no-store",
+      });
+      const batchDataList = await res.json();
+      setData(batchDataList.bthById);
+    } catch (error) {
+        console.error("Error fetching course data:", error);
+    } finally {
+        setIsLoading(false);
+    }
+  }
+  fetchBatchDataById();
+  }, []);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrorMessage(""); // Clear the previous error
@@ -185,8 +226,8 @@ const EditBatch: React.FC = () => {
       setErrorMessage("Please provide location details.");
     } else {
       try {
-        const response = await fetch(`${BASE_API_URL}/api/batches`, {
-          method: "POST",
+        const response = await fetch(`${BASE_API_URL}/api/batches/${BthId}/edit-batch`, {
+          method: "PUT",
           body: JSON.stringify({
             bthName: batchTitle,
             bthShift: data.bthShift,
@@ -202,7 +243,7 @@ const EditBatch: React.FC = () => {
             bthLoc: data.bthLink,
             bthBank: data.bthBank,
             bthQr: image,
-            createdBy: loggedInUser.result._id,
+            updatedBy: loggedInUser.result._id,
           }),
         });
 

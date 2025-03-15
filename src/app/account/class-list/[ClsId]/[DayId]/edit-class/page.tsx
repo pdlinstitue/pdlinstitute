@@ -25,9 +25,9 @@ type ClassItem = {
 };
 
 const EditClass: React.FC<IClsParams> = ({ params }) => {
+
   const router = useRouter();
   const { ClsId, DayId } = use(params);
-
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [assignList, setAssignList] = useState([]);
@@ -42,13 +42,32 @@ const EditClass: React.FC<IClsParams> = ({ params }) => {
     updatedBy: "",
   });
 
-  const loggedInUser = {
+const [loggedInUser, setLoggedInUser] = useState({
     result: {
-      _id: Cookies.get("loggedInUserId"),
-      usrName: Cookies.get("loggedInUserName"),
-      usrRole: Cookies.get("loggedInUserRole"),
+      _id: '',
+      usrName: '',
+      usrRole: '',
     },
-  };
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Fetch Assignment Data
   useEffect(() => {

@@ -14,6 +14,36 @@ type AttdType = {
     markedBy:string
 }
 
+export async function GET(req: NextRequest, { params }: { params: IAttdParams }) {
+  try {
+    await dbConnect();
+
+    const attendance = await Attendance.find({
+      bthId: params.BthId,
+      clsId: params.ClsId,
+      sdkId: params.SdkId, // ✅ Ensure sdkId is used correctly
+    });
+
+    if (attendance.length > 0) { // ✅ Check for actual records
+      return NextResponse.json(
+        { success: true, attendance, msg: "Attendance records found." },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { success: false, attendance: [], msg: "No attendance records found." },
+        { status: 404 } // ✅ Use 404 for "not found"
+      );
+    }
+  } catch (error: any) {
+    console.error("Error fetching attendance:", error);
+    return NextResponse.json(
+      { success: false, msg: "Error fetching attendance data." },
+      { status: 500 } // ✅ Use 500 for internal server errors
+    );
+  }
+}
+
 export async function POST(req: NextRequest, {params}:{params:IAttdParams}) {
   
     try {

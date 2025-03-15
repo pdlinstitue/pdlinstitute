@@ -36,9 +36,9 @@ interface ClassAttendeesProps {
 }
 
 const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
+  
   const router = useRouter();
   const { BthId, ClsId } = use(params);
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enrollData, setEnrollData] = useState<ClassAttendeesProps[]>([]);
   const [selectedRows, setSelectedRows] = useState<ClassAttendeesProps[]>([]);
@@ -83,6 +83,34 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
       { header: "Sadhak Phone", accessorKey: "sdkPhone" },
       { header: "Status", accessorKey: "status", cell: StatusCell },
       { header: "Remarks", accessorKey: "absRemarks" },
+      {
+        header: "Action",
+        accessorKey: "atdAction",
+        cell: ({ row }: { row: any }) => (
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              title="View"
+              onClick={() =>
+                router.push(`/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}`)
+              }
+              className="text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black"
+            >
+              <FiEye size={12} />
+            </button>
+            <button
+              type="button"
+              title="Edit"
+              onClick={() =>
+                router.push(`/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}/amend-attendance`)
+              }
+              className="text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full hover:border-black"
+            >
+              <BiEditAlt size={12} />
+            </button>
+          </div>
+        ),
+      },
     ],
     []
   );  

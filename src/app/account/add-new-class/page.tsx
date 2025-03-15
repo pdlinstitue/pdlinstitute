@@ -116,22 +116,18 @@ const AddNewClass: React.FC = () => {
     }, [data.corId]);
 
   useEffect(() => {
-  async function fetchBatchesByCorId() {
-    try {
-      const res = await fetch(`${BASE_API_URL}/api/batches`, {
-        cache: "no-store",
-      });
-      const batchData = await res.json();
-      const bthByCorId = batchData.bthList.filter(
-        (b: any) => b.corId._id === data.corId
-      );
-      setClsBatch(bthByCorId);
-    } catch (error) {
-      console.error("Error fetching batch data:", error);
-    } finally {
-      setIsLoading(false);
+    async function fetchBatchesByCorId() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/batches`, {cache: "no-store"});
+        const batchData = await res.json();
+        const bthByCorId = batchData.bthList.filter((b: any) => b.corId._id === data.corId);
+        setClsBatch(bthByCorId);
+      } catch (error) {
+          console.error("Error fetching batch data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
   fetchBatchesByCorId();
   }, [data.corId]);
 

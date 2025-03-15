@@ -162,49 +162,26 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
       const data = await response.json();
     
       if (data.encryptedData) {
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
-    
-        // Required Fields
-        const encInput = document.createElement("input");
-        encInput.type = "hidden";
-        encInput.name = "encRequest";
-        encInput.value = data.encryptedData;
-        form.appendChild(encInput);
-    
-        const accessInput = document.createElement("input");
-        accessInput.type = "hidden";
-        accessInput.name = "access_code";
-        accessInput.value = data.accessCode;
-        form.appendChild(accessInput);
-    
-        const commandInput = document.createElement("input");
-        commandInput.type = "hidden";
-        commandInput.name = "command";
-        commandInput.value = "initiateTransaction"; // Required Command
-        form.appendChild(commandInput);
-    
-        const requestTypeInput = document.createElement("input");
-        requestTypeInput.type = "hidden";
-        requestTypeInput.name = "request_type";
-        requestTypeInput.value = "JSON"; // Change to XML or String if needed
-        form.appendChild(requestTypeInput);
-    
-        const responseTypeInput = document.createElement("input");
-        responseTypeInput.type = "hidden";
-        responseTypeInput.name = "response_type";
-        responseTypeInput.value = "JSON"; // Optional
-        form.appendChild(responseTypeInput);
-    
-        const versionInput = document.createElement("input");
-        versionInput.type = "hidden";
-        versionInput.name = "version";
-        versionInput.value = "1.1"; // Required API Version
-        form.appendChild(versionInput);
-    
-        document.body.appendChild(form);
-        form.submit();
+        // Create form & submit
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
+
+      const encInput = document.createElement("input");
+      encInput.type = "hidden";
+      encInput.name = "encRequest";
+      encInput.value = data.encryptedData;
+      form.appendChild(encInput);
+
+      const accessInput = document.createElement("input");
+      accessInput.type = "hidden";
+      accessInput.name = "access_code";
+      accessInput.value = data.accessCode;
+      form.appendChild(accessInput);
+
+      document.body.appendChild(form);
+      form.submit();
+
       }
     };    
   
