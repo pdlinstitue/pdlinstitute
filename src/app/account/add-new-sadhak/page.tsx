@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import Loading from "../Loading";
 
-
 interface AddNewSadhakProps {
   sdkFstName: string;
   sdkMdlName: string;
@@ -31,7 +30,7 @@ interface AddNewSadhakProps {
   sdkParAdds: string;
   sdkImg: string;
   sdkRole: string;
-  isVolunteer:string;
+  isVolunteer: string;
   sdkPwd: string;
   sdkConfPwd: string;
   createdBy: string;
@@ -53,12 +52,11 @@ interface cityListProps {
 }
 
 const AddNewSadhak: React.FC = () => {
-
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [image, setImage] = useState<File | string | null>(null);
-  const [preview, setPreview] = useState<string>('');
+  const [preview, setPreview] = useState<string>("");
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
@@ -85,7 +83,7 @@ const AddNewSadhak: React.FC = () => {
     sdkParAdds: "",
     sdkImg: "",
     sdkRole: "",
-    isVolunteer:"",
+    isVolunteer: "",
     sdkPwd: "",
     sdkConfPwd: "",
     createdBy: "",
@@ -117,7 +115,9 @@ const AddNewSadhak: React.FC = () => {
     async function fetchStateList() {
       try {
         if (sdkData.sdkCountry) {
-          const res = await fetch(`${BASE_API_URL}/api/states?country_id=${sdkData.sdkCountry}`);
+          const res = await fetch(
+            `${BASE_API_URL}/api/states?country_id=${sdkData.sdkCountry}`
+          );
           const stateData = await res.json();
           setStateList(stateData.sttList);
         }
@@ -149,26 +149,27 @@ const AddNewSadhak: React.FC = () => {
     fetchCityList();
   }, [sdkData.sdkState]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ): void => {
     const { name, value } = e.target;
-    setSdkData((prevData) => (
-      { ...prevData, [name]: value }
-    ));
+    setSdkData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleFileChange = (e:any) => {
+  const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
-        setImage(file);
-        setPreview(URL.createObjectURL(file));
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   const handleUpload = async () => {
-
     if (!image) {
-        toast.error("Please select an image!");
-        return;
+      toast.error("Please select an image!");
+      return;
     }
 
     const formData = new FormData();
@@ -176,19 +177,19 @@ const AddNewSadhak: React.FC = () => {
 
     try {
       const res = await fetch("/api/profile-upload", {
-          method: "POST",
-          body: formData,
+        method: "POST",
+        body: formData,
       });
 
       const data = await res.json();
       if (data.success) {
-          toast.success("Image uploaded successfully!");            
-          setImage(data.imageUrl);
+        toast.success("Image uploaded successfully!");
+        setImage(data.imageUrl);
       } else {
-          throw new Error(data.error || "Upload failed");
+        throw new Error(data.error || "Upload failed");
       }
-    } catch (error:any) {
-        toast.error(error.message);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
@@ -319,7 +320,7 @@ const AddNewSadhak: React.FC = () => {
       sdkData.sdkComAdds.trim() === ""
     ) {
       setErrorMessage("Communication address is must.");
-    }  else if (
+    } else if (
       !sdkData ||
       !("sdkPwd" in sdkData) ||
       sdkData.sdkPwd === null ||
@@ -360,10 +361,10 @@ const AddNewSadhak: React.FC = () => {
               sdkParAdds: sdkData.sdkParAdds,
               sdkImg: image,
               sdkRole: sdkData.sdkRole,
-              isVolunteer:sdkData.isVolunteer,
+              isVolunteer: sdkData.isVolunteer,
               sdkPwd: sdkData.sdkPwd,
               sdkConfPwd: sdkData.sdkConfPwd,
-              createdBy: loggedInUser.result?._id,
+              createdBy: loggedInUser.result?._id
             }),
           }
         );
@@ -396,17 +397,19 @@ const AddNewSadhak: React.FC = () => {
       <form className="formStyle w-full" onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-1">
-            <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image
-                src={preview}
-                alt="sadhak"
-                width={600}
-                height={350}
-              />
+            <div className="w-full h-auto border-[1.5px] bg-gray-100">
+              <Image src={preview} alt="sadhak" width={600} height={350} />
             </div>
             <div className="flex items-center gap-1">
-                <input type="file" accept="image/*"  className="inputBox w-full h-[45px]" onChange={handleFileChange}></input>
-                <button type="button" className="btnLeft" onClick={handleUpload} >UPLOAD</button>
+              <input
+                type="file"
+                accept="image/*"
+                className="inputBox w-full h-[45px]"
+                onChange={handleFileChange}
+              ></input>
+              <button type="button" className="btnLeft" onClick={handleUpload}>
+                UPLOAD
+              </button>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -444,7 +447,7 @@ const AddNewSadhak: React.FC = () => {
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Father's Name:</label>
+                <label className="text-lg">Father Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -454,7 +457,7 @@ const AddNewSadhak: React.FC = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Mother's Name:</label>
+                <label className="text-lg">Mother Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -720,20 +723,18 @@ const AddNewSadhak: React.FC = () => {
             </div>
           </div>
         </div>
-        {
-          sdkData.isMedIssue === "Yes" && (
-            <div className="flex flex-col gap-2">
-              <label className="text-lg">Medical Issues:</label>
-              <textarea
-                rows={3}
-                className="inputBox"
-                name="sdkMedIssue"
-                value={sdkData.sdkMedIssue}
-                onChange={handleChange}
-              />
-            </div>
-          )
-        }
+        {sdkData.isMedIssue === "Yes" && (
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Medical Issues:</label>
+            <textarea
+              rows={3}
+              className="inputBox"
+              name="sdkMedIssue"
+              value={sdkData.sdkMedIssue}
+              onChange={handleChange}
+            />
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Create Password:</label>
@@ -756,7 +757,9 @@ const AddNewSadhak: React.FC = () => {
             />
           </div>
         </div>
-        {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
+        {errorMessage && (
+          <p className="text-sm italic text-red-600">{errorMessage}</p>
+        )}
         <div className="grid grid-cols-2 gap-1">
           <button type="submit" className="btnLeft">
             Save
