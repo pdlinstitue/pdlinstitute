@@ -4,12 +4,14 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import { useRouter } from 'next/navigation';
 import React, { ChangeEvent, FormEvent, use, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 interface AccountSettingProps {
   _id?: string;
   sdkPhone: string;
   sdkWhtNbr: string;
   sdkEmail: string;
+  updatedBy?: string;
 }
 
 interface IAccountParams {
@@ -25,7 +27,32 @@ const AccountSetting : React.FC<IAccountParams> = ({params}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [contactDetails, setContactDetails] = useState<AccountSettingProps>({sdkPhone: '', sdkWhtNbr: '', sdkEmail: ''});
-
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -51,7 +78,8 @@ const AccountSetting : React.FC<IAccountParams> = ({params}) => {
           body: JSON.stringify({
               sdkPhone: contactDetails.sdkPhone,
               sdkWhtNbr: contactDetails.sdkWhtNbr,
-              sdkEmail: contactDetails.sdkEmail
+              sdkEmail: contactDetails.sdkEmail,
+              updatedBy: loggedInUser.result._id
           }),
         });
 

@@ -10,14 +10,15 @@ type SdkType = {
     sdkPhone: string,
     sdkWhtNbr: string,
     sdkEmail: string,
+    updatedBy?: string
 }
 
 export async function PUT(req: NextRequest, {params}:{params:ISdkParams}) {
   
     try {
       await dbConnect();
-      const { sdkPhone, sdkWhtNbr, sdkEmail }: SdkType = await req.json();
-      const sdkById = await Users.findByIdAndUpdate(params.SdkId, {sdkPhone, sdkWhtNbr, sdkEmail}, {runValidators:true});
+      const { sdkPhone, sdkWhtNbr, sdkEmail, updatedBy }: SdkType = await req.json();
+      const sdkById = await Users.findByIdAndUpdate(params.SdkId, {sdkPhone, sdkWhtNbr, sdkEmail, updatedBy}, {runValidators:true});
       return NextResponse.json({ sdkById, success: true, msg:"Contact updated successfully." }, {status:200});     
     } catch (error:any) {
       if (error.name === 'ValidationError') {
