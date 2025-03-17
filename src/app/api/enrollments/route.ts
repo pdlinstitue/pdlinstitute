@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 
 type EnrType = {
+  _id?:string,
   enrTnsNo:string,
   enrSrnShot:string,
   enrRemarks:string,
@@ -29,9 +30,9 @@ export async function GET(req: NextRequest) {
 
     // Apply filtering correctly
     if (corId || bthId) {
-      enrList = enrList.filter((enr) => 
-        (!corId || enr.corId._id.toString() === corId) && 
-        (!bthId || enr.bthId._id.toString() === bthId)
+      enrList = enrList.filter((enr:any) => 
+        (!corId || enr.corId._id.ToString() === corId) && 
+        (!bthId || enr.bthId._id.ToString() === bthId)
       );
     }
 

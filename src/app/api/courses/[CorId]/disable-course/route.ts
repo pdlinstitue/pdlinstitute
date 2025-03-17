@@ -3,25 +3,23 @@ import dbConnect from "../../../../../../dbConnect";
 import Courses from "../../../../../../modals/Courses";
 import Batches from "../../../../../../modals/Batches";
 
-interface ICorParams {
-  CorId?: string;
-}
 
 type CoType = {
+  isActive: boolean;
   disabledBy: string;
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: ICorParams }) {
+export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }) {
   
   try 
   {
     await dbConnect();
-    const { CorId } = params;
+    const { CorId } = await params;
     const { disabledBy }: CoType = await req.json();
 
     if (!CorId) {
       return NextResponse.json({ success: false, msg: "No course found." }, { status: 400 });
-    }
+    } 
 
     const currentDate = new Date();
     const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));

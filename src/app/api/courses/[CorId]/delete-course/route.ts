@@ -3,19 +3,16 @@ import dbConnect from "../../../../../../dbConnect";
 import Courses from "../../../../../../modals/Courses";
 import Batches from "../../../../../../modals/Batches";
 
-interface ICorParams {
-  CorId?: string;
-}
 
-export async function DELETE(req: NextRequest, { params }: { params: ICorParams }) {
+export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }) {
 
  try 
   {
     await dbConnect();
-    const { CorId } = params;
+    const { CorId } = await params;
 
     if (!CorId) {
-      return NextResponse.json({ success: false, msg: "No course found." }, { status: 400 });
+      return NextResponse.json({ success: false, msg: "No Course Found." }, { status: 400 });
     }
 
     const currentDate = new Date();
@@ -31,7 +28,7 @@ export async function DELETE(req: NextRequest, { params }: { params: ICorParams 
       );
     } else {
       //Delete the course
-      const delCourse = await Courses.findByIdAndDelete(params.CorId);
+      const delCourse = await Courses.findByIdAndDelete(CorId);
       return NextResponse.json({delCourse, success:true, msg: "Course deleted successfully." }, { status: 200 });
     }
   } catch (error: any) {

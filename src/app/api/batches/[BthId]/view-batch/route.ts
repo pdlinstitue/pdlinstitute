@@ -2,16 +2,14 @@ import { NextResponse, NextRequest } from "next/server";
 import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 
-interface IBthParams{
-    BthId?: string;
-}
 
-export async function GET(req:NextRequest, {params}:{params:IBthParams}){
+export async function GET(req: Request,{ params }: { params: Promise<{ BthId: string }>}){
 
     try {
   
       await dbConnect();
-      const bthById = await Batches.findById(params.BthId);
+      const { BthId } = await params;
+      const bthById = await Batches.findById(BthId);
 
       if(!bthById){
         return NextResponse.json({ message: "No batch found." }, { status: 404 });

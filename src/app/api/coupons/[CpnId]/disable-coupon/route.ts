@@ -3,22 +3,25 @@ import Coupons from "../../../../../../modals/Coupons";
 import dbConnect from "../../../../../../dbConnect";
 
 
-interface ICpnParams{
-    CpnId: string;
+type CpnType = {
+  isActive: boolean,
+  disabledBy: string
 }
 
-export async function PATCH(req: NextRequest, {params}:{params:ICpnParams}) {
+export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ CpnId: string}> }) {
 
     try 
     {
       await dbConnect();
-      const cpnById = await Coupons.findByIdAndUpdate(params.CpnId, {isActive:false}, {runValidators:false});
+      const { CpnId } = await params;
+      const { disabledBy }: CpnType = await req.json();
 
-      if (!cpnById) { 
-        return new NextResponse("Coupon not found", { status: 404 }); 
+      if (!CpnId) { 
+        return new NextResponse("No Coupon Found", { status: 404 }); 
       } else {
+        const cpnById = await Coupons.findByIdAndUpdate(CpnId, {isActive:false, disabledBy}, {runValidators:false}); 
         return NextResponse.json({ cpnById, success: true, msg: "Coupon disabled successfully." }, { status: 200 });
-      } 
+      }
       
     } catch (error:any) {
       if (error.name === 'ValidationError') {

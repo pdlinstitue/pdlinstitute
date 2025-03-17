@@ -44,8 +44,8 @@ const AddNewCourse: React.FC = () => {
   const [courseList, setCourseList] = useState<CoListType[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [image, setImage] = useState<File | string | null>(null);
-  const [preview, setPreview] = useState<string>('');
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>("");
   const [data, setData] = useState<AddNewCourseProps>({
     coName: "",
     coNick: "",
@@ -65,13 +65,32 @@ const AddNewCourse: React.FC = () => {
     createdBy: "",
   });
 
-  const loggedInUser = {
+  const [loggedInUser, setLoggedInUser] = useState({
     result: {
-      _id: Cookies.get("loggedInUserId"),
-      usrName: Cookies.get("loggedInUserName"),
-      usrRole: Cookies.get("loggedInUserRole"),
+      _id: "",
+      usrName: "",
+      usrRole: "",
     },
-  };
+  });
+
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchCatData() {
@@ -118,41 +137,40 @@ const AddNewCourse: React.FC = () => {
     });
   };
 
-  const handleFileChange = (e:any) => {
+  const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
-        setImage(file);
-        setPreview(URL.createObjectURL(file));
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   const handleUpload = async () => {
-
     if (!image) {
-        toast.error("Please select an image!");
-        return;
+      toast.error("Please select an image!");
+      return;
     }
 
     const formData = new FormData();
     formData.append("courseImage", image);
 
     try {
-        const res = await fetch("/api/image-upload", {
-            method: "POST",
-            body: formData,
-        });
+      const res = await fetch("/api/image-upload", {
+        method: "POST",
+        body: formData,
+      });
 
-        const data = await res.json();
-        if (data.success) {
-            toast.success("Image uploaded successfully!");            
-            setImage(data.imageUrl);
-        } else {
-            throw new Error(data.error || "Upload failed");
-        }
-    } catch (error:any) {
-        toast.error(error.message);
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Image uploaded successfully!");
+        setImage(data.imageUrl);
+      } else {
+        throw new Error(data.error || "Upload failed");
+      }
+    } catch (error: any) {
+      toast.error(error.message);
     }
- };
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -224,22 +242,22 @@ const AddNewCourse: React.FC = () => {
 
   return (
     <div>
-      <form
-        onSubmit={handleSubmit}
-        className="formStyle w-full h-auto">
+      <form onSubmit={handleSubmit} className="formStyle w-full h-auto">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-                <Image
-                src={preview}
-                alt="course"
-                width={600}
-                height={350}
-                />
+              <Image src={preview || "/images/uploadImage.jpg"} alt="course" width={600} height={350} />
             </div>
             <div className="flex items-center gap-1">
-                <input type="file" accept="image/*"  className="inputBox w-full h-[45px]" onChange={handleFileChange}></input>
-                <button type="button" className="btnLeft" onClick={handleUpload} >UPLOAD</button>
+              <input
+                type="file"
+                accept="image/*"
+                className="inputBox w-full h-[45px]"
+                onChange={handleFileChange}
+              ></input>
+              <button type="button" className="btnLeft" onClick={handleUpload}>
+                UPLOAD
+              </button>
             </div>
           </div>
           <div className="flex flex-col gap-2">

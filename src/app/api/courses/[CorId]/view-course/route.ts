@@ -3,15 +3,14 @@ import Courses from "../../../../../../modals/Courses";
 import dbConnect from "../../../../../../dbConnect";
 import Categories from "../../../../../../modals/Categories";
  
-interface ICorParams {
-  CorId?: string;
-}
 
-export async function GET(req: NextRequest, { params }: { params: ICorParams }) {
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }) {
+
   try 
   {
     await dbConnect();
-    const corById = await Courses.findById(params.CorId);
+    const { CorId } = await params;
+    const corById = await Courses.findById(CorId);
 
     if (!corById) {
       return NextResponse.json({ success: false, msg: "No course found." }, { status: 404 });

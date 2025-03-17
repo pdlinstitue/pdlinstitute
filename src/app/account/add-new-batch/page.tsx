@@ -29,6 +29,13 @@ interface AddNewBatchProps {
   bthQr: string;
   createdBy: string;
 }
+
+interface CoListProps {
+  _id: string;
+  coNick: string;
+  coName: string;
+}
+
 const AddNewBatch: React.FC = () => {
   const router = useRouter();
   const [image, setImage] = useState<File | string | null>(null);
@@ -50,22 +57,38 @@ const AddNewBatch: React.FC = () => {
     bthQr: "",
     createdBy: "",
   });
+
   const [volunteer, setVolunteer] = useState<VolunteerListProps[] | null>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const loggedInUser = {
-    result: {
-      _id: Cookies.get("loggedInUserId"),
-      usrName: Cookies.get("loggedInUserName"),
-      usrRole: Cookies.get("loggedInUserRole"),
-    },
-  };
-
   const [errorMessage, setErrorMessage] = useState("");
-  const [coList, setCoList] = useState<
-    { _id: string; coNick: string; coName: string }[] | null
-  >([]);
+  const [coList, setCoList] = useState<CoListProps[] | null>([]);
   const [batchTitle, setBatchTitle] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleChange = (e: any) => {
     const name = e.target.name;

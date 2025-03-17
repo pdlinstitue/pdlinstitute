@@ -3,25 +3,23 @@ import Practices from "../../../../../../modals/Practices";
 import dbConnect from "../../../../../../dbConnect";
 
 
-interface IPrcParams{
-    PrcId: string;
-}
-
 type PrcType = {
+  isActive:boolean,
   disabledBy?:string
 }
 
-export async function PATCH(req: NextRequest, {params}:{params:IPrcParams}) {
+export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ PrcId: string}> }) {
 
  try 
   {
     await dbConnect();
+    const { PrcId } = await params;
     const { disabledBy }: PrcType = await req.json();
-    const prcById = await Practices.findByIdAndUpdate(params.PrcId, {isActive:false}, {runValidators:false});
 
-    if (!prcById) { 
-      return new NextResponse("Pfractice class not found", { status: 404 }); 
+    if (!PrcId) { 
+      return new NextResponse("No Practice Class Found", { status: 404 }); 
     } else {
+      const prcById = await Practices.findByIdAndUpdate(PrcId, {isActive:false, disabledBy}, {runValidators:false});
       return NextResponse.json({ prcById, success: true, msg: "Practice class disabled successfully." }, { status: 200 });
     }    
   } catch (error:any) {

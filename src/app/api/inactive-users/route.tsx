@@ -34,33 +34,3 @@ export async function GET () {
     return NextResponse.json({ error: "Error while fetching sadhakData: " + error.message }, { status: 500 });
   }
 }
-
-// export async function POST(req: NextRequest) {
-  
-//     try {
-  
-//       await dbConnect();
-//       const { sdkFstName, sdkMdlName, sdkLstName, sdkBthDate, sdkGender, sdkMarStts, sdkSpouce, sdkPhone, sdkWhtNbr, sdkEmail, sdkComAdds, sdkParAdds, sdkPwd, sdkConfPwd, sdkImg, sdkRole }: SdkType = await req.json();
-  
-//       if(sdkPwd !== sdkConfPwd){
-//             return NextResponse.json({ success: false, msg:"Password & Confirm Password does not match!" }, {status:200});
-//       } else {
-//         const newUser = new Users({ sdkFstName, sdkMdlName, sdkLstName, sdkBthDate, sdkGender, sdkMarStts, sdkSpouce, sdkPhone, sdkWhtNbr, sdkEmail, sdkComAdds, sdkParAdds, sdkPwd, sdkImg, sdkRole});
-//         const savedUser = await newUser.save();
-
-//         if(savedUser){
-//             return NextResponse.json({ savedUser, success: true, msg:"Registration successful." }, {status:200});
-//         }else{
-//             return NextResponse.json({ success: false, msg:"Registration failed." }, {status:200});
-//         }
-//       }
-
-//     } catch (error:any) {
-//       if (error.name === 'ValidationError') {
-//         const messages = Object.values(error.errors).map((val:any) => val.message);
-//         return NextResponse.json({ success: false, msg: messages }, {status:400});
-//       }else{
-//         return new NextResponse ("Error while saving usrData: " + error, {status: 400});
-//       }
-//     }
-// }

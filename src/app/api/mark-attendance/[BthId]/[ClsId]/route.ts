@@ -2,15 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import Attendance from "../../../../../../modals/Attendance";
 import dbConnect from "../../../../../../dbConnect";
 
-interface IAttdParams {
-  BthId: string;
-  ClsId: string;
-}
 
-export async function POST(req: NextRequest, { params }: { params: IAttdParams }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ BthId: string; ClsId: string; }> }) {
   try {
-    await dbConnect();
 
+    await dbConnect();
+    const { BthId, ClsId } = await params;
     const { sdkIds, status, markedBy, absRemarks } = await req.json();
 
     if (!sdkIds || sdkIds.length === 0) {
@@ -22,7 +19,7 @@ export async function POST(req: NextRequest, { params }: { params: IAttdParams }
 
     // ✅ Update multiple records at once
     const result = await Attendance.updateMany(
-      { sdkId: { $in: sdkIds }, clsId: params.ClsId, bthId: params.BthId },
+      { sdkId: { $in: sdkIds }, clsId: ClsId, bthId: BthId },
       { $set: { status, markedBy, absRemarks } },
       { upsert: true } // Create if not found
     );

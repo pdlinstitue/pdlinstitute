@@ -30,7 +30,11 @@ const couponsSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    usrId: {
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users
+    }, 
+    updatedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: Users
     },  

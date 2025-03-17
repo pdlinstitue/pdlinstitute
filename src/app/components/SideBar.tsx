@@ -17,9 +17,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import EnrollMenu from './submenus/EnrollMenu';
 import ClassMenu from './submenus/ClassMenu';
 import TrainingMenu from './submenus/TrainingMenu';
-import AssignMenu from './submenus/AssignMenu';
 import AttendMenu from './submenus/AttendMenu';
-import EventMenu from './submenus/EventMenu';
 import { SiAdblock } from "react-icons/si";
 import DocMenu from './submenus/DocMenu';
 import SadhakMenu from './submenus/SadhakMenu';
@@ -182,23 +180,7 @@ const SideBar: React.FC = () => {
                 <SadhakMenu/>
               </div>
             )
-          }
-          <Link href='/account/study-materials' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-            <FaBookReader size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>STUDY MAT</p>
-          </Link>
-          <button type='button' onClick={() =>handleToggle(4)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-            <RxReader size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>ASSIGNMENT</p>
-            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 2 ? 'rotate-180 duration-500' : ''}`} />      
-          </button>
-          {
-            selectedNumber === 4 && (
-              <div className='flex w-full px-[35px]'>
-                <AssignMenu/>
-              </div>
-            )
-          }
+          }         
           <button type='button' onClick={() =>handleToggle(5)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <FaCalendarCheck size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>ATTENDANCE</p>
@@ -208,18 +190,6 @@ const SideBar: React.FC = () => {
             selectedNumber === 5 && (
               <div className='flex w-full px-[35px]'>
                 <AttendMenu/>
-              </div>
-            )
-          }
-          <button type='button' onClick={() =>handleToggle(6)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-            <BsCalendarEvent  size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>EVENT MGM</p>
-            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 6 ? 'rotate-180 duration-500' : ''}`} />      
-          </button>
-          {
-            selectedNumber === 6 && (
-              <div className='flex w-full px-[35px]'>
-                <EventMenu/>
               </div>
             )
           }

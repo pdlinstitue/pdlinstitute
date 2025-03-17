@@ -2,9 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 
-interface IBthParams{
-    BthId?: string;
-}
 
 type BatchType =  {
     _id?:string,
@@ -25,21 +22,20 @@ type BatchType =  {
     updatedBy?:string
 }
 
-export async function PUT(req: NextRequest, {params}:{params:IBthParams}) {
+export async function PUT(req: Request,{ params }: { params: Promise<{ BthId: string }>}) {
 
   try 
   {
     await dbConnect();
-    
-    const { bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, updatedBy }: BatchType = await req.json();
-    const bthById = await Batches.findByIdAndUpdate(params.BthId, {bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, updatedBy}, {runValidators:true});
+    const { BthId } = await params;
 
-    if(!bthById){
+    if(!BthId){
       return NextResponse.json({ msg: "No batch found." }, { status: 404 });
     }else{
-        return NextResponse.json({ bthById, success: true, msg:"batch updated successfully." }, {status:200});
+      const { bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, updatedBy }: BatchType = await req.json();
+      const bthById = await Batches.findByIdAndUpdate(BthId, {bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, updatedBy}, {runValidators:true});
+      return NextResponse.json({ bthById, success: true, msg:"batch updated successfully." }, {status:200});
     }
-
   } catch (error:any) {
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((val:any) => val.message);

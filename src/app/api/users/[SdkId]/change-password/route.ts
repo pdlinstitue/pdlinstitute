@@ -3,10 +3,6 @@ import dbConnect from "../../../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
-interface ISdkParams {
-    SdkId?: string;
-}
-
 type SdkType = {
     sdkPwd: string,
     sdkNewPwd: string,
@@ -14,12 +10,13 @@ type SdkType = {
     updatedBy?:string
 }
 
-export async function PUT(req: NextRequest, {params}:{params:ISdkParams}) {
+export async function PUT(req: NextRequest, {params}:{params: Promise<{SdkId: string}>}) {
   
   try {
     await dbConnect();
+    const { SdkId } = await params;
     const { sdkPwd, sdkNewPwd, sdkConfPwd, updatedBy }: SdkType = await req.json();
-    const sdkById = await Users.findById(params.SdkId);
+    const sdkById = await Users.findById(SdkId);
 
     // Check if the old password matches
     const isMatch = await bcrypt.compare(sdkPwd, sdkById.sdkPwd);

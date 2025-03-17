@@ -2,20 +2,18 @@ import { NextResponse, NextRequest } from "next/server";
 import Practices from "../../../../../../modals/Practices";
 import dbConnect from "../../../../../../dbConnect";
 
-interface IPrcParams{
-    PrcId?: string;
-}
 
-export async function GET(req:NextRequest, {params}:{params:IPrcParams}){
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ PrcId: string}> }){
 
     try {
   
       await dbConnect();
-      const prcById = await Practices.findById(params.PrcId);
+      const { PrcId } = await params;
 
-      if(!prcById){
+      if(!PrcId){
         return NextResponse.json({ success: false, msg: "No practice class found." }, { status: 404 });
-      }else{
+      } else {
+        const prcById = await Practices.findById(PrcId);
         return NextResponse.json({ prcById, success: true }, {status:200});
       }
     } catch (error) {

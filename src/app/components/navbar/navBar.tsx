@@ -19,7 +19,6 @@ const NavMenu : React.FC = () =>
                         <Link href="/" className="hover:text-orange-500 hover:font-bold ">HOME</Link> 
                         <Link href="/about" className="hover:text-orange-500 hover:font-bold ">ABOUT</Link> 
                         <Link href="/courses" className="hover:text-orange-500 hover:font-bold ">COURSES</Link> 
-                        <Link href="/events" className="hover:text-orange-500 hover:font-bold ">EVENTS</Link> 
                         <Link href="/contact" className="hover:text-orange-500 hover:font-bold ">CONTACT</Link> 
                     </div> 
                     <LogMenu />

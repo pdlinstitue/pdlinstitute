@@ -2,15 +2,14 @@ import { NextResponse, NextRequest } from "next/server";
 import Users from "../../../../../../modals/Users";
 import dbConnect from "../../../../../../dbConnect";
 
-interface ISdkParams{
-    SdkId?: string;
-}
 
-export async function GET(req:NextRequest, {params}:{params:ISdkParams}){
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ SdkId: string }> }){
+
   try 
     {
       await dbConnect();
-      let sdkById = await Users.findById(params.SdkId);
+      const { SdkId } = await params;
+      let sdkById = await Users.findById(SdkId);
 
       if(!sdkById){
         return NextResponse.json({success:false, msg: "No Sadhak found." }, { status: 404 });

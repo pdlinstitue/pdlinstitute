@@ -3,20 +3,18 @@ import Categories from "../../../../../../modals/Categories";
 import Courses from "../../../../../../modals/Courses";
 import dbConnect from "../../../../../../dbConnect";
 
-interface ICatParams {
-    CatId: string;
-}
 
-export async function DELETE(req: NextRequest, {params}:{params: ICatParams}):Promise<NextResponse> {
+export async function DELETE(req: Request,{ params }: { params: Promise<{ CatId: string }>}) {
 
     try {
         await dbConnect();
-        const isCategoryUsed = await Courses.findOne({ coCat: params.CatId });
+        const { CatId } = await params;
+        const isCategoryUsed = await Courses.findOne({ coCat: CatId });
 
         if (isCategoryUsed) {
             return NextResponse.json({success:false, msg: "Category is being used. Can't be deleted." }, { status: 400 });
         }else{
-            const delCat = await Categories.findByIdAndDelete(params.CatId);
+            const delCat = await Categories.findByIdAndDelete(CatId);
             return NextResponse.json({delCat, success:true, msg: "Category deleted successfully." }, { status: 200 });
         }
     } catch (error:any) {

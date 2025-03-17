@@ -1,4 +1,4 @@
-import Crypto from "crypto";
+import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   const IV = Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]); // Correct IV format
 
   // Generate 32-byte key using MD5 hash (as in the provided function)
-  const key = Crypto.createHash("md5").update(workingKey).digest();
+  const key = crypto.createHash("md5").update(workingKey).digest();
   
   // Validate key length
   if (key.length !== 16) {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   
   // 🔹 Encryption function with proper key formatting
   const encrypt = (plainText: string): string => {
-    const cipher = Crypto.createCipheriv("aes-128-cbc", key, IV);
+    const cipher = crypto.createCipheriv("aes-128-cbc", key, IV);
     let encrypted = cipher.update(plainText, "utf8", "hex");
     encrypted += cipher.final("hex");
     return encrypted;

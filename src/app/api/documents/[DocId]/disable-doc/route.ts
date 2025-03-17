@@ -2,30 +2,25 @@ import { NextResponse, NextRequest } from "next/server";
 import Documents from "../../../../../../modals/Documents";
 import dbConnect from "../../../../../../dbConnect";
 
-
-interface IDocParams{
-    DocId: string;
-}
-
 type DocType = {
-  isActive:Boolean,
+  isActive:boolean,
   disabledBy:string
 }
 
-export async function PATCH(req: NextRequest, {params}:{params:IDocParams}) {
+export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ DocId: string}> }) {
 
     try 
     {
       await dbConnect();
+      const { DocId } = await params;
       const {disabledBy} : DocType = await req.json();
-      const docById = await Documents.findByIdAndUpdate(params.DocId, {isActive:false, disabledBy});
 
-      if (!docById) { 
-        return  NextResponse.json({success:false, msg:"Document not found"}, { status: 404 }); 
+      if (!DocId) { 
+        return  NextResponse.json({success:false, msg:"No Document Found"}, { status: 404 }); 
       } else {
+        const docById = await Documents.findByIdAndUpdate(DocId, {isActive:false, disabledBy});
         return NextResponse.json({ docById, success: true, msg: "Document disabled successfully." }, { status: 200 });
-      } 
-      
+      }      
     } catch (error:any) {
       if (error.name === 'ValidationError') {
         const messages = Object.values(error.errors).map((val:any) => val.message);

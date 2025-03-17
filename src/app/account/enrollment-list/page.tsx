@@ -31,7 +31,7 @@ interface SelectedBatchProps {
   bthName:string
 }
 
-const EnrollmentList : React.FC<EnrollmentListProps> = () => {
+const EnrollmentList : React.FC = () => {
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);

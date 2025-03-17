@@ -4,22 +4,17 @@ import Enrollments from "../../../../../../modals/Enrollments";
 import Attendance from "../../../../../../modals/Attendance";
 import mongoose from "mongoose";
 
-interface IBthParams {
-  BthId?: string;
-  ClsId?: string;
-}
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ BthId: string, ClsId:string}> }) {
 
-export async function GET(req: NextRequest, { params }: { params: IBthParams }) {
   try {
     await dbConnect();
-
+    const {BthId, ClsId} = await params;
     // Convert params to ObjectId if necessary
-    const batchId = new mongoose.Types.ObjectId(params.BthId);
-    const classId = new mongoose.Types.ObjectId(params.ClsId);
+    const batchId = new mongoose.Types.ObjectId(BthId);
+    const classId = new mongoose.Types.ObjectId(ClsId);
 
     // Fetch enrollments
-    const enrByBatchId = await Enrollments.find({ bthId: batchId })
-      .populate("createdBy", "sdkFstName sdkPhone");
+    const enrByBatchId = await Enrollments.find({ bthId: batchId }).populate("createdBy", "sdkFstName sdkPhone");
 
     if (!enrByBatchId || enrByBatchId.length === 0) {
       return NextResponse.json({ msg: "No enrollment found." }, { status: 404 });

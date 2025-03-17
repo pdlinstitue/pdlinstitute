@@ -1,10 +1,6 @@
 import Users from "../../../../../../modals/Users";
 import dbConnect from "../../../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
- 
-interface ISdkParams {
-    SdkId?: string;
-}
 
 type SdkType = {
     sdkRegPwd: string,
@@ -12,18 +8,19 @@ type SdkType = {
     updatedBy?:string
 }
 
-export async function PUT(req: NextRequest, {params}:{params:ISdkParams}) {
+export async function PUT(req: NextRequest,{ params }: { params: Promise<{ SdkId: string }> }) {
   
   try {
     await dbConnect();
+    const { SdkId } = await params;
     const { sdkRegPwd, sdkRegPwdExpiry, updatedBy }: SdkType = await req.json();
-    const userById = await Users.findById(params.SdkId);
+    const userById = await Users.findById(SdkId);
 
     if (userById){
-        const sdkById = await Users.findByIdAndUpdate(params.SdkId, {sdkRegPwd, sdkRegPwdExpiry, updatedBy}, {runValidators:true});
+        const sdkById = await Users.findByIdAndUpdate(SdkId, {sdkRegPwd, sdkRegPwdExpiry, updatedBy}, {runValidators:true});
         return NextResponse.json({ sdkById, success: true, msg:"Re-generate password saved successfully." }, {status:200});   
     } else {
-        return NextResponse.json({ success: false, msg:"No user found." }, {status:200}); 
+        return NextResponse.json({ success: false, msg:"No Sadhak Found." }, {status:200}); 
     }  
   } catch (error:any) {
     if (error.name === 'ValidationError') {

@@ -3,10 +3,6 @@ import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 import mongoose from "mongoose";
 
-interface ICorParams{
-    CorId?: string;
-}
-
 type BatchType = {
   bthName:string, 
   bthTime:string, 
@@ -22,16 +18,16 @@ type BatchType = {
   bthLoc:string, 
   bthBank:string, 
   bthQr:string,
-  usrId:string
 }
 
-export async function GET(req:NextRequest, {params}:{params:ICorParams}){
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }){
 
     try {
   
       await dbConnect();
+      const { CorId } = await params;
       const bthList : BatchType[] = await Batches.find();
-      const bthListByCourseId = bthList.filter((bth:any) =>  bth.corId.toString() === params.CorId?.toString());
+      const bthListByCourseId = bthList.filter((bth:any) =>  bth.corId.toString() === CorId?.toString());
 
       if(bthListByCourseId.length === 0){
         return NextResponse.json({success:false, msg:"No Batches found"}, {status:404});

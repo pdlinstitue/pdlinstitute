@@ -8,18 +8,17 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '../Loading';
 
 interface AttendanceListProps {
- _id:string,
- clsName:string,
+ clsDay:string,
  clsStartAt:string,
  clsEndAt:string,
  clsDate:Date,
  coNick:string,
  bthId:string,
  bthName:string,
- bthJoiners:Number
+ bthJoiners:number
 }
 
-const AttendanceList : React.FC<AttendanceListProps> = () => {
+const AttendanceList : React.FC = () => {
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -28,7 +27,7 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
   const columns = React.useMemo(() => [
     { header: 'Course', accessorKey: 'coNick'},
     { header: 'Batch', accessorKey: 'bthName'},
-    { header: 'Class', accessorKey: 'clsName'},
+    { header: 'Class', accessorKey: 'clsDay'},
     { header: 'Date', accessorKey: 'clsDate'},
     { header: 'Starts At', accessorKey: 'clsStartAt'},
     { header: 'Ends At', accessorKey: 'clsEndAt'},
@@ -68,7 +67,7 @@ const AttendanceList : React.FC<AttendanceListProps> = () => {
           return item.clsName.filter((a:any) => a.isActive).map((clsItem: any) => ({
             _id: clsItem._id,
             bthId:bthId,
-            clsName: clsItem.clsDay || "", 
+            clsDay: clsItem.clsDay || "", 
             clsStartAt: clsItem.clsStartAt || "",
             clsEndAt: clsItem.clsEndAt || "", 
             clsDate: clsItem.clsDate ? new Date(clsItem.clsDate) : new Date(),

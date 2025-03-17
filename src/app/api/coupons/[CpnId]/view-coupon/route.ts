@@ -2,16 +2,14 @@ import Coupons from "../../../../../../modals/Coupons";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 
-interface ICpnParams{
-    CpnId?: string;
-}
 
-export async function GET(req:NextRequest, {params}:{params:ICpnParams}){
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ CpnId: string}> }){
 
     try {
   
       await dbConnect();
-      const cpnById = await Coupons.findById(params.CpnId);
+      const { CpnId } = await params;
+      const cpnById = await Coupons.findById(CpnId);
 
       if(!cpnById){
         return NextResponse.json({ success: false, msg: "No coupon found." }, { status: 404 });

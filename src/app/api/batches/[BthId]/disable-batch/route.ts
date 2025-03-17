@@ -4,20 +4,17 @@ import dbConnect from "../../../../../../dbConnect";
 import Classes from "../../../../../../modals/Classes";
 
 
-interface IBthParams{
-    BthId?: string;
-}
-
 type BatchType = {
   isActive:boolean;
   disabledBy:string;
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: IBthParams }) {
+export async function PATCH(req: Request,{ params }: { params: Promise<{ BthId: string }>}) {
 
   try {
+    
       await dbConnect();
-      const { BthId } = params;
+      const { BthId } = await params;
       const { disabledBy }: BatchType = await req.json();
 
       if (!BthId) {
@@ -25,11 +22,10 @@ export async function PATCH(req: NextRequest, { params }: { params: IBthParams }
       }
 
       const currentDate = new Date();
-
       // Check if there are any future classes for the given batch
       const hasFutureClasses = await Classes.findOne({
           bthId: BthId,
-          'clsName.clsDate': { $gte: currentDate }
+          clsName: { $elemMatch: { clsDate: { $gte: currentDate } } },
       }).lean();
 
       if (hasFutureClasses) {

@@ -2,38 +2,34 @@ import { NextResponse, NextRequest } from "next/server";
 import Coupons from "../../../../../../modals/Coupons";
 import dbConnect from "../../../../../../dbConnect";
 
-interface ICpnParams{
-    CpnId?: string;
-}
-
 type CpnType = {
-    _id:String,
-    cpnName: String,
-    cpnUse: Number,
-    cpnVal:Number,
-    cpnDisType: String,
-    cpnDisc:Number,
-    cpnCourse: String,
-    cpnFor: String,
-    cpnSdk: [String],
-    usrId: String 
+  _id: string,
+  cpnName: string,
+  cpnUse: number,
+  cpnVal: number,
+  cpnDisType: string,
+  cpnDisc: number,
+  cpnCourse: string,
+  cpnFor: string,
+  cpnSdk: string[],
+  updatedBy: string 
 }
 
-export async function PUT(req: NextRequest, {params}:{params:ICpnParams}) {
+
+export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CpnId: string}> }) {
 
   try 
   {
     await dbConnect();
-    
-    const { cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, usrId  }: CpnType = await req.json();
-    const cpnById = await Coupons.findByIdAndUpdate(params.CpnId, {cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, usrId}, {runValidators:true});
+    const { CpnId } = await params;
 
-    if(!cpnById){
+    if(!CpnId){
       return NextResponse.json({ success:false, msg: "No coupon found." }, { status: 404 });
     }else{
-        return NextResponse.json({ cpnById, success: true, msg:"Coupon updated successfully." }, {status:200});
+      const { cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, updatedBy  }: CpnType = await req.json();
+      const cpnById = await Coupons.findByIdAndUpdate(CpnId, {cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, updatedBy}, {runValidators:true});
+      return NextResponse.json({ cpnById, success: true, msg:"Coupon updated successfully." }, {status:200});
     }
-
   } catch (error:any) {
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((val:any) => val.message);

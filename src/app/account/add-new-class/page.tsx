@@ -15,13 +15,13 @@ type ClassItem = {
   clsLink: string;
   clsAssignments: string[];
   createdBy: string | undefined;
-}
+};
 
-interface AddNewClassProps { 
-  clsName: ClassItem[];   
-  corId: string; 
-  bthId: string; 
-  clsMaterials: string[];    
+interface AddNewClassProps {
+  clsName: ClassItem[];
+  corId: string;
+  bthId: string;
+  clsMaterials: string[];
 }
 
 const AddNewClass: React.FC = () => {
@@ -30,7 +30,7 @@ const AddNewClass: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [course, setCourse] = useState<string[] | null>([]);
   const [clsBatch, setClsBatch] = useState<string[] | null>([]);
-  const [courseById, setCourseById] = useState({ coName: "", durDays:0 });
+  const [courseById, setCourseById] = useState({ coName: "", durDays: 0 });
   const [assignList, setAssignList] = useState([]);
   const [classArray, setClassArray] = useState<ClassItem[]>([]);
   const [data, setData] = useState<AddNewClassProps>({
@@ -38,49 +38,80 @@ const AddNewClass: React.FC = () => {
     clsMaterials: [],
     corId: "",
     bthId: "",
-   });
-  const [startDate, setStartDate] = useState('');  
-  const [startAt, setStartAt] = useState(""); 
-  const [endAt, setEndAt] = useState("");  
+  });
+  const [startDate, setStartDate] = useState("");
+  const [startAt, setStartAt] = useState("");
+  const [endAt, setEndAt] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: "",
+      usrName: "",
+      usrRole: "",
+    },
+  });
 
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
     }
-  };
-  
-  const handleInputChange = (index: number, field: keyof ClassItem, value: string) => {
+  }, []);
+
+  const handleInputChange = (
+    index: number,
+    field: keyof ClassItem,
+    value: string
+  ) => {
     const updatedArray = [...classArray];
     updatedArray[index] = { ...updatedArray[index], [field]: value };
     setClassArray(updatedArray);
   };
 
   useEffect(() => {
-    if (startAt && endAt && meetingLink && startDate && courseById.durDays > 0 ) {
-      const startDateFrom = new Date(startDate); 
-      const newClassArray = Array.from({ length: courseById.durDays }, (_, index) => { 
-        const clsDate = new Date(startDateFrom); 
-        clsDate.setDate(startDateFrom.getDate() + index);      
-        return { 
-          clsDay: `Day ${index + 1}`, 
-          clsStartAt: startAt, 
-          clsEndAt: endAt, 
-          clsDate: clsDate.toISOString().split('T')[0], // Format as YYYY-MM-DD 
-          clsLink: meetingLink, 
-          clsAssignments: [],
-          createdBy:loggedInUser.result?._id
-        }; 
-      });        
+    if (
+      startAt &&
+      endAt &&
+      meetingLink &&
+      startDate &&
+      courseById.durDays > 0
+    ) {
+      const startDateFrom = new Date(startDate);
+      const newClassArray = Array.from(
+        { length: courseById.durDays },
+        (_, index) => {
+          const clsDate = new Date(startDateFrom);
+          clsDate.setDate(startDateFrom.getDate() + index);
+          return {
+            clsDay: `Day ${index + 1}`,
+            clsStartAt: startAt,
+            clsEndAt: endAt,
+            clsDate: clsDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
+            clsLink: meetingLink,
+            clsAssignments: [],
+            createdBy: loggedInUser.result?._id,
+          };
+        }
+      );
       setClassArray(newClassArray);
     }
   }, [startAt, endAt, startDate, meetingLink, courseById.durDays]);
 
   useEffect(() => {
-  async function fetchCourseData() {
-    try {
+    async function fetchCourseData() {
+      try {
         const res = await fetch(`${BASE_API_URL}/api/courses`, {
           cache: "no-store",
         });
@@ -113,46 +144,49 @@ const AddNewClass: React.FC = () => {
       }
     }
     fetchAssignmentData();
-    }, [data.corId]);
+  }, [data.corId]);
 
   useEffect(() => {
     async function fetchBatchesByCorId() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/batches`, {cache: "no-store"});
+        const res = await fetch(`${BASE_API_URL}/api/batches`, {
+          cache: "no-store",
+        });
         const batchData = await res.json();
-        const bthByCorId = batchData.bthList.filter((b: any) => b.corId._id === data.corId);
+        const bthByCorId = batchData.bthList.filter(
+          (b: any) => b.corId._id === data.corId
+        );
         setClsBatch(bthByCorId);
       } catch (error) {
-          console.error("Error fetching batch data:", error);
+        console.error("Error fetching batch data:", error);
       } finally {
         setIsLoading(false);
       }
     }
-  fetchBatchesByCorId();
+    fetchBatchesByCorId();
   }, [data.corId]);
 
   useEffect(() => {
-  async function fetchCourseById() {
-    if(data.corId){
-      try 
-      {
-        const res = await fetch(
-          `${BASE_API_URL}/api/courses/${data.corId}/view-course`,
-          { cache: "no-store" }
-        );
-        const courseData = await res.json();
-        setCourseById(courseData.corById);        
-      } catch (error) {
-        console.error("Error fetching course data:", error);
-      } finally {
-        setIsLoading(false);
+    async function fetchCourseById() {
+      if (data.corId) {
+        try {
+          const res = await fetch(
+            `${BASE_API_URL}/api/courses/${data.corId}/view-course`,
+            { cache: "no-store" }
+          );
+          const courseData = await res.json();
+          setCourseById(courseData.corById);
+        } catch (error) {
+          console.error("Error fetching course data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setCourseById({ coName: "", durDays: 0 });
       }
-    }else{
-      setCourseById({ coName: "", durDays: 0 });
     }
-  }
-  fetchCourseById();
-}, [data.corId]);
+    fetchCourseById();
+  }, [data.corId]);
 
   const handleChange = (e: any) => {
     const name = e.target.name;
@@ -164,8 +198,6 @@ const AddNewClass: React.FC = () => {
       };
     });
   };
-
-  
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -188,7 +220,7 @@ const AddNewClass: React.FC = () => {
 
       const response = await fetch(`${BASE_API_URL}/api/classes`, {
         method: "POST",
-        body: JSON.stringify({postData}),
+        body: JSON.stringify({ postData }),
       });
 
       const post = await response.json();
@@ -212,28 +244,31 @@ const AddNewClass: React.FC = () => {
       </div>
     );
   }
+
   return (
     <div>
       <form
         className="flex flex-col gap-2 p-6 border border-orange-500 rounded-md"
         onSubmit={handleSubmit}
       >
-      <div className="flex flex-col gap-2">
-        <label>Course:</label>
-        <select
-          className="inputBox"
-          name="corId"
-          value={data.corId}
-          onChange={handleChange}
-        >
-          <option className="text-center" value="">--- Select Course ---</option>
-          {course?.map((item: any) => {
-            return (
-              <option key={item._id} value={item._id}>
-                {item.coName}
-              </option>
-            );
-          })}
+        <div className="flex flex-col gap-2">
+          <label>Course:</label>
+          <select
+            className="inputBox"
+            name="corId"
+            value={data.corId}
+            onChange={handleChange}
+          >
+            <option className="text-center" value="">
+              --- Select Course ---
+            </option>
+            {course?.map((item: any) => {
+              return (
+                <option key={item._id} value={item._id}>
+                  {item.coName}
+                </option>
+              );
+            })}
           </select>
         </div>
         <div className="grid grid-cols-2 gap-6">
@@ -279,7 +314,7 @@ const AddNewClass: React.FC = () => {
               className="inputBox"
               name="startAt"
               value={startAt}
-              onChange={(e)=>setStartAt(e.target.value)}
+              onChange={(e) => setStartAt(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -289,7 +324,7 @@ const AddNewClass: React.FC = () => {
               className="inputBox"
               name="endAt"
               value={endAt}
-              onChange={(e)=>setEndAt(e.target.value)}
+              onChange={(e) => setEndAt(e.target.value)}
             />
           </div>
         </div>
@@ -311,7 +346,7 @@ const AddNewClass: React.FC = () => {
               className="inputBox"
               name="durDays"
               value={courseById.durDays}
-              readOnly        
+              readOnly
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -334,52 +369,68 @@ const AddNewClass: React.FC = () => {
               className="inputBox"
               name="clsDay"
               value={cls.clsDay}
-              onChange={(e) => handleInputChange(index, 'clsDay', e.target.value)}
+              onChange={(e) =>
+                handleInputChange(index, "clsDay", e.target.value)
+              }
             />
             <input
               type="time"
               className="inputBox"
               name="clsStartAt"
               value={cls.clsStartAt}
-              onChange={(e) => handleInputChange(index, 'clsStartAt', e.target.value)}
+              onChange={(e) =>
+                handleInputChange(index, "clsStartAt", e.target.value)
+              }
             />
             <input
               type="time"
               className="inputBox"
               name="clsEndAt"
               value={cls.clsEndAt}
-              onChange={(e) => handleInputChange(index, 'clsEndAt', e.target.value)}
+              onChange={(e) =>
+                handleInputChange(index, "clsEndAt", e.target.value)
+              }
             />
             <input
               type="date"
               className="inputBox"
               name="clsDate"
               value={cls.clsDate}
-              onChange={(e) => handleInputChange(index, 'clsDate', e.target.value)}
+              onChange={(e) =>
+                handleInputChange(index, "clsDate", e.target.value)
+              }
             />
             <input
               type="text"
               className="inputBox"
               name="clsLink"
               value={cls.clsLink}
-              onChange={(e) => handleInputChange(index, 'clsLink', e.target.value)}
+              onChange={(e) =>
+                handleInputChange(index, "clsLink", e.target.value)
+              }
             />
             <select
               className="inputBox"
               name="clsAssignments"
               value={cls.clsAssignments}
-              onChange={(e) => handleInputChange(index, 'clsAssignments', e.target.value)}
+              onChange={(e) =>
+                handleInputChange(index, "clsAssignments", e.target.value)
+              }
             >
               <option>--- Select ---</option>
-              {assignList?.map((item:any)=>{
-                return(
-                  <option key={item._id} value={item._id}>{item.asnName}</option>
-                )
+              {assignList?.map((item: any) => {
+                return (
+                  <option key={item._id} value={item._id}>
+                    {item.asnName}
+                  </option>
+                );
               })}
             </select>
           </div>
         ))}
-        {errorMessage && <p className='text-red-600 italic text-xs'>{errorMessage}</p>}
+        {errorMessage && (
+          <p className="text-red-600 italic text-xs">{errorMessage}</p>
+        )}
         <div className="flex gap-6 w-full mt-3">
           <button type="submit" className="btnRight w-full">
             Save
