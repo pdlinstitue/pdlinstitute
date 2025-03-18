@@ -10,6 +10,7 @@ import { HiPlus } from 'react-icons/hi';
 import { RxCross2 } from 'react-icons/rx';
 import Loading from '../../Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
+import { format } from 'date-fns';
 
 interface InActiveSadhakListProps {
   _id:string,
@@ -34,16 +35,20 @@ const InActiveSadhakList : React.FC = () => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const [inActiveSdk, setInActiveSdk] = useState<InActiveSadhakListProps[] | null>([]);
+    const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
     const data = React.useMemo(() => inActiveSdk ?? [], [inActiveSdk]);
     const columns = React.useMemo(() => [
       { header: 'Sadhak ID', accessorKey: '_id'},
       { header: 'Sadhak Name', accessorKey: 'sdkFstName'},
-      { header: 'DOR', accessorKey: 'createdAt'},
+      { header: 'DOR', 
+        accessorKey: 'createdAt',
+        cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
+      },
       { header: 'Phone', accessorKey: 'sdkPhone'},
       { header: 'WhatsApp', accessorKey: 'sdkWhtNbr'},
-      { header: 'Email', accessorKey: 'sdkEmail'},
+      { header: 'State', accessorKey: 'sdkState'},
       { header: 'Country', accessorKey: 'sdkCountry'},
-      { header: 'Action', accessorKey: 'sdkAction', 
+      { header: 'Action', accessorKey: 'action', 
             cell: ({ row }: { row: any }) => ( 
               <div className='flex items-center gap-3'> 
                 <button type='button' title='View' onClick={()=> router.push(`/account/sadhak-list/inactive-sadhak/${row.original._id}/view-sadhak`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
@@ -120,17 +125,11 @@ const InActiveSadhakList : React.FC = () => {
 
   return (
     <div>
-      <div>
-        <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center'>
-            <select className='inputBox w-[300px]'>--- Select Course ---</select>
-            <select className='inputBox w-[300px]'>--- Select Batch ---</select>
-          </div>
+      <div className='flex mb-2 items-center justify-between'>
           <div className='flex gap-2 items-center'>
             <Link href="/account/add-new-sadhak" className='btnLeft'><FaUserPlus size={24}/></Link>
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
           </div>
-        </div>
       </div>
       <div className='overflow-auto max-h-[412px]'>
         <DataTable  table={table}/>

@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { FiEye } from 'react-icons/fi';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '../Loading';
+import { format } from 'date-fns';
 
 interface AttendanceListProps {
  clsDay:string,
@@ -23,18 +24,22 @@ const AttendanceList : React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [clsData, setClsData] = useState<AttendanceListProps[] | null>([]);
+  const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
   const data = React.useMemo(() => clsData ?? [], [clsData]);
   const columns = React.useMemo(() => [
     { header: 'Course', accessorKey: 'coNick'},
     { header: 'Batch', accessorKey: 'bthName'},
     { header: 'Class', accessorKey: 'clsDay'},
-    { header: 'Date', accessorKey: 'clsDate'},
+    { header: 'Date', 
+      accessorKey: 'clsDate',
+      cell: ({ row }: { row: any }) => formatDate(row.original.clsDate),
+    },
     { header: 'Starts At', accessorKey: 'clsStartAt'},
     { header: 'Ends At', accessorKey: 'clsEndAt'},
     { header: 'Joiners', accessorKey: 'bthJoiners'},
     { header: 'Present', accessorKey: 'clsPresent'},
     { header: 'Absent', accessorKey: 'clsAbsent'},
-    { header: 'Action', accessorKey: 'atdAction', 
+    { header: 'Action', accessorKey: 'action', 
         cell: ({ row }: { row: any }) => ( 
           <div className='flex items-center justify-center'> 
             <button type='button' title='View' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attendees`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>

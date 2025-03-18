@@ -314,6 +314,22 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
       sdkData.sdkEmail.trim() === ""
     ) {
       setErrorMessage("Email is required.");
+    } else if (
+      !sdkData ||
+      !("isMedIssue" in sdkData) ||
+      sdkData.isMedIssue === null ||
+      sdkData.isMedIssue.trim() === ""
+    ) {
+      setErrorMessage("Please check medical issue.");
+    } else if (
+      sdkData && "isMedIssue" in sdkData &&
+      sdkData.isMedIssue === "Yes" &&
+      ( !sdkData ||
+        !("sdkMedIssue" in sdkData) ||
+        sdkData.sdkMedIssue === null ||
+        sdkData.sdkMedIssue?.trim() === "")
+    ) {
+      setErrorMessage("Please describe medical issue.");
     } else {
       try {
         const response = await fetch(
@@ -376,7 +392,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-1">
             <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image src={preview || sdkData?.sdkImg}  alt="sadhakImage" width={600} height={350} />
+              <Image src={preview || sdkData?.sdkImg || '/images/uploadImage.jpg'}  alt="sadhakImage" width={600} height={350} />
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -659,7 +675,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
                   type="radio"
                   name="isMedIssue"
                   value="No"
-                  checked={sdkData.isMedIssue !== "Yes"}
+                  checked={sdkData.isMedIssue === "No"}
                   onChange={handleChange}
                   className="mr-2"
                 />

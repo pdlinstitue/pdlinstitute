@@ -37,6 +37,7 @@ const ClassList : React.FC = () => {
 const router = useRouter();
 const [classData, setClassData] = useState<ClassListProps[] | null>([]);
 const [isLoading, setIsLoading] = useState<boolean>(true);
+const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
 const data = React.useMemo(() => classData?.flatMap(cls => cls.clsName.filter((a:any) => a.isActive).map(clsDetail => ({ dayId: clsDetail._id, clsName: clsDetail.clsDay, clsDate: clsDetail.clsDate, clsLink: clsDetail.clsLink, clsStartsAt: clsDetail.clsStartAt, clsEndsAt: clsDetail.clsEndAt, bthId: cls.bthId, corId: cls.corId, clsId:cls._id }))) ?? [], [classData]);
 
 const columns = React.useMemo(() => [ 
@@ -45,7 +46,10 @@ const columns = React.useMemo(() => [
   { header: 'Course', accessorKey: 'corId.coNick'},
   { header: 'Starts At', accessorKey: 'clsStartsAt'},
   { header: 'Ends At', accessorKey: 'clsEndsAt'},
-  { header: 'Date', accessorKey: 'clsDate'},
+  { header: 'Date', 
+    accessorKey: 'clsDate',
+    cell: ({ row }: { row: any }) => formatDate(row.original.clsDate),
+  },
   { header: 'Link', accessorKey: 'clsLink',
     cell: ({ row }: { row: any }) => ( 
       <div className='flex items-center gap-3'> 
@@ -55,7 +59,7 @@ const columns = React.useMemo(() => [
   }, 
   {
     header: 'Action',
-    accessorKey: 'clsAction',
+    accessorKey: 'action',
     cell: ({ row }: { row: any }) => {
       const clsId = row.original.clsId;
       const dayId = row.original.dayId; // Access the _id inside clsName array

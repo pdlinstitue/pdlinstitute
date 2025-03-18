@@ -17,7 +17,6 @@ import { IoIosArrowDown } from "react-icons/io";
 import EnrollMenu from './submenus/EnrollMenu';
 import ClassMenu from './submenus/ClassMenu';
 import TrainingMenu from './submenus/TrainingMenu';
-import AttendMenu from './submenus/AttendMenu';
 import { SiAdblock } from "react-icons/si";
 import DocMenu from './submenus/DocMenu';
 import SadhakMenu from './submenus/SadhakMenu';
@@ -181,18 +180,10 @@ const SideBar: React.FC = () => {
               </div>
             )
           }         
-          <button type='button' onClick={() =>handleToggle(5)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+          <Link href="/account/attendance-list" className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <FaCalendarCheck size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>ATTENDANCE</p>
-            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 5 ? 'rotate-180 duration-500' : ''}`} />      
-          </button>
-          {
-            selectedNumber === 5 && (
-              <div className='flex w-full px-[35px]'>
-                <AttendMenu/>
-              </div>
-            )
-          }
+          </Link>
           <Link href='/account/dashboard' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <SiAdblock size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>PERMISSION</p>

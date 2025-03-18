@@ -41,6 +41,7 @@ const EnrollmentList : React.FC = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [selectedCourse, setSelectedCourse] = useState<string>(''); 
   const [selectedBatch, setSelectedBatch] = useState<string>('')
+  const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
   const [filtered, setFiltered] = React.useState('');
   const [pageInput, setPageInput] = React.useState(1);
   const data = React.useMemo(() => enrData ?? [], [enrData]);
@@ -64,12 +65,18 @@ const EnrollmentList : React.FC = () => {
     { header: 'Phone',  accessorKey: 'createdBy.sdkPhone'},
     { header: 'Course', accessorKey: 'coNick'},
     { header: 'Type',   accessorKey: 'coType'},
-    { header: 'Batch Name',  accessorKey: 'bthId'},
-    { header: 'Batch Date', accessorKey: 'bthStart'},
-    { header: 'Joining Date', accessorKey: 'createdAt'},
+    { header: 'Batch',  accessorKey: 'bthId'},
+    { header: 'Batch Date', 
+      accessorKey: 'bthStart',
+      cell: ({ row }: { row: any }) => formatDate(row.original.bthStart),
+    },
+    { header: 'Enroll Date', 
+      accessorKey: 'createdAt',
+      cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
+    },
     { header: 'Trans Id', accessorKey: 'enrTnsNo'},
     { header: 'Status', accessorKey: 'isApproved', cell: StatusCell},
-    { header: 'Action', accessorKey: 'enrAction', 
+    { header: 'Action', accessorKey: 'action', 
           cell: ({ row }: { row: any }) => ( 
             <div className='flex items-center justify-center'> 
               <button type='button' title='View' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/view-enrollment`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>

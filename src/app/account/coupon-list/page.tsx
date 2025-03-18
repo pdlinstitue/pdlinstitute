@@ -38,7 +38,7 @@ const Couponlist : React.FC = () => {
     { header: 'Type', accessorKey: 'cpnDisType'},    
     { header: 'Discount', accessorKey: 'cpnDisc'},
     { header: 'Coupon For', accessorKey: 'cpnFor'}, 
-    { header: 'Action', accessorKey: 'couponAction', 
+    { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
           <button type='button' title='View' onClick={()=> router.push(`/account/coupon-list/${row.original._id}/view-coupon`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>

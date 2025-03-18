@@ -37,7 +37,7 @@ const BatchList : React.FC = () => {
   const [batchData, setBatchData] = useState<BatchListProps[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
   const data = React.useMemo(() => batchData ?? [], [batchData]);
-  const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\'th\', yyyy'); };
+  const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\'th\', yyyy')};
   const columns = React.useMemo(() => [
     { header: 'Batch', accessorKey: 'bthName'},
     { header: 'Shift', accessorKey: 'bthShift'},
@@ -60,7 +60,7 @@ const BatchList : React.FC = () => {
     // { header: 'Location', accessorKey: 'bthLoc'},
     // { header: 'Bank', accessorKey: 'bthBank'},
     // { header: 'Meeting Link', accessorKey: 'bthLink'},
-    { header: 'Action', accessorKey: 'coAction', 
+    { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
           <button type='button' title='View' onClick={()=> router.push(`/account/batch-list/${row.original._id}/view-batch`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>

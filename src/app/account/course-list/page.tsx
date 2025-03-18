@@ -46,7 +46,7 @@ const CourseList : React.FC = () => {
       { header: 'Donation', accessorKey: 'coDon'},    
       { header: 'Created By', accessorKey: 'createdBy'},
       { header: 'Updated By', accessorKey: 'updatedBy'}, 
-      { header: 'Action', accessorKey: 'coAction', 
+      { header: 'Action', accessorKey: 'action', 
         cell: ({ row }: { row: any }) => ( 
           <div className='flex items-center gap-3'> 
             <button type='button' title='View' onClick={()=> router.push(`/account/course-list/${row.original._id}/view-course`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
