@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       const savedEnr = await newEnr.save();
 
       if(savedEnr){
-        return NextResponse.json({ savedEnr, success: true, msg:"Enrollment done successfully." }, {status:200});
+        return NextResponse.json({ savedEnr, success: true, msg:"Enrolled successfully." }, {status:200});
       }else{
         return NextResponse.json({ savedEnr, success: false, msg:"Enrollment failed." }, {status:200});
       }

@@ -2,8 +2,9 @@
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
+import Link from 'next/link';
 import { MdDashboard } from "react-icons/md";
+import { MdPlaylistAddCheckCircle } from "react-icons/md";
 import { MdOutlineAppRegistration } from "react-icons/md";
 import { BiSolidUserRectangle } from "react-icons/bi";
 import { SiGoogleclassroom } from "react-icons/si";
@@ -107,7 +108,7 @@ const SideBar: React.FC = () => {
            <p className='font-semibold group-hover:text-black'>MY PRACTICE</p>
          </Link>
          <Link href='/account/my-attendance' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-           <GiMeditation size={24} className=' group-hover:text-black'/>
+           <MdPlaylistAddCheckCircle size={24} className=' group-hover:text-black'/>
            <p className='font-semibold group-hover:text-black'>MY ATTENDANCE</p>
          </Link>
          <button type='button' onClick={() =>handleToggle(9)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>

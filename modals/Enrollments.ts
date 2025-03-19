@@ -22,8 +22,8 @@ const enrollmentSchema = new mongoose.Schema({
         default:false
     },
     isCompleted: {
-        type: Boolean,
-        default:false
+        type: String,
+        default:"Pending"
     },
     enrPaymentStatus:{
         type:String,
@@ -38,6 +38,10 @@ const enrollmentSchema = new mongoose.Schema({
     bthId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:Batches
+    },
+    sdkId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,

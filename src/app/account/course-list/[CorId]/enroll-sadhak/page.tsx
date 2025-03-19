@@ -5,7 +5,7 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
-import NoBatch from '@/app/components/NoBatch';
+import NoBatchAdmin from '@/app/components/NoBatchAdmin';
 
 interface IEnrollCourseParams {
   params: Promise<{
@@ -23,18 +23,19 @@ interface BatchDataProps {
   enrSrnShot:string,
   corId:string,
   bthId:string,
+  createdBy:string,
   sdkId:string,
-  createdBy?:string,
+  isApproved:string,
 }
 
-const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
+const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
 
   const { CorId } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [payThrough, setPaythrough] = useState<string>('QR');
   const [corData, setCorData] = useState<{ [key: string]: string }>({coDon:'', coType:''});
-  const [enrData, setEnrData] = useState<BatchDataProps>({enrSrnShot:'', enrTnsNo:'', corId:'', bthId:'', sdkId:'', createdBy:''})
+  const [enrData, setEnrData] = useState<BatchDataProps>({enrSrnShot:'', enrTnsNo:'', corId:'', bthId:'', createdBy:'', sdkId:'', isApproved:''})
   const [bthData, setBthData] = useState<{ [key: string]: string }>({id: '', bthBank:'', bthQr:''});
   const [batchList, setBatchList] = useState<BatchListProps[] | null>([]);
 
@@ -122,7 +123,8 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
           enrSrnShot:bthData.enrSrnShot,
           bthId: enrData.bthId,
           corId: CorId,
-          sdkId: loggedInUser.result?._id,
+          sdkId: enrData.sdkId,
+          isApproved: "Approved",
           createdBy: loggedInUser.result?._id,
         }),
       });
@@ -137,7 +139,7 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
         }
         else{
           toast.success(post.msg);
-          router.push('/account/my-courses/elg-courses');
+          router.push('/account/course-list');
         }
         }
       } catch (error) {
@@ -230,16 +232,20 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
                   
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col gap-2">
-                      <label className="font-bold">TRANSACTION NO.</label>
+                      <label className="font-bold">TRANSN NO:</label>
                       <input type="text" name='enrTnsNo' value={enrData.enrTnsNo} onChange={handleChange} className="inputBox h-[48px]" placeholder='Enter transaction no.' />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="font-bold">UPLOAD SCREENSHOT</label>
+                      <label className="font-bold">UPLOAD SCREENSHOT:</label>
                       <input type="file" name='enrScnShot' className="inputBox" />
                     </div>
                   </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="font-bold">SDK ID:</label>
+                    <input type="text" name='sdkId' value={enrData.sdkId} onChange={handleChange} className="inputBox h-[48px]" placeholder='Enter transaction no.' />
+                  </div>
                   <div className='flex flex-col gap-2'>
-                    <label className='font-semibold'>PAY THROUGH</label>
+                    <label className='font-semibold'>PAY THROUGH:</label>
                     <div className='flex gap-2'>
                       <input type='radio' name='payThrough'  onClick={()=>handlePayThrough('QR')} defaultChecked/>QR Code
                       <input type='radio' name='payThrough' onClick={()=>handlePayThrough('CCA')} />CCAvenue
@@ -270,18 +276,18 @@ const EnrollCourse : React.FC<IEnrollCourseParams> = ({params}) => {
               <button
                 type="button"
                 className="btnRight"
-                onClick={() => router.push("/account/my-courses/elg-courses")}
+                onClick={() => router.push("/account/course-list")}
               >
                 BACK
               </button>
             </div>
           </form>
         ) : (
-          <NoBatch CourseId={CorId}/>
+          <NoBatchAdmin CourseId={CorId}/>
         )}
       </div>
     </div>
   );
 }  
 
-export default EnrollCourse;
+export default EnrollSadhak;

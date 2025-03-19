@@ -36,6 +36,10 @@ const prospectsSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:Courses
     },
+    sdkId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Users
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref:Users
