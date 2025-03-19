@@ -8,10 +8,8 @@ import { MdPlaylistAddCheckCircle } from "react-icons/md";
 import { MdOutlineAppRegistration } from "react-icons/md";
 import { BiSolidUserRectangle } from "react-icons/bi";
 import { SiGoogleclassroom } from "react-icons/si";
-import { FaBookReader } from "react-icons/fa";
-import { RxReader } from "react-icons/rx";
+import { BiSolidDockTop } from "react-icons/bi";
 import { FaCalendarCheck } from "react-icons/fa6";
-import { BsCalendarEvent } from "react-icons/bs";
 import { HiOutlineDocumentReport } from "react-icons/hi";
 import { MdCastForEducation } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
@@ -189,15 +187,11 @@ const SideBar: React.FC = () => {
             <SiAdblock size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>PERMISSION</p>
           </Link>
-          <Link href='/account/dashboard' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-            <HiOutlineDocumentReport size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>REPORTS</p>
-          </Link>
           <button type='button' onClick={() =>handleToggle(7)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-          <HiOutlineDocumentReport size={24} className=' group-hover:text-black'/>
-          <p className='font-semibold group-hover:text-black'>MY DOCS</p>
-          <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 7 ? 'rotate-180 duration-500' : ''}`} />      
-        </button>
+            <BiSolidDockTop size={24} className=' group-hover:text-black'/>
+            <p className='font-semibold group-hover:text-black'>DOCUMENTS</p>
+            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 7 ? 'rotate-180 duration-500' : ''}`} />      
+          </button>
         {
           selectedNumber === 7 && (
             <div className='flex w-full px-[35px]'>
@@ -205,6 +199,10 @@ const SideBar: React.FC = () => {
             </div>
           )
         }
+        <Link href='/account/dashboard' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+          <HiOutlineDocumentReport size={24} className=' group-hover:text-black'/>
+          <p className='font-semibold group-hover:text-black'>REPORTS</p>
+        </Link>
         </React.Fragment>
         )
       }
