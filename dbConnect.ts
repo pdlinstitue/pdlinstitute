@@ -1,34 +1,19 @@
 import mongoose from "mongoose";
 
-const MONGO_URL = process.env.MONGO_URL;
-
-if (!MONGO_URL) {
-    throw new Error("MongoDB URI not provided in environment variables.");
-}
-
-let isConnected = false; // Track connection state
-
 const dbConnect = async (): Promise<void> => {
     try {
-        if (isConnected) {
-            console.log("Using existing MongoDB connection.");
-            return;
+        if (!process.env.MONGO_URL) {
+            throw new Error("MongoDB URI not provided in environment variables.");
         }
 
-        console.log("MongoDB URI:", MONGO_URL); // Debugging
+        console.log('MongoDB URI:', process.env.MONGO_URL);  // Debug the URI
 
-        mongoose.set("strictQuery", false); // Avoid warnings
-        await mongoose.connect(MONGO_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        } as any); // Workaround for TypeScript
-
-        isConnected = true;
+        await mongoose.connect(process.env.MONGO_URL);
         console.log("DB connection successful.");
     } catch (error: any) {
-        console.error("Error while connecting to MongoDB:", error);
-        throw error; // Preserve the original error
+        console.error('Error while connecting to MongoDB:', error.stack || error.message);
+        throw new Error("Error while connecting to DB.");
     }
-};
+}
 
 export default dbConnect;
