@@ -29,7 +29,7 @@ const CategoryList : React.FC = () => {
     { header: 'Category', accessorKey: 'catName'},
     { header: 'Created By', accessorKey: 'createdBy'},
     { header: 'Updated By', accessorKey: 'updatedBy'},
-    { header: 'Action', accessorKey: 'catAction', 
+    { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
           <button type='button' title='View' onClick={()=> router.push(`/account/category-list/${row.original._id}/view-category`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
@@ -41,10 +41,9 @@ const CategoryList : React.FC = () => {
     }, 
   ], []);
 
-    const [sorting, setSorting] = React.useState<SortingState>([]);
-    const [filtered, setFiltered] = React.useState('');
-    const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [filtered, setFiltered] = useState('');
+    const [pageInput, setPageInput] = useState(1);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
@@ -84,7 +83,7 @@ const CategoryList : React.FC = () => {
         state: {
           sorting: sorting,
           globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+          pagination: { pageIndex: pageInput - 1, pageSize: 100 }
         },
         onSortingChange: setSorting,
         getFilteredRowModel: getFilteredRowModel(),

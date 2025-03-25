@@ -24,7 +24,8 @@ interface DoneCoursesProps {
   coDon:number, 
   durDays:number, 
   durHrs:number, 
-  usrId: string
+  usrId: string,
+  eligibilityName:string
 }
 
 const DoneCourses : React.FC = () => {
@@ -81,7 +82,7 @@ const DoneCourses : React.FC = () => {
                     <p className='text-sm'><span className='font-bold'>Duration:</span> {cor.durDays} DAYS</p>
                     <p className='text-sm'><span className='font-bold'>Hrs:</span> {cor.durHrs}</p>
                 </div>
-                <p className='text-sm'><span className='font-bold'>Elegibility:</span>{cor.coElg}</p>
+                <p className='text-sm'><span className='font-bold'>Elegibility:</span>{cor.eligibilityName}</p>
                 <div className='grid grid-cols-2 gap-1'>
                     <button type='button'  className='btnLeft' onClick={()=>router.push(`/account/my-courses/${cor._id}/read-more`)}>Read More</button>
                     <button type='button'  className='btnRight' onClick={()=>router.push(`/account/my-courses/${cor._id}/enroll-course`)}>Re-Enroll</button>

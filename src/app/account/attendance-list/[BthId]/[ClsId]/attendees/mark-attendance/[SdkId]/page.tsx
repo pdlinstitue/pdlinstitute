@@ -137,6 +137,8 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
                 <option value='' className='text-center'> --- Choose Reason --- </option>
                 <option value='Video off'>Video off</option>
                 <option value='Light off'>Light off</option>
+                <option value='Sadhak-N/A'>Sadhak-N/A</option>
+                <option value='Sadhak-N/P'>Sadhak-N/P</option>
                 <option value='Incorrect Name'>Incorrect Name</option>
               </select>
             </div>

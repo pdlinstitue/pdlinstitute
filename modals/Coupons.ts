@@ -30,11 +30,23 @@ const couponsSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: Users
     }, 
     updatedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users
+    },
+    disabledBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Users
+    },
+    deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: Users
     },  

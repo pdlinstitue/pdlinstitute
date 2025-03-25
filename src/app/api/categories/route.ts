@@ -13,11 +13,11 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const catList: CatType[] = await Categories.find()
+      const catList: CatType[] = await Categories.find({isActive: true})
       .populate('createdBy', 'sdkFstName')
       .populate('updatedBy', 'sdkFstName');
-      const categoryList = catList.filter((item:any)=> item.isActive === true);
-      return NextResponse.json({ catList:categoryList, success: true }, {status:200});
+      
+      return NextResponse.json({ catList, success: true }, {status:200});
   
     } catch (error) {
       return new NextResponse("Error while fetching catData: " + error, {status:500});

@@ -23,12 +23,13 @@ import { BASE_API_URL } from "@/app/utils/constant";
 import { format } from "date-fns";
 
 interface SadhakListProps {
-  _id: string;
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
+  sdkRegNo: string;
   sdkBthDate: Date;
   sdkGender: string;
+  isMedIssue:string,
   sdkMarStts: string;
   sdkSpouce: string;
   sdkPhone: string;
@@ -49,8 +50,8 @@ const ActiveSadhakList: React.FC = () => {
   const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
   const columns = React.useMemo(
     () => [
-      { header: "Sadhak ID", accessorKey: "_id" },
       { header: "Sadhak", accessorKey: "sdkFstName" },
+      { header: "Sdk ID", accessorKey: "sdkRegNo" },
       { header: 'DOR', 
         accessorKey: 'createdAt',
         cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
@@ -135,7 +136,6 @@ const ActiveSadhakList: React.FC = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [filtered, setFiltered] = React.useState("");
   const [pageInput, setPageInput] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(25);
 
   const globalFilterFn: FilterFn<any> = (
     row,
@@ -157,7 +157,7 @@ const ActiveSadhakList: React.FC = () => {
     state: {
       sorting: sorting,
       globalFilter: filtered,
-      pagination: { pageIndex: pageInput - 1, pageSize: 25 },
+      pagination: { pageIndex: pageInput - 1, pageSize: 100 },
     },
     onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
@@ -178,17 +178,13 @@ const ActiveSadhakList: React.FC = () => {
           cache: "no-store",
         });
 
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
         const sadhakData = await res.json();
         setActiveSdk(sadhakData.activeSdkList);
-        console.log(sadhakData.activeSdkList);
+
       } catch (error) {
-        console.error("Error fetching sadhak data:", error);
+          console.error("Error fetching sadhak data:", error);
       } finally {
-        setIsLoading(false);
+          setIsLoading(false);
       }
     }
     fetchSadhakData();
@@ -204,11 +200,9 @@ const ActiveSadhakList: React.FC = () => {
 
   return (
     <div>
-      <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center'>
-            <Link href="/account/add-new-sadhak" className='btnLeft'><FaUserPlus size={24}/></Link>
-            <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
-          </div>
+      <div className='flex gap-2 items-center justify-between mb-4'>
+          <Link href="/account/add-new-sadhak" className='btnLeft'><FaUserPlus size={24}/></Link>
+        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className="overflow-auto max-h-[412px]">
         <DataTable table={table} />

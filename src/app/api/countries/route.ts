@@ -5,6 +5,7 @@ import Countries from "../../../../modals/Countries";
 type CtrType = {
     _id:string,
     country_name:string
+    country_iso2:string
 }
 
 export async function GET(req: NextRequest) {

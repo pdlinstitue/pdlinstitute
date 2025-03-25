@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { BASE_API_URL } from '../utils/constant';
 
 interface UserDataProps {
+  sdkRegNo?: string;
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
@@ -197,7 +198,7 @@ const Register = () => {
               toast.error(user.msg);
           } else {
               toast.success(user.msg);
-              router.push(`/registration-success?sdkId=${user.savedUser._id}`);
+              router.push(`/registration-success?sdkRegNo=${user.savedUser.sdkRegNo}`);
           }
       } catch (error) {
           toast.error('Error while registering.');

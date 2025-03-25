@@ -3,6 +3,7 @@ import Courses from "../../../../modals/Courses";
 import Enrollments from "../../../../modals/Enrollments";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
+import Categories from "../../../../modals/Categories";
 
 export async function GET(req: NextRequest) {
     try {
@@ -21,16 +22,30 @@ export async function GET(req: NextRequest) {
         // Step 2: Filter courses based on completion status
         const completedCourses = [];
 
+        let eligibilityName = "";
+
         for (const course of allCourses) {
             // Check if the user is enrolled and has completed the course
             const enrollment = await Enrollments.findOne({
                 createdBy: sdkObjectId,
                 corId: course._id,
-                isCompleted: true,
+                isCompleted: "Complete",
             });
 
+            if (course.coElgType === "Course" && course.coElg!=="None"){
+                const eligibleCourse = await Courses.findById(course.coElgId, "coNick");
+                eligibilityName = eligibleCourse ? eligibleCourse.coNick : "Unknown Course";
+            }
+            else if (course.coElgType === "Category" && course.coElg!=="None"){
+                const eligibleCategory = await Categories.findById(course.coElg, "catName");
+                eligibilityName = eligibleCategory ? eligibleCategory.catName : "Unknown Category";
+            }
+            else{
+                eligibilityName=course.coElg;
+            }
+
             if (enrollment) {
-                completedCourses.push(course);
+                completedCourses.push({ ...course, eligibilityName });
             }
         }
 

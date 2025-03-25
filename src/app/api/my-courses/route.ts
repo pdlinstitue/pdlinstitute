@@ -3,6 +3,7 @@ import Courses from "../../../../modals/Courses";
 import Enrollments from "../../../../modals/Enrollments";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
+import Categories from "../../../../modals/Categories";
 
 export async function GET(req: NextRequest) {
     try {
@@ -29,24 +30,29 @@ export async function GET(req: NextRequest) {
             });
 
             // Skip the course if the user is enrolled and has completed it
-            if (enrollment && enrollment.isCompleted) {
+            if (enrollment && enrollment.isCompleted === "Complete") {
                 continue;
             }
 
             if (course.coElg === "None") {
-                filteredCourses.push(course);
+                filteredCourses.push({ ...course, eligibilityName:"None" });
                 continue;
             }
 
-            if (course.coElgType === "Course") {
-                const coElgId = new mongoose.Types.ObjectId(course.coElg);
+            let eligibilityName = "";
+
+            if (course.coElgType === "Course") {                
                 const isCompleted = await Enrollments.exists({
                     createdBy: sdkObjectId,
-                    corId: coElgId,
-                    isCompleted: true,
+                    corId: course.coElg,
+                    isCompleted: "Complete",
                 });
+
+                const eligibleCourse = await Courses.findById(course.coElg, "coNick");
+                eligibilityName = eligibleCourse ? eligibleCourse.coNick : "Unknown Course";
+
                 if (isCompleted) {
-                    filteredCourses.push(course);
+                    filteredCourses.push({ ...course, eligibilityName });
                 }
             } else if (course.coElgType === "Category") {
                 const categoryCourses = await Courses.find({ coCat: course.coElg }).lean();
@@ -54,16 +60,20 @@ export async function GET(req: NextRequest) {
                 const completedCount = await Enrollments.countDocuments({
                     createdBy: sdkObjectId,
                     corId: { $in: categoryCourseIds },
-                    isCompleted: true,
+                    isCompleted: "Complete",
                 });
+
+                const eligibleCategory = await Categories.findById(course.coElg, "catName");
+                eligibilityName = eligibleCategory ? eligibleCategory.catName : "Unknown Category";
+
                 if (completedCount === categoryCourses.length) {
-                    filteredCourses.push(course);
+                    filteredCourses.push({ ...course, eligibilityName });
                 }
             }
         }
 
         // Step 3: Filter only active courses
-        const activeCourseList = filteredCourses.filter((item) => item.isActive === true);
+        const activeCourseList = filteredCourses.filter((item:any) => item.isActive === true);
         return NextResponse.json({ coList: activeCourseList, success: true }, { status: 200 });
 
     } catch (error) {

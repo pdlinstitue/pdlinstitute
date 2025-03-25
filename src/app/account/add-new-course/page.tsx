@@ -146,30 +146,54 @@ const AddNewCourse: React.FC = () => {
   };
 
   const handleUpload = async () => {
+
     if (!image) {
       toast.error("Please select an image!");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("courseImage", image);
-
-    try {
-      const res = await fetch("/api/image-upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        toast.success("Image uploaded successfully!");
-        setImage(data.imageUrl);
-      } else {
-        throw new Error(data.error || "Upload failed");
-      }
-    } catch (error: any) {
-      toast.error(error.message);
+    
+    // Validate file size (≤ 100 KB)
+    if (image instanceof File && image.size > 100 * 1024) {
+      toast.error("File size must be 100 KB or less!");
+      return;
     }
+
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+    
+    // Validate image resolution
+    img.onload = async () => {
+      if (img.width !== 600 || img.height !== 350) {
+        toast.error("Image must be 600x350 pixels!");
+        return;
+      }
+  
+      const formData = new FormData();
+      formData.append("courseImage", image);
+  
+      try {
+        const res = await fetch("/api/image-upload", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Image uploaded successfully!");
+          setImage(data.imageUrl);
+        } else {
+          throw new Error(data.error || "Upload failed");
+        }
+      } catch (error:any) {
+        toast.error(error.message);
+      }
+    };
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -182,8 +206,8 @@ const AddNewCourse: React.FC = () => {
       setErrorMessage("Nick name is must.");
     } else if (!data.coCat.trim()) {
       setErrorMessage("Please select category.");
-    } else if (!data.coType.trim()) {
-      setErrorMessage("Please select course type.");
+    } else if (!data.coShort.trim()) {
+      setErrorMessage("Course intro is must.");
     } else if (!data.coElgType.trim()) {
       setErrorMessage("Please select elegibility type.");
     } else if (!data.coElg.trim()) {
@@ -192,8 +216,8 @@ const AddNewCourse: React.FC = () => {
       setErrorMessage("Please duration days.");
     } else if (data.durHrs <= 1) {
       setErrorMessage("Please duration hours.");
-    } else if (!data.coShort.trim()) {
-      setErrorMessage("Please enter course introduction.");
+    } else if (!data.coType.trim()) {
+      setErrorMessage("Please select course type.");
     } else {
       try {
         const response = await fetch(`${BASE_API_URL}/api/courses`, {
@@ -214,7 +238,7 @@ const AddNewCourse: React.FC = () => {
             coDon: data.coDon,
             durDays: data.durDays,
             durHrs: data.durHrs,
-            createdBy: loggedInUser.result._id,
+            createdBy: loggedInUser.result?._id,
           }),
         });
 
@@ -262,7 +286,7 @@ const AddNewCourse: React.FC = () => {
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
-              <label className="text-lg">Course Title:</label>
+              <label className="text-lg">Course Title:<span className="text-red-600">*</span></label>
               <input
                 type="text"
                 name="coName"
@@ -273,7 +297,7 @@ const AddNewCourse: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-1">
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Nick Name:</label>
+                <label className="text-lg">Nick Name:<span className="text-red-600">*</span></label>
                 <input
                   type="text"
                   name="coNick"
@@ -283,7 +307,7 @@ const AddNewCourse: React.FC = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Category:</label>
+                <label className="text-lg">Category:<span className="text-red-600">*</span></label>
                 <select
                   name="coCat"
                   value={data.coCat}
@@ -304,7 +328,7 @@ const AddNewCourse: React.FC = () => {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-lg">Short Intro:</label>
+              <label className="text-lg">Short Intro:<span className="text-red-600">*</span></label>
               <textarea
                 name="coShort"
                 value={data.coShort}
@@ -315,7 +339,7 @@ const AddNewCourse: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-1">
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Elg Type:</label>
+                <label className="text-lg">Elg Type:<span className="text-red-600">*</span></label>
                 <select
                   name="coElgType"
                   value={data.coElgType}
@@ -330,7 +354,7 @@ const AddNewCourse: React.FC = () => {
                 </select>
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Elegibility:</label>
+                <label className="text-lg">Elegibility:<span className="text-red-600">*</span></label>
                 <select
                   name="coElg"
                   value={data.coElg}
@@ -342,13 +366,13 @@ const AddNewCourse: React.FC = () => {
                   </option>
                   <option value="None">None</option>
                   {data.coElgType === "Course"
-                    ? courseList.map((item) => (
+                    ? courseList.map((item:any) => (
                         <option key={item._id} value={item._id}>
                           {item.coNick}
                         </option>
                       ))
                     : data.coElgType === "Category"
-                    ? cat.map((item) => (
+                    ? cat.map((item:any) => (
                         <option key={item._id} value={item._id}>
                           {item.catName}
                         </option>
@@ -361,7 +385,7 @@ const AddNewCourse: React.FC = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Course Duration-DAYS:</label>
+            <label className="text-lg">Days:<span className="text-red-600">*</span></label>
             <input
               name="durDays"
               value={data.durDays}
@@ -371,7 +395,7 @@ const AddNewCourse: React.FC = () => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Course Duration-HRS:</label>
+            <label className="text-lg">Hours:<span className="text-red-600">*</span></label>
             <input
               name="durHrs"
               value={data.durHrs}
@@ -383,7 +407,7 @@ const AddNewCourse: React.FC = () => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Course Type:</label>
+            <label className="text-lg">Course Type:<span className="text-red-600">*</span></label>
             <select
               name="coType"
               value={data.coType}
@@ -432,15 +456,13 @@ const AddNewCourse: React.FC = () => {
           <label className="text-lg">Description:</label>
           <textarea
             name="coDesc"
-            value={data.coDesc}
+            value={data?.coDesc}
             onChange={handleChange}
             rows={6}
             className="inputBox"
           />
         </div>
-        {errorMessage && (
-          <p className="text-xs italic text-red-600">{errorMessage}</p>
-        )}
+        {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
         <div className="flex gap-1 w-full">
           <button type="submit" className="btnLeft w-full">
             Save

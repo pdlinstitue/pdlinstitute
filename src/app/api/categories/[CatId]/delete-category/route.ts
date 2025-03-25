@@ -4,7 +4,7 @@ import Courses from "../../../../../../modals/Courses";
 import dbConnect from "../../../../../../dbConnect";
 
 
-export async function DELETE(req: Request,{ params }: { params: Promise<{ CatId: string }>}) {
+export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ CatId: string }>}) {
 
     try {
         await dbConnect();

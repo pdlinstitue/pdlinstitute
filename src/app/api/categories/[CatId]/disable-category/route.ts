@@ -8,7 +8,7 @@ type CatType = {
   disabledBy:string;
 }
 
-export async function PATCH(req: Request,{ params }: { params: Promise<{ CatId: string }>}) {
+export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ CatId: string }>}) {
 
     try 
     {

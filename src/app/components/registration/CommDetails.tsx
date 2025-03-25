@@ -12,11 +12,13 @@ interface countryListProps {
 interface stateListProps {
   state_id:string,
   state_name:string
+  country_iso2:string
 }
 
 interface cityListProps {
   city_id:string,
-  city_name:string
+  city_name:string,
+  state_iso2:number
 }
 
 const CommDetails : React.FC = () => {

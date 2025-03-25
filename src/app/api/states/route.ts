@@ -7,6 +7,8 @@ type SttType = {
     state_id: number;
     state_name: string;
     country_id: number;
+    country_iso2: string;
+    state_iso2: string;
 };
 
 export async function GET(req: NextRequest) {
@@ -17,7 +19,7 @@ export async function GET(req: NextRequest) {
         const country_id = req.nextUrl.searchParams.get("country_id");
 
         if (!country_id) {
-            return NextResponse.json({ success: false, msg: "country_id is required" }, { status: 400 });
+            return NextResponse.json({ success: false, msg: "country is required" }, { status: 400 });
         }
 
         const stateList: SttType[] = await States.find({ country_id });

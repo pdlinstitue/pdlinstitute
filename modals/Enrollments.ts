@@ -10,6 +10,9 @@ const enrollmentSchema = new mongoose.Schema({
     enrTnsNo: {
         type: String
     },
+    cpnName: {
+        type: String
+    },
     enrSrnShot: {
         type: String
     },   

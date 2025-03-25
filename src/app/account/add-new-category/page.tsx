@@ -63,7 +63,7 @@ const AddNewCategory: React.FC = () => {
           method: "POST",
           body: JSON.stringify({
             catName: data.catName,
-            createdBy: loggedInUser.result._id,
+            createdBy: loggedInUser.result?._id,
           }),
         });
         const post = await response.json();
@@ -101,7 +101,7 @@ const AddNewCategory: React.FC = () => {
           />
         </div>
         {errorMessage && (
-          <p className="text-red-600 italic text-xs">{errorMessage}</p>
+          <p className="text-red-600 italic text-sm">{errorMessage}</p>
         )}
         <div className="flex gap-1 w-full">
           <button type="submit" className="btnLeft w-full">

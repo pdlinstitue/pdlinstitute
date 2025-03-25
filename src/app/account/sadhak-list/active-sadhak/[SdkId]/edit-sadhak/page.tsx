@@ -92,12 +92,32 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     updatedBy: "",
   });
 
-  const loggedInUser = {
+  const [loggedInUser, setLoggedInUser] = useState({
     result: {
-      _id: Cookies.get("loggedInUserId"),
-      usrName: Cookies.get("loggedInUserName"),
+      _id: '',
+      usrName: '',
+      usrRole: '',
     },
-  };
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
   async function fetchSdkById() {
@@ -189,6 +209,28 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         return;
     }
 
+    // Validate file size (≤ 100 KB)
+    if (image instanceof File && image.size > 100 * 1024) {
+      toast.error("File size must be 100 KB or less!");
+      return;
+    }
+  
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+
+    // Validate image resolution
+    img.onload = async () => {
+      if (img.width !== 600 || img.height !== 350) {
+        toast.error("Image must be 600x350 pixels!");
+        return;
+      }
+
     const formData = new FormData();
     formData.append("profileImage", image);
     formData.append("profileImageFileName", sdkData.sdkImg);
@@ -206,10 +248,11 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         } else {
             throw new Error(data.error || "Upload failed");
         }
-    } catch (error:any) {
-        toast.error(error.message);
+      } catch (error:any) {
+          toast.error(error.message);
+      }
     }
- };
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -392,7 +435,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-1">
             <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image src={preview || sdkData?.sdkImg || '/images/uploadImage.jpg'}  alt="sadhakImage" width={600} height={350} />
+              <Image src={sdkData?.sdkImg || preview ||  '/images/uploadImage.jpg'}  alt="sadhakImage" width={600} height={350} />
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -400,7 +443,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
                 accept="image/*"
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
-              ></input>
+              />
               <button type="button" className="btnLeft" onClick={handleUpload}>
                 UPLOAD
               </button>

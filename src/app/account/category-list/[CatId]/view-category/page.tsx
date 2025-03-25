@@ -50,7 +50,7 @@ const ViewCategory: React.FC<ICatParams> = ({ params }) => {
     return (
         <div className="flex justify-center items-center">
             <form className="formStyle w-[350px] my-24 ">
-                <div className="flex flex-col mb-3 gap-2">
+                <div className="flex flex-col gap-2">
                     <label className="font-semibold uppercase">Category:</label>
                     <input type="text" className="inputBox" name="catName" value={data.catName} readOnly/>
                 </div>

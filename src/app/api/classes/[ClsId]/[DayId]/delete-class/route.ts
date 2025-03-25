@@ -20,7 +20,7 @@ export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ Cl
         if (!delClass) {
             return NextResponse.json({ success: false, msg: "Class not found." }, { status: 404 });
         } else {
-            return NextResponse.json({ delClass, success: true, msg: "Class entry deleted successfully." }, { status: 200 });
+            return NextResponse.json({ delClass, success: true, msg: "Class deleted successfully." }, { status: 200 });
         }
 
     } catch (error: any) {

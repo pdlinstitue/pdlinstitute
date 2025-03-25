@@ -441,11 +441,9 @@ const AddNewBatch: React.FC = () => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <div className="relative w-full h-auto border-[1.5px] bg-gray-100 flex items-center justify-center">
-              {!preview && (
-                <span className="absolute font-bold text-center">QR CODE</span>
-              )}
-              <Image src={preview || "/default-image.png"} alt="qr-code" width={400} height={400} />
+            <div className="flex flex-col gap-2">
+              <label>QR Code:</label>
+              <Image src={preview ? preview : "/images/uploadQr.jpg"} alt="qr-code" width={600} height={400} />
             </div>
             <div className="flex items-center gap-1">
               <input

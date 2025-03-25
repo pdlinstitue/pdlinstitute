@@ -26,8 +26,7 @@ export async function GET () {
   try 
   {
     await dbConnect();
-    const sdkList:SdkType[] = await Users.find();
-    const InActiveSdkList = sdkList.filter((item:any)=> item.isActive === false);
+    const InActiveSdkList:SdkType[] = await Users.find({isActive: false});
     return NextResponse.json({ InActiveSdkList, success: true }, {status:200});
 
   } catch (error:any) {

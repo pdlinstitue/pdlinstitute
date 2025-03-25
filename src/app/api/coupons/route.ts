@@ -19,8 +19,9 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const cpnData:CpnType[] = await Coupons.find().populate('cpnCourse', 'coName');
-      const cpnList = cpnData.filter((item:any)=> item.isActive === true);
+      const cpnList:CpnType[] = await Coupons.find({isActive: true})
+      .populate('cpnCourse', 'coName');
+
       return NextResponse.json({ cpnList, success: true }, {status:200});
   
     } catch (error) {

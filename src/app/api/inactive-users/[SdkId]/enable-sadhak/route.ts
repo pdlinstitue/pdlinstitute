@@ -18,7 +18,7 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Sdk
       if (!SdkId){
           return NextResponse.json({ success: false, msg: "No Sadhak found with the given id." }, { status: 404 });
       } else {
-        const sdkById = await Users.findByIdAndUpdate(SdkId, {isActive:false, updatedBy}, {new: true, runValidators: true});
+        const sdkById = await Users.findByIdAndUpdate(SdkId, {isActive:true, updatedBy}, {new: true, runValidators: true});
         return NextResponse.json({ sdkById, success: true, msg:"Sadhak enabled successfully." }, {status:200});   
       }
     } catch (error:any) {

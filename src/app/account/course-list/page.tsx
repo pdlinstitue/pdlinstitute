@@ -61,7 +61,6 @@ const CourseList : React.FC = () => {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
@@ -100,7 +99,7 @@ const CourseList : React.FC = () => {
         state: {
           sorting: sorting,
           globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+          pagination: { pageIndex: pageInput - 1, pageSize: 100 }
         },
         onSortingChange: setSorting,
         getFilteredRowModel: getFilteredRowModel(),
@@ -122,17 +121,9 @@ const CourseList : React.FC = () => {
 
   return (
     <div>
-      <div>
-        <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center'>
-            <select className='inputBox w-[300px]'>--- Select Course ---</select>
-            <select className='inputBox w-[300px]'>--- Select Batch ---</select>
-          </div>
-          <div className='flex gap-2 items-center'>
-            <Link href="/account/add-new-course" className='btnLeft'><IoCreateOutline size={24}/></Link>
-            <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
-          </div>
-        </div>
+      <div className='flex items-center justify-between mb-4'>
+        <Link href="/account/add-new-course" className='btnLeft'><IoCreateOutline size={24}/></Link>
+        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className='overflow-auto max-h-[412px]'>
         <DataTable  table={table}/>

@@ -183,7 +183,7 @@ const SideBar: React.FC = () => {
             <FaCalendarCheck size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>ATTENDANCE</p>
           </Link>
-          <Link href='/account/dashboard' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+          <Link href='/account/role-list' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <SiAdblock size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>PERMISSION</p>
           </Link>

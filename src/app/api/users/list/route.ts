@@ -1,6 +1,6 @@
 import Users from "../../../../../modals/Users";
 import dbConnect from "../../../../../dbConnect";
-import { NextRequest, NextResponse } from "next/server";
+import {NextResponse } from "next/server";
 
 type SdkType = {
     sdkFstName: string
@@ -19,7 +19,6 @@ type SdkType = {
     sdkComAdds: string,
     sdkParAdds: string,
     sdkPwd: string,
-    sdkConfPwd?: string,
     isActive:boolean,
     sdkImg:string,
     sdkRole:string,
@@ -31,8 +30,8 @@ export async function GET () {
   try 
   {
     await dbConnect();
-    const sdkList:SdkType[] = await Users.find();
-    const activeSdkList = sdkList.filter((item:any)=> item.isActive === true);
+    const activeSdkList:SdkType[] = await Users.find({isActive: true});
+
     return NextResponse.json({ activeSdkList, success: true }, {status:200});
 
   } catch (error:any) {

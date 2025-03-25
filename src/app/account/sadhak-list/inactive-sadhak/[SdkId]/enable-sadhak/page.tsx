@@ -5,9 +5,11 @@ import toast from 'react-hot-toast';
 import React, { FormEvent, useState } from 'react';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '@/app/account/Loading';
+import Cookies from 'js-cookie';
 
 interface SdkNameProps {
-    sdkFstName:string
+    sdkFstName:string,
+    updatedBy:string
 }
 
 interface ISdkParams {
@@ -21,8 +23,34 @@ const EnableSadhak : React.FC <ISdkParams>= ({params}) => {
   const router = useRouter();
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
-  const [sadhakName, setSadhakName] = useState<SdkNameProps>({sdkFstName:''});
-  
+  const [sadhakName, setSadhakName] = useState<SdkNameProps>({sdkFstName:'', updatedBy:''});
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
     useEffect(() => { 
     async function fetchSadhakById() { 
         try 
@@ -43,7 +71,10 @@ const EnableSadhak : React.FC <ISdkParams>= ({params}) => {
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/inactive-users/${SdkId}/enable-sadhak`, {
-                method: 'PATCH'
+                method: 'PATCH',
+                body: JSON.stringify({
+                    updatedBy:loggedInUser.result?._id
+                })
             });
 
             const post = await response.json();

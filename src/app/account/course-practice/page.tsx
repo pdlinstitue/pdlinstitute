@@ -57,13 +57,10 @@ const Practice: React.FC = () => {
   const convertTimeToDate = (timeStr: string) => {
     // Replace '.' with ':' to match valid time format (21:14 instead of 21.14)
     const formattedTime = timeStr.replace('.', ':');
-  
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
-  
     // Create a full timestamp string (YYYY-MM-DDTHH:mm)
     const dateTimeString = `${today}T${formattedTime}:00`;
-  
     return new Date(dateTimeString);
   };
 

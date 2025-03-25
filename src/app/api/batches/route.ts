@@ -25,13 +25,12 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const batchList:BatchType[] = await Batches.find()
+      const bthList: BatchType[] = await Batches.find({ isActive: true })
       .populate('corId', 'coName coNick')
       .populate('bthVtr', 'sdkFstName')
       .populate('createdBy', 'sdkFstName')
       .populate('updatedBy', 'sdkFstName');
-      
-      const bthList = batchList.filter((item:any)=> item.isActive === true);
+
       return NextResponse.json({ bthList, success: true }, {status:200});
   
     } catch (error) {
@@ -46,7 +45,7 @@ export async function POST(req: NextRequest) {
     await dbConnect();
     const {bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, createdBy}: BatchType = await req.json();
 
-    const newBatche = new Batches({ bthName, bthShift, bthStart, bthEnd, corId, bthVtr, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, createdBy});
+    const newBatche = new Batches({ bthName, bthShift, bthStart, bthEnd, corId, bthVtr:bthVtr?bthVtr:null, bthWhatGrp, bthTeleGrp, bthLang, bthMode, bthLink, bthLoc, bthBank, bthQr, createdBy});
     const savedBatch = await newBatche.save();
 
     if(savedBatch){

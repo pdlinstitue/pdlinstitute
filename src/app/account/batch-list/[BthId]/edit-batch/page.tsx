@@ -7,6 +7,7 @@ import Loading from "@/app/account/Loading";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
+import { parseISO } from "date-fns/parseISO";
 
 interface VolunteerListProps {
   _id: string;
@@ -36,6 +37,12 @@ interface EditBatchProps {
   updatedBy: string;
 }
 
+interface CoListProps {
+  _id: string;
+  coNick: string;
+  coName: string;
+}
+
 const EditBatch: React.FC <IBthParam>= ({params}) => {
 
   const router = useRouter();
@@ -60,9 +67,9 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
     updatedBy: "",
   });
   const [volunteer, setVolunteer] = useState<VolunteerListProps[] | null>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [coList, setCoList] = useState<{ _id: string; coNick: string; coName: string }[] | null>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [coList, setCoList] = useState<CoListProps[] | null>([]);
   const [batchTitle, setBatchTitle] = useState("");
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
@@ -111,6 +118,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
   };
 
   const handleUpload = async () => {
+
     if (!image) {
       toast.error("Please select an image!");
       return;
@@ -192,21 +200,26 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
   }, []);
 
   useEffect(() => {
-  async function fetchBatchDataById() {
-    try {
-      const res = await fetch(`${BASE_API_URL}/api/batches/${BthId}/view-batch`, {
-        cache: "no-store",
-      });
-      const batchDataList = await res.json();
-      setData(batchDataList.bthById);
-    } catch (error) {
+    async function fetchBatchDataById() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/batches/${BthId}/view-batch`, {
+          cache: "no-store",
+        });
+
+        const batchDetails = await res.json(); 
+        batchDetails.bthById.bthStart = format(parseISO(batchDetails.bthById.bthStart), "yyyy-MM-dd");
+        batchDetails.bthById.bthEnd = format(parseISO(batchDetails.bthById.bthEnd), "yyyy-MM-dd");    
+        setData(batchDetails.bthById);
+      } catch (error) {
         console.error("Error fetching course data:", error);
-    } finally {
+      } finally {
         setIsLoading(false);
+      }
     }
-  }
-  fetchBatchDataById();
+    
+    fetchBatchDataById();
   }, []);
+  
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -243,7 +256,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
             bthLoc: data.bthLink,
             bthBank: data.bthBank,
             bthQr: image,
-            updatedBy: loggedInUser.result._id,
+            updatedBy: loggedInUser.result?._id,
           }),
         });
 
@@ -283,7 +296,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
                 type="text"
                 className="inputBox"
                 name="bthName"
-                value={batchTitle}
+                value={batchTitle ? batchTitle : data.bthName}
                 readOnly
               />
             </div>
@@ -292,7 +305,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
               <select
                 className="inputBox"
                 name="bthShift"
-                value={data.bthShift}
+                value={data?.bthShift}
                 onChange={handleChange}
               >
                 <option className="text-center">--- Select Shift ---</option>
@@ -305,7 +318,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
               <select
                 className="inputBox"
                 name="corId"
-                value={data.corId}
+                value={data?.corId}
                 onChange={handleChange}
               >
                 <option className="text-center">--- Select Course ---</option>
@@ -323,7 +336,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
               <select
                 className="inputBox"
                 name="bthVtr"
-                value={data.bthVtr}
+                value={data?.bthVtr}
                 onChange={handleChange}
               >
                 <option className="text-center">
@@ -459,11 +472,9 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <div className="relative w-full h-auto border-[1.5px] bg-gray-100 flex items-center justify-center">
-              {!preview && (
-                <span className="absolute font-bold text-center">QR CODE</span>
-              )}
-              <Image src={preview || "/default-image.png"} alt="qr-code" width={400} height={400} />
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">QR Code:</label>
+              <Image src={data.bthQr || preview || "/images/uploadImage.jpg"} alt="QR-Code" width={800} height={400} />
             </div>
             <div className="flex items-center gap-1">
               <input

@@ -19,9 +19,8 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const prcList:PrcType[] = await Practices.find();
-      const activePracticeList = prcList.filter((item:any)=> item.isActive === true);
-      return NextResponse.json({ prcList:activePracticeList, success: true }, {status:200});
+      const prcList:PrcType[] = await Practices.find({isActive: true});
+      return NextResponse.json({ prcList, success: true }, {status:200});
   
     } catch (error) {
       return new NextResponse("Error while fetching practiceData: " + error, {status:500});

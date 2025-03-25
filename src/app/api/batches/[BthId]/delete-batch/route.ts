@@ -2,8 +2,9 @@ import { NextResponse, NextRequest } from "next/server";
 import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 import Classes from "../../../../../../modals/Classes";
+import Enrollments from "../../../../../../modals/Enrollments";
 
-export async function DELETE(req: Request,{ params }: { params: Promise<{ BthId: string }>}) {
+export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ BthId: string }>}) {
   
   try {
     await dbConnect();
@@ -28,6 +29,13 @@ export async function DELETE(req: Request,{ params }: { params: Promise<{ BthId:
         { success: false, msg: "This batch has running classes. Can't be deleted." },
         { status: 400 }
       );
+    }
+
+    // Check if there are any enrollments for this batch
+    const hasEnrollments = await Enrollments.findOne({ bthId: BthId }).lean();
+    
+    if (hasEnrollments) {
+      return NextResponse.json({ success: false, msg: "This batch has enrollments. Can't be disabled." }, { status: 400 });
     }
 
     // Delete the batch

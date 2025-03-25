@@ -126,31 +126,54 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
   const handleUpload = async () => {
 
     if (!image) {
-        toast.error("Please select an image!");
+      toast.error("Please select an image!");
+      return;
+    }
+  
+    // Validate file size (≤ 100 KB)
+    if (image instanceof File && image.size > 100 * 1024) {
+      toast.error("File size must be 100 KB or less!");
+      return;
+    }
+  
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
         return;
     }
 
-    const formData = new FormData();
-    formData.append("courseImage", image);
-    formData.append("courseImageFileName", data.coImg);
-
-    try {
+    // Validate image resolution
+    img.onload = async () => {
+      if (img.width !== 600 || img.height !== 350) {
+        toast.error("Image must be 600x350 pixels!");
+        return;
+      }
+  
+      const formData = new FormData();
+      formData.append("courseImage", image);
+      formData.append("courseImageFileName", data.coImg);
+  
+      try {
         const res = await fetch("/api/image-upload", {
-            method: "POST",
-            body: formData,
+          method: "POST",
+          body: formData,
         });
-
+  
         const data = await res.json();
         if (data.success) {
-            toast.success("Image uploaded successfully!");            
-            setImage(data.imageUrl);
+          toast.success("Image uploaded successfully!");            
+          setImage(data.imageUrl);
         } else {
-            throw new Error(data.error || "Upload failed");
+          throw new Error(data.error || "Upload failed");
         }
-    } catch (error:any) {
+      } catch (error:any) {
         toast.error(error.message);
-    }
- };
+      }
+    };
+  };
 
   useEffect(() => {
     async function fetchCourseById() {
@@ -275,7 +298,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image src={preview || data.coImg}  alt="sadhak" width={600} height={350} />
+              <Image src={data.coImg || preview || "/images/uploadImage.jpg"}  alt="sadhak" width={600} height={350} />
             </div>
             <div className="flex items-center gap-1">
               <input

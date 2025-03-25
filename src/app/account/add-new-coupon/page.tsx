@@ -124,52 +124,50 @@ const AddNewCoupon: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrorMessage(""); // Clear the previous error
-    let errMsg: string[] = [];
 
     if (!data.cpnName.trim()) {
-      errMsg.push("Coupon name is must.");
-    }
-
-    if (!data.cpnCourse.trim()) {
-      errMsg.push("Please select course.");
-    }
-
-    if (!couponFor.trim()) {
-      errMsg.push("Please select coupon is for whom.");
-    }
-
-    if (errMsg.length > 0) {
-      setErrorMessage(errMsg.join(" || "));
-      return;
-    }
-
-    try {
-      const response = await fetch(`${BASE_API_URL}/api/coupons`, {
-        method: "POST",
-        body: JSON.stringify({
-          cpnName: data.cpnName,
-          cpnUse: data.cpnUse,
-          cpnVal: data.cpnVal,
-          cpnDisType: data.cpnDisType,
-          cpnDisc: data.cpnDisc,
-          cpnCourse: data.cpnCourse,
-          cpnFor: couponFor,
-          cpnSdk: manageBox,
-          createdBy: loggedInUser.result._id,
-        }),
-      });
-
-      const post = await response.json();
-      console.log(post);
-
-      if (post.success === false) {
-        toast.error(post.msg);
-      } else {
-        toast.success(post.msg);
-        router.push("/account/coupon-list");
+      setErrorMessage("Coupon name is must.");
+    } else if (!data.cpnUse) {
+      setErrorMessage("Please enter number of uses.");
+    } else if (!data.cpnVal) {
+      setErrorMessage("Please enter validity.");
+    } else if (!data.cpnDisType.trim()) {
+      setErrorMessage("Please select discount type.");
+    } else if (!data.cpnDisc) {
+      setErrorMessage("Please enter discount.");
+    } else if (!data.cpnCourse.trim()) {
+      setErrorMessage("Please select course.");
+    } else if (!couponFor.trim()) {
+      setErrorMessage("Please select coupon is for whom.");
+    } else {
+      try {
+        const response = await fetch(`${BASE_API_URL}/api/coupons`, {
+          method: "POST",
+          body: JSON.stringify({
+            cpnName: data.cpnName,
+            cpnUse: data.cpnUse,
+            cpnVal: data.cpnVal,
+            cpnDisType: data.cpnDisType,
+            cpnDisc: data.cpnDisc,
+            cpnCourse: data.cpnCourse,
+            cpnFor: couponFor,
+            cpnSdk: manageBox,
+            createdBy: loggedInUser.result._id,
+          }),
+        });
+  
+        const post = await response.json();
+        console.log(post);
+  
+        if (post.success === false) {
+          toast.error(post.msg);
+        } else {
+          toast.success(post.msg);
+          router.push("/account/coupon-list");
+        }
+      } catch (error) {
+        toast.error("Error creating coupon.");
       }
-    } catch (error) {
-      toast.error("Error creating coupon.");
     }
   };
 
@@ -271,7 +269,6 @@ const AddNewCoupon: React.FC = () => {
                 type="radio"
                 name="couponFor"
                 value="All"
-                defaultChecked
                 onChange={(e: any) => handleCouponFor("All")}
               />{" "}
               All Sadhak
@@ -316,7 +313,7 @@ const AddNewCoupon: React.FC = () => {
             </button>
           </div>
         )}
-        {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
+        {errorMessage && <p className="text-sm italic text-red-600">{errorMessage}</p>}
         <div className="flex gap-1 w-full">
           <button type="submit" className="btnLeft w-full">
             Save

@@ -1,57 +1,92 @@
 import Enrollments from "../../../../modals/Enrollments";
+import Classes from "../../../../modals/Classes";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
+import mongoose from "mongoose";
+import Attendance from "../../../../modals/Attendance";
 
 type EnrType = {
-  _id?:string,
-  enrTnsNo:string,
-  enrSrnShot:string,
-  enrRemarks:string,
-  corId:string,
-  bthId:string,
-  createdBy:string,
-  ttlJoiners?:number
-}
+  _id?: string;
+  enrTnsNo: string;
+  cpnName: string;
+  enrSrnShot: string;
+  enrRemarks: string;
+  corId: mongoose.Types.ObjectId;
+  bthId: mongoose.Types.ObjectId;
+  createdBy: mongoose.Types.ObjectId;
+  ttlJoiners?: number;
+  batchAttendance?: number;
+};
 
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
 
-    // Extract query params correctly
+    // Extract and convert query parameters
     const corId = req.nextUrl.searchParams.get("corId");
     const bthId = req.nextUrl.searchParams.get("bthId");
 
+    const filter: Record<string, any> = {};
+    if (corId && mongoose.Types.ObjectId.isValid(corId)) {
+      filter.corId = new mongoose.Types.ObjectId(corId);
+    }
+    if (bthId && mongoose.Types.ObjectId.isValid(bthId)) {
+      filter.bthId = new mongoose.Types.ObjectId(bthId);
+    }
+
     // Fetch enrollments with population
-    let enrList: EnrType[] = await Enrollments.find()
+    const enrList = await Enrollments.find(filter)
       .populate("corId", "coName coNick coType")
       .populate("bthId", "bthName bthStart")
       .populate("createdBy", "sdkFstName sdkPhone")
-      .lean() as unknown as EnrType[];
+      .lean();
 
-    // Apply filtering correctly
-    if (corId || bthId) {
-      enrList = enrList.filter((enr:any) => 
-        (!corId || enr.corId._id.ToString() === corId) && 
-        (!bthId || enr.bthId._id.ToString() === bthId)
-      );
-    }
+    const batchClassCounts: Record<string, number> = {};
+    const batchClassIds: Record<string, mongoose.Types.ObjectId[]> = {};
 
-    // Compute ttlJoiners asynchronously
-    enrList = await Promise.all(
-      enrList.map(async (doc) => {
+    const classes = await Classes.find({ bthId: { $exists: true } }).lean();
+
+    classes.forEach((cls) => {
+      const batchId = cls.bthId.toString();
+      if (!batchClassCounts[batchId]) {
+        batchClassCounts[batchId] = 0;
+        batchClassIds[batchId] = [];
+      }
+
+      if (cls.clsName && Array.isArray(cls.clsName)) {
+        batchClassCounts[batchId] += cls.clsName.length; // Count total classes
+        batchClassIds[batchId].push(...cls.clsName.map((c: any) => c._id)); // Store all class IDs
+      }
+    });
+
+    // Compute ttlJoiners & batchAttendance in one loop
+    const enrListWithStats = await Promise.all(
+      enrList.map(async (enr) => {
+        // Count total joiners
         const ttlJoiners = await Enrollments.countDocuments({
-          corId: doc.corId,
-          bthId: doc.bthId,
+          corId: enr.corId,
+          bthId: enr.bthId,
         });
-        return { ...doc, ttlJoiners };
+
+        // Compute batch-wise attendance
+        const totalClasses = batchClassCounts[enr.bthId.toString()] || 0;
+        const classIds = batchClassIds[enr.bthId.toString()] || [];
+
+        const attendedClasses = await Attendance.countDocuments({
+          bthId: enr.bthId,
+          clsId: { $in: classIds },
+          sdkId: enr.createdBy._id,
+          status: "Present",
+        });
+
+        const batchAttendance =
+          totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0;
+
+        return { ...enr, ttlJoiners, batchAttendance };
       })
     );
 
-    if (enrList.length > 0) {
-      return NextResponse.json({ enrList, success: true }, { status: 200 });
-    } else {
-      return NextResponse.json({ msg: "No enrollments found", success: false }, { status: 404 });
-    }
+    return NextResponse.json({ enrList: enrListWithStats, success: true }, { status: 200 });
   } catch (error: any) {
     console.error("Error fetching enrollments:", error);
     return new NextResponse(`Error fetching enrollments: ${error.message}`, { status: 500 });
@@ -63,9 +98,9 @@ export async function POST(req: NextRequest) {
     try {
   
       await dbConnect();
-      const { enrTnsNo, enrSrnShot, enrRemarks, corId, bthId, createdBy }: EnrType = await req.json();
+      const { enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, createdBy }: EnrType = await req.json();
   
-      const newEnr = new Enrollments({ enrTnsNo, enrSrnShot, enrRemarks, corId, bthId, createdBy});
+      const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, createdBy});
       const savedEnr = await newEnr.save();
 
       if(savedEnr){

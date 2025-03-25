@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
 import Loading from "../Loading";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
@@ -13,7 +12,6 @@ type ClassItem = {
   clsEndAt: string;
   clsDate: string;
   clsLink: string;
-  clsAssignments: string[];
   createdBy: string | undefined;
 };
 
@@ -21,21 +19,19 @@ interface AddNewClassProps {
   clsName: ClassItem[];
   corId: string;
   bthId: string;
-  clsMaterials: string[];
 }
 
 const AddNewClass: React.FC = () => {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [course, setCourse] = useState<string[] | null>([]);
   const [clsBatch, setClsBatch] = useState<string[] | null>([]);
   const [courseById, setCourseById] = useState({ coName: "", durDays: 0 });
-  const [assignList, setAssignList] = useState([]);
   const [classArray, setClassArray] = useState<ClassItem[]>([]);
   const [data, setData] = useState<AddNewClassProps>({
     clsName: [],
-    clsMaterials: [],
     corId: "",
     bthId: "",
   });
@@ -127,26 +123,6 @@ const AddNewClass: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    async function fetchAssignmentData() {
-      try {
-        const res = await fetch(`${BASE_API_URL}/api/assignments`, {
-          cache: "no-store",
-        });
-        const assignmentData = await res.json();
-        const asnByCorId = assignmentData.asnList.filter(
-          (a: any) => a.corId?._id === data.corId
-        );
-        setAssignList(asnByCorId);
-      } catch (error) {
-        console.error("Error fetching course data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchAssignmentData();
-  }, [data.corId]);
-
-  useEffect(() => {
     async function fetchBatchesByCorId() {
       try {
         const res = await fetch(`${BASE_API_URL}/api/batches`, {
@@ -158,9 +134,9 @@ const AddNewClass: React.FC = () => {
         );
         setClsBatch(bthByCorId);
       } catch (error) {
-        console.error("Error fetching batch data:", error);
+          console.error("Error fetching batch data:", error);
       } finally {
-        setIsLoading(false);
+          setIsLoading(false);
       }
     }
     fetchBatchesByCorId();
@@ -201,39 +177,35 @@ const AddNewClass: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    debugger
     setErrorMessage(""); // Clear the previous error
-    let errMsg: string[] = [];
+    
     if (!data.corId.trim()) {
-      errMsg.push("Please select course.");
-    }
-    if (!data.bthId.trim()) {
-      errMsg.push("Please select batch.");
-    }
-    if (errMsg.length > 0) {
-      setErrorMessage(errMsg.join(" || "));
-      return;
-    }
-
-    try {
-      var postData = data;
-      postData.clsName = classArray;
-
-      const response = await fetch(`${BASE_API_URL}/api/classes`, {
-        method: "POST",
-        body: JSON.stringify({ postData }),
-      });
-
-      const post = await response.json();
-      console.log(post);
-
-      if (post.success === false) {
-        toast.error(post.msg);
-      } else {
-        toast.success(post.msg);
-        router.push("/account/class-list");
+      setErrorMessage("Please select course.");
+    } else if (!data.bthId.trim()) {
+      setErrorMessage("Please select batch.");
+    } else {
+      try {
+        const response = await fetch(`${BASE_API_URL}/api/classes`, {
+          method: "POST",
+          body: JSON.stringify({ 
+            corId: data.corId, 
+            bthId: data.bthId, 
+            clsName: classArray 
+          }),
+        });      
+  
+        const post = await response.json();
+  
+        if (post.success === false) {
+          toast.error(post.msg);
+        } else {
+          toast.success(post.msg);
+          router.push("/account/class-list");
+        }
+      } catch (error) {
+        toast.error("Error creating classes.");
       }
-    } catch (error) {
-      toast.error("Error creating classes.");
     }
   };
 
@@ -280,7 +252,6 @@ const AddNewClass: React.FC = () => {
               value={data.bthId}
               onChange={handleChange}
             >
-              {/* onChange={(e) => setBatch(e.target.value)} */}
               <option className="text-center">--- Select Batch ---</option>
               {clsBatch?.map((item: any) => {
                 return (
@@ -292,18 +263,14 @@ const AddNewClass: React.FC = () => {
             </select>
           </div>
           <div className="flex flex-col gap-2">
-            <label>Study Mat:</label>
-            <select
+            <label>Course Duration:</label>
+            <input
+              type="number"
               className="inputBox"
-              name="clsMaterials"
-              value={data.clsMaterials}
-              onChange={handleChange}
-            >
-              <option className="text-center">--- Select Study Mat ---</option>
-              <option value="101">101</option>
-              <option value="102">102</option>
-              <option value="103">103</option>
-            </select>
+              name="durDays"
+              value={courseById.durDays}
+              readOnly
+            />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-6">
@@ -328,25 +295,15 @@ const AddNewClass: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label>Meeting Link:</label>
             <input
-              type="text"
+              type="url"
               className="inputBox"
               name="clsLink"
               value={meetingLink}
               onChange={(e) => setMeetingLink(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label>Course Duration:</label>
-            <input
-              type="number"
-              className="inputBox"
-              name="durDays"
-              value={courseById.durDays}
-              readOnly
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -363,7 +320,7 @@ const AddNewClass: React.FC = () => {
           <p>List of Classes</p>
         </div>
         {classArray.map((cls, index) => (
-          <div key={index} className="grid grid-cols-6 gap-2">
+          <div key={index} className="grid grid-cols-5 gap-2">
             <input
               type="text"
               className="inputBox"
@@ -401,7 +358,7 @@ const AddNewClass: React.FC = () => {
               }
             />
             <input
-              type="text"
+              type="url"
               className="inputBox"
               name="clsLink"
               value={cls.clsLink}
@@ -409,7 +366,7 @@ const AddNewClass: React.FC = () => {
                 handleInputChange(index, "clsLink", e.target.value)
               }
             />
-            <select
+            {/* <select
               className="inputBox"
               name="clsAssignments"
               value={cls.clsAssignments}
@@ -425,7 +382,7 @@ const AddNewClass: React.FC = () => {
                   </option>
                 );
               })}
-            </select>
+            </select> */}
           </div>
         ))}
         {errorMessage && (

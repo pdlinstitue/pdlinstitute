@@ -40,7 +40,6 @@ const BatchList : React.FC = () => {
   const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\'th\', yyyy')};
   const columns = React.useMemo(() => [
     { header: 'Batch', accessorKey: 'bthName'},
-    { header: 'Shift', accessorKey: 'bthShift'},
     { header: 'Start Date', 
       accessorKey: 'bthStart',
       cell: ({ row }: { row: any }) => formatDate(row.original.bthStart),
@@ -51,7 +50,6 @@ const BatchList : React.FC = () => {
     },
     { header: 'Course', accessorKey: 'corId'},
     { header: 'Mode', accessorKey: 'bthMode'},
-    { header: 'Lang', accessorKey: 'bthLang'},
     { header: 'Volunteer', accessorKey: 'bthVtr'},
     { header: 'Created By', accessorKey: 'createdBy'},
     { header: 'Updated By', accessorKey: 'updatedBy'},
@@ -74,7 +72,6 @@ const BatchList : React.FC = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [filtered, setFiltered] = React.useState('');
   const [pageInput, setPageInput] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(25);
 
   const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
     return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
@@ -88,7 +85,7 @@ const BatchList : React.FC = () => {
       const updatedBatchList = batchData.bthList.map((item:any) => { 
         return { ...item, 
           corId: item.corId.coNick,
-          bthVtr:item.bthVtr.sdkFstName,
+          bthVtr:item.bthVtr?.sdkFstName,
           createdBy: item.createdBy ? item.createdBy.sdkFstName : 'N/A',
           updatedBy: item.updatedBy ? item.updatedBy.sdkFstName : 'N/A'  
         };
@@ -114,7 +111,7 @@ const BatchList : React.FC = () => {
       state: {
         sorting: sorting,
         globalFilter: filtered,
-        pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+        pagination: { pageIndex: pageInput - 1, pageSize: 100 }
       },
       onSortingChange: setSorting,
       getFilteredRowModel: getFilteredRowModel(),
@@ -136,17 +133,9 @@ const BatchList : React.FC = () => {
 
   return (
     <div>
-      <div>
-        <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center'>
-            <select className='inputBox w-[300px]'>--- Select Course ---</select>
-            <select className='inputBox w-[300px]'>--- Select Batch ---</select>
-          </div>
-          <div className='flex gap-2 items-center'>
-            <Link href="/account/add-new-batch" className='btnLeft'><BiLayerPlus size={24}/></Link>
-            <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
-          </div>
-        </div>
+      <div className='flex items-center justify-between mb-4'>
+        <Link href="/account/add-new-batch" className='btnLeft'><BiLayerPlus size={24}/></Link>
+        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className='overflow-auto max-h-[412px]'>
         <DataTable  table={table}/>

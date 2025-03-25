@@ -7,6 +7,7 @@ import Loading from "@/app/account/Loading";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
+import { parseISO } from "date-fns/parseISO";
 
 interface VolunteerListProps {
   _id: string;
@@ -39,11 +40,8 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
 
   const router = useRouter();
   const {BthId} = use(params);
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const [volunteer, setVolunteer] = useState<VolunteerListProps[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
   const [coList, setCoList] = useState<{ _id: string; coNick: string; coName: string }[] | null>([]);
   const [batchTitle, setBatchTitle] = useState("");
   const [data, setData] = useState<EditBatchProps>({
@@ -98,41 +96,6 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
         [name]: value,
       };
     });
-  };
-
-  const handleFileChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!image) {
-      toast.error("Please select an image!");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("qrImage", image);
-
-    try {
-      const res = await fetch("/api/qr-upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        toast.success("QR uploaded successfully!");
-        setImage(data.imageUrl);
-      } else {
-        throw new Error(data.error || "Upload failed");
-      }
-    } catch (error: any) {
-      toast.error(error.message);
-    }
   };
 
   useEffect(() => {
@@ -190,21 +153,25 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
   }, []);
 
   useEffect(() => {
-  async function fetchBatchDataById() {
-    try {
-      const res = await fetch(`${BASE_API_URL}/api/batches/${BthId}/view-batch`, {
-        cache: "no-store",
-      });
-      const batchDataList = await res.json();
-      setData(batchDataList.bthById);
-    } catch (error) {
-        console.error("Error fetching course data:", error);
-    } finally {
-        setIsLoading(false);
-    }
-  }
-  fetchBatchDataById();
-  }, []);
+      async function fetchBatchDataById() {
+        try {
+          const res = await fetch(`${BASE_API_URL}/api/batches/${BthId}/view-batch`, {
+            cache: "no-store",
+          });
+  
+          const batchDetails = await res.json(); 
+          batchDetails.bthById.bthStart = format(parseISO(batchDetails.bthById.bthStart), "yyyy-MM-dd");
+          batchDetails.bthById.bthEnd = format(parseISO(batchDetails.bthById.bthEnd), "yyyy-MM-dd");    
+          setData(batchDetails.bthById);
+        } catch (error) {
+          console.error("Error fetching course data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      
+      fetchBatchDataById();
+    }, []);
 
   if (isLoading) {
     return (
@@ -403,18 +370,7 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
           <div className="flex flex-col gap-1">
             <div className="flex flex-col gap-2">
               <label>QR Code:</label>
-              <Image src={preview || "/images/uploadImage.jpg"} alt="qr-code" width={600} height={400} />
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="file"
-                accept="image/*"
-                className="inputBox w-full h-[45px]"
-                onChange={handleFileChange}
-              ></input>
-              <button type="button" className="btnLeft" onClick={handleUpload}>
-                UPLOAD
-              </button>
+              <Image src={data.bthQr || "/images/uploadImage.jpg"} alt="qr-code" width={600} height={400} />
             </div>
           </div>
         </div>

@@ -1,7 +1,12 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+import Countries from './Countries';
+import States from './States';
 
 const usrSchema = new mongoose.Schema({
+    sdkRegNo: { 
+        type: String, 
+    },
     sdkFstName: { 
         type: String, 
         required: [true, "First name is required."]
@@ -70,10 +75,12 @@ const usrSchema = new mongoose.Schema({
     },
     sdkCountry: { 
         type: String, 
+        ref: Countries,
         required: [true, "Please select country."]
     },
     sdkState: { 
         type: String, 
+        ref: States,
         required: [true, "Please select state."]
     },
     sdkCity: { 

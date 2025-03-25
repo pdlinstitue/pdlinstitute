@@ -27,7 +27,6 @@ interface ViewCourseProps{
     coDon:number, 
     durDays:number, 
     durHrs:number, 
-    usrId: string
 }
 
 const ViewCourse : React.FC<ICourseParams> = ({params}) => {
@@ -35,7 +34,7 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
   const { CorId } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [data, setData] = useState<ViewCourseProps>({coName:'', coShort:'', coType:'', coAuth:'', coDon:0, coDesc:'', prodType:'Courses', coCat:'', coElg:'', coWhatGrp:'', coTeleGrp:'', durDays:0, durHrs:0, coImg:'', usrId:''});
+  const [data, setData] = useState<ViewCourseProps>({coName:'', coShort:'', coType:'', coAuth:'', coDon:0, coDesc:'', prodType:'Courses', coCat:'', coElg:'', coWhatGrp:'', coTeleGrp:'', durDays:0, durHrs:0, coImg:''});
 
   useEffect(() =>{
   async function fetchCourseData() {
@@ -79,16 +78,19 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
         <div className='text-sm'>
             <p>{data.coShort}</p>
         </div>
-        <div className='text-sm'>
-            <p><span className='font-semibold uppercase mr-3'>Fee:</span>{data.coDon}</p>
-        </div>
-        <div className='grid grid-cols-2 gap-1'>
+        <div className='grid grid-cols-3 gap-1'>
+            <div className='text-sm'>
+                <p><span className='font-semibold uppercase mr-3'>Fee:</span>{data.coDon}</p>
+            </div>
             <div className='text-sm'>
                 <p><span className='font-semibold uppercase mr-3'>Days:</span>{data.durDays}</p>
             </div>
             <div className='text-end text-sm'>
                 <p><span className='font-semibold uppercase mr-3'>Hrs:</span>{data.durHrs}</p>
             </div>
+        </div>
+        <div className='text-sm'>
+            <p><span className='font-semibold uppercase mr-3'>ELG:</span>{data.coElg}</p>
         </div>
         <div className='grid grid-cols-2 gap-1'>
             <button type='button' className='btnLeft' onClick={()=> router.push(`/account/course-list/${CorId}/enroll-sadhak`)}>

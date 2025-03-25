@@ -3,7 +3,7 @@ import Categories from "../../../../../../modals/Categories";
 import dbConnect from "../../../../../../dbConnect";
 
 
-export async function GET(req: Request,{ params }: { params: Promise<{ CatId: string }>}){
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ CatId: string }>}){
 
     try {
   

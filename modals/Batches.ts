@@ -17,7 +17,7 @@ const batchSchema = new mongoose.Schema({
         type: Date,
     },
     bthVtr: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: Users
     },
     bthWhatGrp: {

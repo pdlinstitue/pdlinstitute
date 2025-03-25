@@ -4,8 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/account/Loading";
 import { BASE_API_URL } from "@/app/utils/constant";
-import toast from "react-hot-toast";
-import Cookies from "js-cookie";
+
 
 interface ISadhakParams {
   params: Promise<{
@@ -53,11 +52,17 @@ interface cityListProps {
   city_name: string;
 }
 
+interface SadhakTypeProps {
+  _id:string,
+  roleType:string
+}
+
 const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
+
   const router = useRouter();
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [sadhakTypeList, setSadhakTypeList] = useState<SadhakTypeProps[] | null>([]);
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
@@ -158,6 +163,21 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
     fetchCityList();
   }, [sdkData.sdkState]);
 
+  useEffect(() => {
+    async function fetchSadhakTypeData() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/role-list`);
+        const sadhakTypeData = await res.json();
+        setSadhakTypeList(sadhakTypeData.rolList);
+      } catch (error) {
+        console.error("Error fetching country data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchSadhakTypeData();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
     const { name, value } = e.target;
     setSdkData((prevData) => (
@@ -179,7 +199,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-6">
           <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
             <Image
-              src={sdkData.sdkImg || "/images/sadhak.jpg"}
+              src={sdkData.sdkImg || "/images/uploadImage.jpg"}
               alt="sadhak"
               width={600}
               height={350}
@@ -220,7 +240,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Father's Name:</label>
+                <label className="text-lg">Father Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -230,7 +250,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Mother's Name:</label>
+                <label className="text-lg">Mother Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -408,9 +428,13 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
               onChange={handleChange}
             >
               <option className="text-center"> --- Select --- </option>
-              <option value="Admin">Admin</option>
-              <option value="Sadhak">Sadhak</option>
-              <option value="Volunteer">Volunteer</option>
+              {
+                sadhakTypeList?.map((typ:any)=>{
+                  return (
+                    <option key={typ._id} value={typ.roleType}>{typ.roleType}</option>
+                  )
+                })
+              }
             </select>
           </div>
         </div>
@@ -486,7 +510,6 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
           <p>BSK 1</p>
           <p>GK 1</p>
         </div>
-        {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
         <div className="grid grid-cols-1 gap-1">
           <button
             type="button"
@@ -501,3 +524,5 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
   );
 };
 export default ViewSadhak;
+
+

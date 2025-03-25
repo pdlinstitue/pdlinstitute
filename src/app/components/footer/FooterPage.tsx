@@ -10,7 +10,7 @@ import { ImLocation2 } from "react-icons/im";
 const Footer : React.FC = () => {
 
   return (
-    <footer className="bg-orange-500 text-white mt-16 p-6 md:p-0">
+    <footer className="bg-orange-700 text-white mt-16 p-6 md:p-0">
         <Container>
             <div className="flex flex-col md:flex-row justify-between pt-16 pb-8">
                 <FooterList>

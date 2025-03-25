@@ -38,35 +38,64 @@ export async function GET(req: NextRequest) {
 
         // Create a map for quick lookup of joinersCount
         const countMap = new Map();
-        enrollmentCounts.forEach(({ _id, joinersCount }) => {
+        enrollmentCounts?.forEach(({ _id, joinersCount }) => {
             const key = `${_id.corId}_${_id.bthId}`;
             countMap.set(key, joinersCount);
         });
 
         // Create a map for attendance counts
         const attendanceMap = new Map();
-        attendanceCounts.forEach(({ _id, presentCount, absentCount }) => {
+        attendanceCounts?.forEach(({ _id, presentCount, absentCount }) => {
             const key = `${_id.bthId}_${_id.clsId}`;
             attendanceMap.set(key, { presentCount, absentCount });
         });
 
         // Attach joinersCount and attendance data to each class in clsList
-        const clsListWithCounts = clsList.map(cls => {
-            const joinersKey = `${cls.corId._id}_${cls.bthId._id}`;
-            const joinersCount = countMap.get(joinersKey) || 0;
-            
-            const classAttendance = cls.clsName.map((session:any) => {
-                const attendanceKey = `${cls.bthId._id}_${session._id}`;
-                const { presentCount = 0, absentCount = 0 } = attendanceMap.get(attendanceKey) || {};
-                return { ...session.toObject(), presentCount, absentCount };
-            });
+        const clsListWithCounts = clsList?.map(cls => {
 
+            const joinersKey = `${cls.corId?._id}_${cls.bthId?._id}`;
+            const joinersCount = countMap.get(joinersKey) || 0;        
+            // Ensure cls.clsName is an array before filtering and mapping
+            const classAttendance = Array.isArray(cls.clsName) 
+              ? cls.clsName
+                  .filter((session:any) => session?.isActive) // Use filter instead of find()
+                  .map((session:any) => {
+                    const attendanceKey = `${cls.bthId?._id}_${session._id}`;
+                    const { presentCount = 0, absentCount = 0 } = attendanceMap.get(attendanceKey) || {};
+                    return { ...session.toObject(), presentCount, absentCount };
+                  })
+              : [];
+          
             return { ...cls.toObject(), joinersCount, clsName: classAttendance };
-        });
+          });          
 
         return NextResponse.json({ clsList: clsListWithCounts, success: true }, { status: 200 });
     } catch (error) {
         console.error("Error while fetching clsData:", error);
         return new NextResponse("Error while fetching clsData: " + error, { status: 500 });
+    }
+}
+
+export async function POST(req:NextRequest) {
+    
+    try {
+        await dbConnect();
+        
+        const { clsName, bthId, corId }  = await req.json();
+
+        if (!bthId || !corId) {
+            return NextResponse.json({ success:false,msg: "Batch and Course are required." }, { status: 400 });
+        }
+
+        const newClass = new Classes({
+            clsName,
+            bthId,
+            corId
+        });
+
+        await newClass.save();
+        return NextResponse.json({success:true, msg: "Classes created successfully", class: newClass }, { status: 201 });
+    } catch (error:any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

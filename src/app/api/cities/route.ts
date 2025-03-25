@@ -6,6 +6,7 @@ type CityType = {
     _id: string;
     city_id: number;
     city_name: string;
+    state_iso2: number;
     state_id: number;
 };
 
@@ -17,10 +18,10 @@ export async function GET(req: NextRequest) {
         const state_id = req.nextUrl.searchParams.get("state_id");
 
         if (!state_id) {
-            return NextResponse.json({ success: false, msg: "state_id is required" }, { status: 400 });
+            return NextResponse.json({ success: false, msg: "state is required" }, { status: 400 });
         }
 
-        const cityList: CityType[] = await Cities.find({ state_id });
+        const cityList: CityType[] = await Cities.find({state_id});
 
         if (cityList.length > 0) {
             return NextResponse.json({ cityList: cityList, success: true }, { status: 200 });

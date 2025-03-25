@@ -13,21 +13,22 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import { format } from 'date-fns';
 
 interface InActiveSadhakListProps {
-  _id:string,
-  sdkFstName: string
-  sdkMdlName: string
-  sdkLstName: string
-  sdkBthDate: Date
-  sdkGender: string
-  sdkMarStts: string
-  sdkSpouce: string
+  sdkRegNo:string,
+  sdkFstName: string,
+  sdkMdlName: string,
+  sdkLstName: string,
+  sdkBthDate: Date,
+  sdkGender: string,
+  isMedIssue:string,
+  sdkMarStts: string,
+  sdkSpouce: string,
   sdkPhone: string,
   sdkWhtNbr: string,
   sdkEmail: string,
   sdkComAdds: string,
   sdkParAdds: string,
   sdkImg:string,
-  sdkRole:string,
+  sdkRole:string
 }
 
 const InActiveSadhakList : React.FC = () => {
@@ -38,8 +39,8 @@ const InActiveSadhakList : React.FC = () => {
     const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
     const data = React.useMemo(() => inActiveSdk ?? [], [inActiveSdk]);
     const columns = React.useMemo(() => [
-      { header: 'Sadhak ID', accessorKey: '_id'},
       { header: 'Sadhak Name', accessorKey: 'sdkFstName'},
+      { header: 'Sdk ID', accessorKey: 'sdkRegNo'},
       { header: 'DOR', 
         accessorKey: 'createdAt',
         cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),

@@ -24,6 +24,9 @@ export async function PUT(req: NextRequest, {params}:{params: Promise<{SdkId: st
       return NextResponse.json({ success: false, msg: "Old password does not match." }, {status: 400});
     }
 
+    if ( sdkNewPwd && sdkNewPwd.length < 8) {
+          return NextResponse.json({ success: false, msg: 'New Password must be at least 8 chars long.' }, { status: 400 })}
+
     // Check if the new password and confirm password are the same
     if (sdkNewPwd !== sdkConfPwd) {
       return NextResponse.json({ success: false, msg: "New password and confirm password do not match." }, {status: 400});
@@ -35,6 +38,7 @@ export async function PUT(req: NextRequest, {params}:{params: Promise<{SdkId: st
     // Update the password
     sdkById.sdkPwd = hashedNewPwd;
     sdkById.updatedBy = updatedBy;
+    
     await sdkById.save();
     return NextResponse.json({ sdkById, success: true, msg:"Password changed successfully." }, {status:200});
 

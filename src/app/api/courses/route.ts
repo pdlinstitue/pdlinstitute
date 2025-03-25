@@ -26,12 +26,12 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const coList:CoType[] = await Courses.find()
+      const coList:CoType[] = await Courses.find({isActive: true})
       .populate('coCat', 'catName')
       .populate('createdBy', 'sdkFstName')
       .populate('updatedBy', 'sdkFstName');
-      const activeCourseList = coList.filter((item:any)=> item.isActive === true);
-      return NextResponse.json({ coList:activeCourseList, success: true }, {status:200});
+
+      return NextResponse.json({ coList, success: true }, {status:200});
   
     } catch (error) {
       return new NextResponse("Error while fetching coData: " + error, {status:500});
