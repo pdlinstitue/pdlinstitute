@@ -10,11 +10,11 @@ type AttdType = {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { BthId: string; ClsId: string; SdkId: string } }
+  { params }: { params: Promise<{ BthId: string; ClsId: string; SdkId: string }> }
 ) {
   try {
     await dbConnect();
-    const { BthId, ClsId, SdkId } = params;
+    const { BthId, ClsId, SdkId } = await params;
 
     const attendance = await Attendance.findOne({
       bthId: BthId,
@@ -44,11 +44,11 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { BthId: string; ClsId: string; SdkId: string } }
+  { params }: { params: Promise<{ BthId: string; ClsId: string; SdkId: string }> }
 ) {
   try {
     await dbConnect();
-    const { BthId, ClsId, SdkId } = params;
+    const { BthId, ClsId, SdkId } = await params;
     const { status, absRemarks, markedBy }: AttdType = await req.json();
 
     const existingAttd = await Attendance.findOne({

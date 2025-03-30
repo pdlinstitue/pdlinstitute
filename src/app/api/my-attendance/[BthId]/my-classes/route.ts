@@ -3,12 +3,12 @@ import Classes from "../../../../../../modals/Classes";
 import dbConnect from "../../../../../../dbConnect";
 import Attendance from "../../../../../../modals/Attendance";
 
-export async function GET(req: NextRequest, { params }: { params: { BthId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ BthId: string }> }) {
   try {
     // Establish database connection
     await dbConnect();
 
-    const { BthId } = params;
+    const { BthId } = await params;
     const sdkId = req.nextUrl.searchParams.get("sdkId");
 
     // Fetching classes matching the criteria and populating related data

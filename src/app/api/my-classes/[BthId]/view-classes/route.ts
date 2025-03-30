@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import Classes from "../../../../../../modals/Classes";
 import dbConnect from "../../../../../../dbConnect";
 
-export async function GET(req:NextRequest,{ params }: { params: { BthId: string } }){
+export async function GET(req:NextRequest,{ params }: { params: Promise<{ BthId: string }> }){
 
     try {
   
       await dbConnect();
-      const { BthId } = params;
+      const { BthId } = await params;
 
       const clsList = await Classes.find({bthId: BthId, clsName: { $elemMatch: { isActive: true }}})
       .populate("bthId", "bthName")
