@@ -11,7 +11,7 @@ type CpnType = {
     cpnCourse: String,
     cpnFor: String,
     cpnSdk: [String],
-    usrId: String 
+    createdBy: String 
 }
 
 export async function GET(req:NextRequest){
@@ -20,7 +20,8 @@ export async function GET(req:NextRequest){
   
       await dbConnect();
       const cpnList:CpnType[] = await Coupons.find({isActive: true})
-      .populate('cpnCourse', 'coName');
+      .populate('cpnCourse', 'coNick')
+      .sort({createdAt:-1});
 
       return NextResponse.json({ cpnList, success: true }, {status:200});
   
@@ -34,9 +35,9 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const { cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, usrId  }: CpnType = await req.json();
+      const { cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, createdBy  }: CpnType = await req.json();
   
-      const newCoupon = new Coupons({ cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, usrId});
+      const newCoupon = new Coupons({ cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, createdBy});
       const savedCoupon = await newCoupon.save();
   
       return NextResponse.json({ savedCoupon, success: true, msg:"Coupon generated successfully." }, {status:200});

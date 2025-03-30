@@ -29,7 +29,8 @@ export async function GET(req:NextRequest){
       const coList:CoType[] = await Courses.find({isActive: true})
       .populate('coCat', 'catName')
       .populate('createdBy', 'sdkFstName')
-      .populate('updatedBy', 'sdkFstName');
+      .populate('updatedBy', 'sdkFstName')
+      .sort({createdAt:-1});
 
       return NextResponse.json({ coList, success: true }, {status:200});
   

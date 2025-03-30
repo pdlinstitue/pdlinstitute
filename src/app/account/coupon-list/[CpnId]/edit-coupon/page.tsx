@@ -167,7 +167,7 @@ const EditCoupon: React.FC<ICpnParams> = ({ params }) => {
       setErrorMessage("Please select coupon is for whom.");
     } else {
       try {
-        const response = await fetch(`${BASE_API_URL}/api/coupons`, {
+        const response = await fetch(`${BASE_API_URL}/api/coupons/${CpnId}/edit-coupon`, {
           method: "PUT",
           body: JSON.stringify({
             cpnName: data.cpnName,

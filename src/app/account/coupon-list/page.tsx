@@ -65,7 +65,7 @@ const Couponlist : React.FC = () => {
         const res = await fetch(`${BASE_API_URL}/api/coupons`, { cache: "no-store" });
         const cpnData = await res.json();
         const updatedCpnData = cpnData.cpnList.map((item:any) => { 
-          return { ...item, cpnCourse: item.cpnCourse.coName };
+          return { ...item, cpnCourse: item.cpnCourse.coNick };
         });
         setCouponData(updatedCpnData);
       } catch (error) {

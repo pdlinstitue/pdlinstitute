@@ -34,6 +34,9 @@ const enrollmentSchema = new mongoose.Schema({
     enrRemarks:{
         type: String
     },
+    enrIncompRemarks:{
+        type: String
+    },
     corId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:Courses

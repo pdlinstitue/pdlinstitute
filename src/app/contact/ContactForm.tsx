@@ -8,10 +8,62 @@ import { FaInstagram } from "react-icons/fa";
 import { TbBrandYoutube } from "react-icons/tb";
 import Link from "next/link";
 import { AiFillTwitterCircle } from "react-icons/ai";
+import { ChangeEvent, FormEvent, useState } from "react";
+import toast from "react-hot-toast";
+import { BASE_API_URL } from "../utils/constant";
+import { useRouter } from "next/navigation";
 
-
+interface EnquiryProps {
+    eqrName:string,
+    eqrEmail:string,
+    eqrPhone:string,
+    eqrMessage:string,
+    eqrSub:string
+}
 
 const ContactUs = () => {
+
+    const router = useRouter();
+    const [eqrData, setEqrData] = useState<EnquiryProps>({eqrName:'', eqrEmail:'', eqrPhone:'', eqrMessage:'', eqrSub:''});
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+        const { name, value } = e.target;
+        setEqrData((prevData) => ({ ...prevData, [name]: value }));
+      };
+    
+      const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${BASE_API_URL}/api/enquiries`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                eqrName: eqrData.eqrName,
+                eqrEmail: eqrData.eqrEmail,
+                eqrPhone: eqrData.eqrPhone,
+                eqrSub: eqrData.eqrSub,
+                eqrMessage: eqrData.eqrMessage,
+            }),
+            });
+
+            const post = await response.json();
+            console.log(post);
+            if (post.success === false) {
+                toast.error(post.msg);
+            } else {
+                toast.success(post.msg);
+                router.push("/contact")
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("An unknown error occurred.");
+            }
+        }
+    };
 
     return ( 
         <div className="py-20">
@@ -59,12 +111,13 @@ const ContactUs = () => {
                     </div>
                 </div>
                 <div>
-                    <form className="flex flex-col gap-3">
+                    <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-3">
-                            <input type="text" className="inputBox" placeholder="Name"></input>
-                            <input type="text" className="inputBox" placeholder="Email"></input>
-                            <input type="text" className="inputBox" placeholder="Subject"></input>
-                            <textarea rows={6} className="inputBox" placeholder="Message"></textarea>
+                            <input type="text" name="eqrName" value={eqrData.eqrName} onChange={handleChange} className="inputBox" placeholder="Full Name" required></input>
+                            <input type="email" name="eqrEmail" value={eqrData.eqrEmail} onChange={handleChange} className="inputBox" placeholder="Email" required></input>
+                            <input type="tel" name="eqrPhone" value={eqrData.eqrPhone} onChange={handleChange} className="inputBox" placeholder="Phone with country code e.g +91" required></input>
+                            <input type="text" name="eqrSub" value={eqrData.eqrSub} onChange={handleChange} className="inputBox" placeholder="Subject" required></input>
+                            <textarea rows={6} name="eqrMessage" value={eqrData.eqrMessage} onChange={handleChange} className="inputBox" placeholder="Message" required></textarea>
                         </div>
                         <button type="submit" className="btnLeft">Submit</button>
                     </form>

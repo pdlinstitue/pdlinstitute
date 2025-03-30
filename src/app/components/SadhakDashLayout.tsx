@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-const DashLayout : React.FC = () => {
+const SadhakDashLayout : React.FC = () => {
 
   return (
     <div>
@@ -23,4 +23,4 @@ const DashLayout : React.FC = () => {
   )
 }
 
-export default DashLayout;
+export default SadhakDashLayout;

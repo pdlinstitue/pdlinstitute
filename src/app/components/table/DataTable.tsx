@@ -7,6 +7,9 @@ interface DataTableProps {
 }
 
 const DataTable: React.FC<DataTableProps> = ({ table }) => {
+  
+  const rows = table?.getRowModel().rows;
+
   return (
     <div>
       <table className="table-auto w-full">
@@ -42,18 +45,26 @@ const DataTable: React.FC<DataTableProps> = ({ table }) => {
           ))}
         </thead>
         <tbody className="text-left">
-          {table.getRowModel().rows.map((row: any) => (
-            <tr
-              key={row.id}
-              className="hover:bg-gray-100 border-b-[1.5px] border-gray-200"
-            >
-              {row.getVisibleCells().map((cell: any) => (
-                <td key={cell.id} className="py-2 px-3">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+          {rows.length > 0 ? (
+            rows.map((row: any) => (
+              <tr
+                key={row.id}
+                className="hover:bg-gray-100 border-b-[1.5px] border-gray-200"
+              >
+                {row.getVisibleCells().map((cell: any) => (
+                  <td key={cell.id} className="py-2 px-3">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={table.getAllColumns().length} className="text-center py-4">
+                No Data
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

@@ -45,13 +45,19 @@ const InActiveSadhakList : React.FC = () => {
         accessorKey: 'createdAt',
         cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
       },
-      { header: 'Phone', accessorKey: 'sdkPhone'},
+      { header: 'Phone', accessorKey: 'sdkPhone',
+        cell: ({ row }: { row: any }) => (
+          <Link href={`tel:${row.original.sdkPhone}`} className='text-blue-700'>
+            {row.original.sdkPhone}
+          </Link>
+        )
+      },
       { header: 'WhatsApp', accessorKey: 'sdkWhtNbr'},
       { header: 'State', accessorKey: 'sdkState'},
       { header: 'Country', accessorKey: 'sdkCountry'},
       { header: 'Action', accessorKey: 'action', 
             cell: ({ row }: { row: any }) => ( 
-              <div className='flex items-center gap-3'> 
+              <div className='flex items-center gap-3 justify-center'> 
                 <button type='button' title='View' onClick={()=> router.push(`/account/sadhak-list/inactive-sadhak/${row.original._id}/view-sadhak`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
                 <button type='button' title='Enable' onClick={()=> router.push(`/account/sadhak-list/inactive-sadhak/${row.original._id}/enable-sadhak`)} className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full  hover:border-black'><HiPlus size={12}/></button>
                 <button type='button' title='Delete' onClick={()=> router.push(`/account/sadhak-list/inactive-sadhak/${row.original._id}/delete-sadhak`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>

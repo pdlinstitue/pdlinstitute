@@ -12,7 +12,7 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ CatId
       const catById = await Categories.findById(CatId);
 
       if(!catById){
-        return NextResponse.json({ message: "No category found." }, { status: 404 });
+        return NextResponse.json({ msg: "No category found." }, { status: 404 });
       }else{
         return NextResponse.json({ catById, success: true }, {status:200});
       }

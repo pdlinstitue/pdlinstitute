@@ -26,6 +26,7 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
   const router = useRouter();
   const {BthId, ClsId, SdkId} = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [status, setStatus] = useState<string>('')
   const [attdStatus, setAttdStatus] = useState<MarkAttendanceProps>({status:'', absRemarks:'', markedBy:''});
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
@@ -62,11 +63,8 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
     }));
   };
 
-  const handleMarkAttd = (status: string) => {
-    setAttdStatus((prev) => ({
-      ...prev,
-      status: status,
-    }));
+  const handleMarkAttd = (status:string) => {
+    setStatus(status);
   };
 
 
@@ -78,7 +76,7 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          status:attdStatus.status,
+          status:status,
           absRemarks:attdStatus.absRemarks,
           markedBy:loggedInUser.result._id
         }),
@@ -104,6 +102,8 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
     </div>
   }
 
+  
+
   return (
     <div className='flex justify-center items-center'>
       <form className='formStyle w-[350px] my-24' onSubmit={handleSubmit}>
@@ -115,7 +115,6 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
             <input
               type="radio"
               name="status"
-              defaultChecked
               onClick={()=>handleMarkAttd("Present")}
             />
             <span>Present</span>
@@ -130,7 +129,7 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
           </div>
         </div>
         {
-          attdStatus.status === "Absent" && (
+          status === "Absent" && (
             <div className='flex flex-col gap-2'>
               <label className='font-bold'>Remarks:</label>
               <select className='inputBox text-center' name='absRemarks' value={attdStatus.absRemarks} onChange={handleChange}>

@@ -3,13 +3,9 @@ import DataTable from '@/app/components/table/DataTable';
 import { useReactTable, getCoreRowModel, getFilteredRowModel, FilterFn, getPaginationRowModel, getSortedRowModel, SortingState } from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Loading from '../Loading';
-import { HiMiniUserGroup, HiMinus } from "react-icons/hi2";
-import { FiEye } from 'react-icons/fi';
-import { BiEditAlt } from 'react-icons/bi';
-import { RxCross2 } from 'react-icons/rx';
 import { BASE_API_URL } from '@/app/utils/constant';
+import Cookies from 'js-cookie';
 
 interface PracticeProps {
   _id: string;
@@ -23,7 +19,8 @@ interface PracticeProps {
   prcWhatLink: string;
 }
 
-const MYPracticeClass: React.FC = () => {
+const MyPracticeClass: React.FC = () => {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [prcData, setPrcData] = useState<PracticeProps[]>([]);
@@ -37,12 +34,46 @@ const MYPracticeClass: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     async function fetchPracticeData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/course-practice`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/my-practice-class?sdkId=${Cookies.get("loggedInUserId")}`, { cache: "no-store" });
         const practiceData = await res.json();
-        setPrcData(practiceData.prcList || []);
+        const updatedPrcList = practiceData?.prcList?.map((item:any)=>{
+          return {
+            ...item,
+            prcName:item.prcName.coNick
+          }
+        })
+        setPrcData(updatedPrcList);
+        console.log(updatedPrcList);
       } catch (error) {
         console.error("Error fetching course data:", error);
       } finally {
@@ -57,13 +88,10 @@ const MYPracticeClass: React.FC = () => {
   const convertTimeToDate = (timeStr: string) => {
     // Replace '.' with ':' to match valid time format (21:14 instead of 21.14)
     const formattedTime = timeStr.replace('.', ':');
-  
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
-  
     // Create a full timestamp string (YYYY-MM-DDTHH:mm)
     const dateTimeString = `${today}T${formattedTime}:00`;
-  
     return new Date(dateTimeString);
   };
 
@@ -98,21 +126,12 @@ const MYPracticeClass: React.FC = () => {
         }
       },
     },
-    {
-      header: 'Action',
-      accessorKey: 'prcAction',
-      cell: ({ row }: { row: any }) => (
-        <div className='flex items-center gap-3'>
-          <button type='button' title='View' onClick={() => router.push(`/account/my-practice-class/${row.original._id}/view-practice-class`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12} /></button>
-        </div>
-      ),
-    },
   ], [currentTime, router]);
 
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [filtered, setFiltered] = useState('');
   const [pageInput, setPageInput] = useState(1);
-
+  const [filtered, setFiltered] = useState('');
+ 
   const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => 
     String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase());
 
@@ -124,7 +143,11 @@ const MYPracticeClass: React.FC = () => {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn,
-    state: { sorting, globalFilter: filtered },
+    state: { 
+      sorting, 
+      globalFilter: filtered,
+      pagination: { pageIndex: pageInput - 1, pageSize: 100 } 
+    },
     onSortingChange: setSorting,
     onGlobalFilterChange: setFiltered,
   });
@@ -133,11 +156,14 @@ const MYPracticeClass: React.FC = () => {
 
   return (
     <div>
+      <div className='flex items-center justify-between mb-4'>
+        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)} />
+      </div>
       <div className='overflow-auto max-h-[412px]'>
         <DataTable table={table} />
       </div>
     </div>
   );
-}
+} 
 
-export default MYPracticeClass;
+export default MyPracticeClass;

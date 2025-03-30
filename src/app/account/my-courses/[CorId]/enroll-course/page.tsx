@@ -248,8 +248,8 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
           cpnName: enrData.cpnName,
           bthId: enrData.bthId,
           corId: CorId,
-          sdkId: loggedInUser.result?._id,
-          createdBy: loggedInUser.result?._id,
+          sdkId: loggedInUser.result._id,
+          createdBy: loggedInUser.result._id
         }),
       });
 
@@ -414,7 +414,6 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
                         type="radio"
                         name="payThrough"
                         onClick={() => handlePayThrough("QR")}
-                        defaultChecked
                       />
                       QR Code
                       <input
@@ -425,10 +424,10 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
                       CCAvenue
                     </div>
                   </div>
-                  {payThrough === "QR" && (
+                  {payThrough === "QR" && bthData.bthQr && (
                     <div className="flex flex-col gap-2">
                       <label className="font-bold">QR CODE:</label>
-                      <p>{bthData.bthQr}</p>
+                      <Image src={bthData.bthQr} alt="paymentQR" width={400} height={400} />
                     </div>
                   )}
                 </div>

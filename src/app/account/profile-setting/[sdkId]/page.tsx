@@ -54,6 +54,7 @@ interface cityListProps {
 }
 
 const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
+
   const router = useRouter();
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -89,12 +90,37 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
     updatedBy: "",
   });
 
-  const loggedInUser = {
-    result: {
-      _id: Cookies.get("loggedInUserId"),
-      usrName: Cookies.get("loggedInUserName"),
-    },
+  const handleMedIssue = (medIssue:string) => {
+    setSdkData((prev) => ({ ...prev, isMedIssue: medIssue }));
   };
+  
+
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchSdkById() {
@@ -187,6 +213,28 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         return;
     }
 
+    // Validate file size (≤ 100 KB)
+    if (image instanceof File && image.size > 100 * 1024) {
+      toast.error("File size must be 100 KB or less!");
+      return;
+    }
+  
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+
+    // Validate image resolution
+    img.onload = async () => {
+      if (img.width !== 600 || img.height !== 350) {
+        toast.error("Image must be 600x350 pixels!");
+        return;
+      }
+
     const formData = new FormData();
     formData.append("profileImage", image);
     formData.append("profileImageFileName", sdkData.sdkImg);
@@ -207,7 +255,8 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
     } catch (error:any) {
         toast.error(error.message);
     }
-  };
+  }
+};
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -312,6 +361,22 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
       sdkData.sdkEmail.trim() === ""
     ) {
       setErrorMessage("Email is required.");
+    } else if (
+      !sdkData ||
+      !("isMedIssue" in sdkData) ||
+      sdkData.isMedIssue === null ||
+      sdkData.isMedIssue.trim() === ""
+    ) {
+      setErrorMessage("Please check medical issue.");
+    } else if (
+      sdkData && "isMedIssue" in sdkData &&
+      sdkData.isMedIssue === "Yes" &&
+      ( !sdkData ||
+        !("sdkMedIssue" in sdkData) ||
+        sdkData.sdkMedIssue === null ||
+        sdkData.sdkMedIssue?.trim() === "")
+    ) {
+      setErrorMessage("Please describe medical issue.");
     } else {
       try {
         const response = await fetch(
@@ -376,7 +441,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-1">
             <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image src={preview || sdkData.sdkImg}  alt="sadhakImage" width={600} height={350} />
+              <Image src={sdkData.sdkImg || preview || "/images/uploadImage.jpg"}  alt="sadhakImage" width={600} height={350} />
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -425,7 +490,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Father's Name:</label>
+                <label className="text-lg">Father Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -435,7 +500,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Mother's Name:</label>
+                <label className="text-lg">Mother Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -641,37 +706,29 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Profile Image:</label>
-            <input type="file" className="inputBox" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Do you have any medical issues?</label>
-            <div className="flex gap-4 mt-3">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="isMedIssue"
-                  value="Yes"
-                  checked={sdkData.isMedIssue === "Yes"}
-                  onChange={handleChange}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="isMedIssue"
-                  value="No"
-                  checked={sdkData.isMedIssue !== "Yes"}
-                  onChange={handleChange}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-lg">Do you have any medical issues?</label>
+          <div className="flex gap-4 mt-3">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="isMedIssue"
+                checked={sdkData.isMedIssue === "Yes"}
+                onChange={()=>handleMedIssue("Yes")}
+                className="mr-2"
+              />
+              Yes
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="isMedIssue"
+                checked={sdkData.isMedIssue === "No"}
+                onChange={()=>handleMedIssue("No")}
+                className="mr-2"
+              />
+              No
+            </label>
           </div>
         </div>
         {
@@ -695,9 +752,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
           <p>BSK 1</p>
           <p>GK 1</p>
         </div>
-        {errorMessage && (
-          <p className="text-sm italic text-red-600">{errorMessage}</p>
-        )}
+        {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
         <div className="grid grid-cols-2 gap-1">
           <button type="submit" className="btnLeft">
             Save

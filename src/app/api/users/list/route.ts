@@ -27,10 +27,12 @@ type SdkType = {
 
 
 export async function GET () {
+  
   try 
   {
     await dbConnect();
-    const activeSdkList:SdkType[] = await Users.find({isActive: true});
+    const activeSdkList:SdkType[] = await Users.find({isActive: true})
+    .sort({createdAt:-1});
 
     return NextResponse.json({ activeSdkList, success: true }, {status:200});
 

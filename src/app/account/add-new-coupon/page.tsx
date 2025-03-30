@@ -41,6 +41,7 @@ const AddNewCoupon: React.FC = () => {
   });
   const [manageBox, setManageBox] = React.useState<string[]>([]);
   const [couponFor, setCouponFor] = useState("");
+  const [randomCpn, setRandomCpn] = useState<string>('');
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
       _id: "",
@@ -90,6 +91,21 @@ const AddNewCoupon: React.FC = () => {
     }
   };
 
+  const generateCoupon = () => {
+
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    let randomStr = "";
+    
+    for (let i = 0; i < 6; i++) {
+        randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    const coupon = "PDL" + randomStr;
+    setRandomCpn(coupon);
+    return coupon;
+  };
+
+
   useEffect(() => {
     async function fetchCourseData() {
       try {
@@ -125,8 +141,8 @@ const AddNewCoupon: React.FC = () => {
     e.preventDefault();
     setErrorMessage(""); // Clear the previous error
 
-    if (!data.cpnName.trim()) {
-      setErrorMessage("Coupon name is must.");
+    if (!randomCpn.trim()) {
+      setErrorMessage("Please generate coupon.");
     } else if (!data.cpnUse) {
       setErrorMessage("Please enter number of uses.");
     } else if (!data.cpnVal) {
@@ -144,7 +160,7 @@ const AddNewCoupon: React.FC = () => {
         const response = await fetch(`${BASE_API_URL}/api/coupons`, {
           method: "POST",
           body: JSON.stringify({
-            cpnName: data.cpnName,
+            cpnName: randomCpn,
             cpnUse: data.cpnUse,
             cpnVal: data.cpnVal,
             cpnDisType: data.cpnDisType,
@@ -184,15 +200,17 @@ const AddNewCoupon: React.FC = () => {
       <form onSubmit={handleSubmit} className="formStyle w-[450px]">
         <div className="flex flex-col gap-2">
           <label className="text-lg">Coupon Name:</label>
-          <input
-            type="text"
-            className="inputBox"
-            name="cpnName"
-            value={data.cpnName}
-            onChange={handleChange}
-          />
+          <div className="flex items-center gap-1">
+            <input
+              type="text"
+              className="inputBox w-full"
+              name="cpnName"
+              defaultValue={randomCpn}
+            />
+            <button type="button" className="btnRight" onClick={generateCoupon}>Create</button>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-1">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Number of Uses:</label>
             <input
@@ -214,7 +232,7 @@ const AddNewCoupon: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-1">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Discout Type:</label>
             <select
@@ -267,8 +285,8 @@ const AddNewCoupon: React.FC = () => {
             <label className="text-lg">
               <input
                 type="radio"
-                name="couponFor"
-                value="All"
+                name="cpnFor"
+                value={couponFor}
                 onChange={(e: any) => handleCouponFor("All")}
               />{" "}
               All Sadhak
@@ -276,8 +294,8 @@ const AddNewCoupon: React.FC = () => {
             <label className="text-lg">
               <input
                 type="radio"
-                name="couponFor"
-                value="Specific"
+                name="cpnFor"
+                value={couponFor}
                 onChange={(e: any) => handleCouponFor("Specific")}
               />{" "}
               Specific Sadhak

@@ -19,11 +19,19 @@ interface AddNewPracticeProps {
   createdBy?: string;
 }
 
+interface CourseListProps {
+  _id:string,
+  coName:string,
+  coNick:string
+}
+
 const AddNewPractice = () => {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [pracDays, setPracDays] = useState<string[] | null>([]);
+  const [courseList, setCourseList] = useState<CourseListProps[] | null>([]);
   const [data, setData] = useState<AddNewPracticeProps>({
     prcName: "",
     prcLang: "",
@@ -70,6 +78,21 @@ const AddNewPractice = () => {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    async function fetchCourseData() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/courses`, { cache: "no-store" });
+        const coData = await res.json();
+        setCourseList(coData.coList);
+      } catch (error) {
+          console.error("Error fetching course data:", error);
+      } finally {
+          setIsLoading(false);
+      }
+    }
+    fetchCourseData();
+    }, []);
 
   const handleChange = (e: any) => {
     const name = e.target.name;
@@ -163,14 +186,21 @@ const AddNewPractice = () => {
         </div>
         <div className="flex flex-col gap-2 w-full">
           <label>Class Name:</label>
-          <input
-            type="text"
+          <select
             className="inputBox"
             name="prcName"
             value={data.prcName}
             onChange={handleChange}
-            placeholder="Enter class name"
-          />
+          >
+            <option className="text-center">--- Select ---</option>
+            {
+              courseList?.map((crs:any)=>{
+                return (
+                  <option key={crs._id} value={crs._id}>{crs.coName}</option>
+                )
+              })
+            }
+          </select>
         </div>
         <div className="grid grid-cols-3 gap-1 w-full">
           <div className="flex flex-col gap-2 w-full">

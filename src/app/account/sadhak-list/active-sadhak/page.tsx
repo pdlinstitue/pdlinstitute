@@ -56,7 +56,13 @@ const ActiveSadhakList: React.FC = () => {
         accessorKey: 'createdAt',
         cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
       },
-      { header: "Phone", accessorKey: "sdkPhone" },
+      { header: "Phone", accessorKey: "sdkPhone",
+        cell: ({ row }: { row: any }) => (
+          <Link href={`tel:${row.original.sdkPhone}`} className='text-blue-700'>
+            {row.original.sdkPhone}
+          </Link>
+        )
+       },
       { header: "WhatsApp", accessorKey: "sdkWhtNbr" },
       { header: "Medical", accessorKey: "isMedIssue" },
       { header: "State", accessorKey: "sdkState" },
@@ -65,7 +71,7 @@ const ActiveSadhakList: React.FC = () => {
         header: "Action",
         accessorKey: "action",
         cell: ({ row }: { row: any }) => (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-center">
             <button
               type="button"
               title="View"

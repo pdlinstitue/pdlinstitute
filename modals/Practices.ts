@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
+import Users from "./Users";
+import Courses from "./Courses";
   
-const practiceSchema = new mongoose.Schema({
+const practiceSchema = new mongoose.Schema({   
     prcName: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref:Courses
     },
     prcImg: {
         type: String
@@ -37,20 +40,20 @@ const practiceSchema = new mongoose.Schema({
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users'
+        ref: Users
     },
     updatedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users'
+        ref: Users
     },
     disabledBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users'
+        ref: Users
     },
     deletedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users'
-    },  
+        ref: Users
+    }
 }, {timestamps: true});
 
 const Practices = mongoose.models.Practices || mongoose.model('Practices', practiceSchema);

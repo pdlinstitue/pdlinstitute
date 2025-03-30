@@ -41,9 +41,9 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Enr
 
       const enrById = await Enrollments.findByIdAndUpdate(EnrId, {enrRemarks, isApproved, updatedBy}, {new: true, runValidators: true});
       if (enrById === "Rejected") { 
-        return NextResponse.json({ enrById, success: true, msg: "Document dis-approved." }, { status: 200 }); 
+        return NextResponse.json({ enrById, success: true, msg: "Enrollment dis-approved." }, { status: 200 }); 
       } else {
-        return NextResponse.json({ enrById, success: true, msg: "Document approved." }, { status: 200 });
+        return NextResponse.json({ enrById, success: true, msg: "Enrollment approved." }, { status: 200 });
       } 
     }  
   } catch (error:any) {

@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
         await dbConnect();
 
         const sdkId = req.nextUrl.searchParams.get("sdkid");
+        
         if (!sdkId) {
             return NextResponse.json({ error: "Missing sdkid parameter" }, { status: 400 });
         }

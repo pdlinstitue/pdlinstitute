@@ -85,12 +85,12 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
       { header: "Remarks", accessorKey: "absRemarks" },
       {
         header: "Action",
-        accessorKey: "atdAction",
+        accessorKey: "action",
         cell: ({ row }: { row: any }) => (
           <div className="flex items-center gap-4">
             <button
               type="button"
-              title="View"
+              title="Mark"
               onClick={() =>
                 router.push(`/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}`)
               }
@@ -100,7 +100,7 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
             </button>
             <button
               type="button"
-              title="Edit"
+              title="Amend"
               onClick={() =>
                 router.push(`/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}/amend-attendance`)
               }

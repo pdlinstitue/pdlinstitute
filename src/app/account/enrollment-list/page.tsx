@@ -15,6 +15,7 @@ import { FiEye } from 'react-icons/fi';
 import { BASE_API_URL } from '@/app/utils/constant';
 import { format } from 'date-fns';
 interface EnrollmentListProps {
+  sdkRegNo:string,
   enrBthName:string,
   enrTnsNo:string,
   enrSrnShot:string,
@@ -44,6 +45,7 @@ const EnrollmentList : React.FC = () => {
   const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
   const [filtered, setFiltered] = React.useState('');
   const [pageInput, setPageInput] = React.useState(1);
+  const [selectedDuration, setSelectedDuration]=useState<number>(1);
   const data = React.useMemo(() => enrData ?? [], [enrData]);
 
   //changing the status color as per the status
@@ -60,9 +62,9 @@ const EnrollmentList : React.FC = () => {
   };
 
   const columns = React.useMemo(() => [
-    { header: 'Sadhak', accessorKey: 'createdBy.sdkFstName'},
-    { header: 'SDK Id', accessorKey: 'createdBy._id'},
-    { header: 'Phone',  accessorKey: 'createdBy.sdkPhone'},
+    { header: 'Sadhak', accessorKey: 'sdkFstName'},
+    { header: 'SDK Id', accessorKey: 'sdkRegNo'},
+    { header: 'Phone',  accessorKey: 'sdkPhone'},
     { header: 'Course', accessorKey: 'coNick'},
     { header: 'Type',   accessorKey: 'coType'},
     { header: 'Batch',  accessorKey: 'bthId'},
@@ -92,7 +94,7 @@ const EnrollmentList : React.FC = () => {
   useEffect(()=>{
     async function fetchEnrollmentData(){
       try {
-        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
         const enrDataList = await res.json();
         const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
           return { 
@@ -100,8 +102,9 @@ const EnrollmentList : React.FC = () => {
             coNick: item.corId.coNick, 
             coType: item.corId.coType,  
             bthId: item.bthId.bthName, 
-            sdkFstName: item.createdBy.sdkFstName,
-            sdkPhone: item.createdBy.sdkPhone,
+            sdkFstName: item.sdkId.sdkFstName,
+            sdkPhone: item.sdkId.sdkPhone,
+            sdkRegNo: item.sdkId.sdkRegNo,
             bthStart: format(new Date(item.bthId.bthStart), 'dd MMM, yyyy'),  
             createdAt: format(new Date(item.createdAt), 'dd MMM, yyyy')   
           };
@@ -114,7 +117,7 @@ const EnrollmentList : React.FC = () => {
       }
     }
     fetchEnrollmentData();
-  },[selectedCourse, selectedBatch])
+  },[selectedCourse, selectedBatch, selectedDuration])
 
   const table = useReactTable(
     {
@@ -185,6 +188,9 @@ const EnrollmentList : React.FC = () => {
     setSelectedBatch(e.target.value);
   };
 
+  const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDuration(Number(e.target.value));
+  };
 
   if(isLoading){
     return <div>
@@ -196,7 +202,12 @@ const EnrollmentList : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className="flex gap-2 items-center w-[600px]">
+          <div className="flex gap-2 items-center w-[900px]">
+            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+              <option value="1">Last One Month</option>
+              <option value="2">Last Two Month</option>
+              <option value="3">Last Three Month</option>
+            </select>
             <select className="inputBox w-full" name="corId" value={selectedCourse} onChange={handleCourseChange}>
               <option value="" className='text-center'>--- Select Course ---</option>
               {courseList?.map((item: any) => {

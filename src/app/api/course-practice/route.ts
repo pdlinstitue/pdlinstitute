@@ -19,9 +19,15 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const prcList:PrcType[] = await Practices.find({isActive: true});
-      return NextResponse.json({ prcList, success: true }, {status:200});
-  
+      const prcList:PrcType[] = await Practices.find({isActive: true})
+      .populate("prcName", "coName coNick")
+      .sort({createdAt:-1});
+      
+      if(prcList.length > 0 ){
+        return NextResponse.json({ prcList, success: true }, {status:200});
+      } else {
+        return NextResponse.json({ success: false, msg:"No practice class found" }, {status:404});
+      } 
     } catch (error) {
       return new NextResponse("Error while fetching practiceData: " + error, {status:500});
     }

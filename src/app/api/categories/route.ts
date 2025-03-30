@@ -15,7 +15,8 @@ export async function GET(req:NextRequest){
       await dbConnect();
       const catList: CatType[] = await Categories.find({isActive: true})
       .populate('createdBy', 'sdkFstName')
-      .populate('updatedBy', 'sdkFstName');
+      .populate('updatedBy', 'sdkFstName')
+      .sort({ createdAt: -1 });
       
       return NextResponse.json({ catList, success: true }, {status:200});
   

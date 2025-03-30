@@ -22,7 +22,8 @@ export async function GET(req:NextRequest){
       const prosList:ProsType[] = await Prospects.find()
       .populate('corId', 'coName')
       .populate('createdBy', 'sdkFstName')
-      .populate('updatedBy', 'sdkFstName');
+      .populate('updatedBy', 'sdkFstName')
+      .sort({createdAt:-1});
 
       if(prosList && prosList.length > 0){
         const activeProsList = prosList.filter((item:any)=> item.isActive === true);

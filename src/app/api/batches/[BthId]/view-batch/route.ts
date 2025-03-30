@@ -12,7 +12,7 @@ export async function GET(req: Request,{ params }: { params: Promise<{ BthId: st
       const bthById = await Batches.findById(BthId);
 
       if(!bthById){
-        return NextResponse.json({ message: "No batch found." }, { status: 404 });
+        return NextResponse.json({ msg: "No batch found." }, { status: 404 });
       }else{
         return NextResponse.json({ bthById, success: true }, {status:200});
       }

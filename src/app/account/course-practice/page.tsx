@@ -24,6 +24,7 @@ interface PracticeProps {
 }
 
 const Practice: React.FC = () => {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [prcData, setPrcData] = useState<PracticeProps[]>([]);
@@ -42,7 +43,13 @@ const Practice: React.FC = () => {
       try {
         const res = await fetch(`${BASE_API_URL}/api/course-practice`, { cache: "no-store" });
         const practiceData = await res.json();
-        setPrcData(practiceData.prcList || []);
+        const updatedPrcList = practiceData?.prcList?.map((item:any)=>{
+          return {
+            ...item,
+            prcName:item.prcName.coNick
+          }
+        })
+        setPrcData(updatedPrcList);
       } catch (error) {
         console.error("Error fetching course data:", error);
       } finally {
@@ -110,9 +117,9 @@ const Practice: React.FC = () => {
   ], [currentTime, router]);
 
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [pageInput, setPageInput] = React.useState(1);
   const [filtered, setFiltered] = useState('');
-  const [pageInput, setPageInput] = useState(1);
-
+ 
   const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => 
     String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase());
 
@@ -124,7 +131,11 @@ const Practice: React.FC = () => {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn,
-    state: { sorting, globalFilter: filtered },
+    state: { 
+      sorting, 
+      globalFilter: filtered,
+      pagination:{ pageIndex: pageInput - 1, pageSize: 100 } 
+     },
     onSortingChange: setSorting,
     onGlobalFilterChange: setFiltered,
   });
@@ -133,18 +144,15 @@ const Practice: React.FC = () => {
 
   return (
     <div>
-      <div className='flex mb-2 items-center justify-between'>
-        <select className='inputBox w-[300px]'>--- Select Course ---</select>
-        <div className='flex gap-2 items-center'>
-          <Link href="/account/add-new-practice" className='btnLeft'><HiMiniUserGroup size={24} /></Link>
-          <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)} />
-        </div>
+      <div className='flex items-center justify-between mb-4'>
+        <Link href="/account/add-new-practice" className='btnLeft'><HiMiniUserGroup size={24} /></Link>
+        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)} />
       </div>
       <div className='overflow-auto max-h-[412px]'>
         <DataTable table={table} />
       </div>
     </div>
   );
-}
+} 
 
 export default Practice;

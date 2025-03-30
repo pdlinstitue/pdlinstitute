@@ -1,6 +1,14 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
-import {useReactTable, getCoreRowModel, getFilteredRowModel, FilterFn, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
+import {
+  useReactTable, 
+  getCoreRowModel, 
+  getFilteredRowModel, 
+  FilterFn, 
+  getPaginationRowModel, 
+  getSortedRowModel, 
+  SortingState
+} from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiEye } from 'react-icons/fi';
@@ -19,6 +27,7 @@ interface SelectedBatchProps {
 }
 
 interface EnrollmentListProps {
+  sdkId:string,
   corId:string,
   bthId:string,
   createdBy?:string
@@ -70,7 +79,7 @@ const CompleteCourse : React.FC = () => {
     },
     {
       header: 'SDK ID',
-      accessorKey: 'createdBy',
+      accessorKey: 'sdkRegNo',
     },
     {
       header: 'Presence(%)',
@@ -83,7 +92,7 @@ const CompleteCourse : React.FC = () => {
     { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center justify-center'> 
-          <button type='button' title='Update' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/update-completion-status`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+          <button type='button' title='Update' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/edit-enrollment`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
         </div> 
       ), 
     },
@@ -113,8 +122,8 @@ const CompleteCourse : React.FC = () => {
           return { 
             ...item, 
             sdkFstName: item.createdBy.sdkFstName,
-            createdBy: item.createdBy._id,
             sdkPresent: item.batchAttendance,
+            sdkRegNo:item.sdkId.sdkRegNo
           };
         });
         setEnrData(updatedEnrDataList);
@@ -202,7 +211,8 @@ const CompleteCourse : React.FC = () => {
         </div>
       };
 
-  async function handleComplete(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {    
+  async function handleComplete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {  
+    e.preventDefault  
     const selectedRows = table.getSelectedRowModel().rows;
     if (selectedRows.length === 0) {
       alert("Please select at least one row to mark as complete.");

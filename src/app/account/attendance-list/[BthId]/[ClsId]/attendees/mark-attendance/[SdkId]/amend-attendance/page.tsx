@@ -26,6 +26,7 @@ const AmendAttendance : React.FC<IAttdParams> = ({params}) => {
   const router = useRouter();
   const {BthId, ClsId, SdkId} = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [status, setStatus] = useState<string>('');
   const [attdStatus, setAttdStatus] = useState<MarkAttendanceProps>({status:'', absRemarks:'', updatedBy:''});
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
@@ -62,11 +63,8 @@ const AmendAttendance : React.FC<IAttdParams> = ({params}) => {
     }));
   };
 
-  const handleMarkAttd = (status: string) => {
-    setAttdStatus((prev) => ({
-      ...prev,
-      status: status,
-    }));
+  const handleMarkAttd = (status:string) => {
+    setStatus(status);
   };
 
   useEffect(() => {
@@ -106,7 +104,7 @@ const AmendAttendance : React.FC<IAttdParams> = ({params}) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sdkIds:[SdkId],
-          status:attdStatus.status,
+          status:status,
           absRemarks:attdStatus.absRemarks,
           updatedBy:loggedInUser.result._id
         }),
@@ -136,14 +134,13 @@ const AmendAttendance : React.FC<IAttdParams> = ({params}) => {
     <div className='flex justify-center items-center'>
       <form className='formStyle w-[350px] my-24' onSubmit={handleSubmit}>
         <h1 className='p-2 bg-gray-200 font-bold uppercase text-center'>
-          Mark Attendance
+          Amend Attendance
         </h1>
         <div className='grid grid-cols-2 gap-4 p-2'>
           <div className='flex items-center gap-4'>
             <input
               type="radio"
               name="status"   
-              checked={attdStatus?.status === "Present"}
               onClick={()=>handleMarkAttd("Present")}
             />
             <span>Present</span>
@@ -152,14 +149,13 @@ const AmendAttendance : React.FC<IAttdParams> = ({params}) => {
             <input
               type="radio"
               name="status"
-              checked={attdStatus?.status === "Absent"}
               onClick={()=>handleMarkAttd("Absent")}
             />
             <span>Absent</span>
           </div>
         </div>
         {
-          attdStatus.status === "Absent" && (
+          status === "Absent" && (
             <div className='flex flex-col gap-2'>
               <label className='font-bold'>Remarks:</label>
               <select className='inputBox text-center' name='absRemarks' value={attdStatus.absRemarks} onChange={handleChange}>

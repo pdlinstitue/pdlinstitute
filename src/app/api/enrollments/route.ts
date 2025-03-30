@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import Attendance from "../../../../modals/Attendance";
 
 type EnrType = {
-  _id?: string;
+  sdkId: string;
   enrTnsNo: string;
   cpnName: string;
   enrSrnShot: string;
@@ -19,14 +19,18 @@ type EnrType = {
 };
 
 export async function GET(req: NextRequest) {
-  try {
-    await dbConnect();
 
-    // Extract and convert query parameters
+  try {
+
+    await dbConnect();
     const corId = req.nextUrl.searchParams.get("corId");
     const bthId = req.nextUrl.searchParams.get("bthId");
+    const durInMonth = Number(req.nextUrl.searchParams.get("dur"));
 
-    const filter: Record<string, any> = {};
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - durInMonth);
+
+    const filter: Record<string, any> = { createdAt: { $gte: startDate } };
     if (corId && mongoose.Types.ObjectId.isValid(corId)) {
       filter.corId = new mongoose.Types.ObjectId(corId);
     }
@@ -38,7 +42,8 @@ export async function GET(req: NextRequest) {
     const enrList = await Enrollments.find(filter)
       .populate("corId", "coName coNick coType")
       .populate("bthId", "bthName bthStart")
-      .populate("createdBy", "sdkFstName sdkPhone")
+      .populate("sdkId", "sdkFstName sdkPhone sdkRegNo")
+      .populate("createdBy", "sdkFstName")
       .lean();
 
     const batchClassCounts: Record<string, number> = {};
@@ -69,8 +74,8 @@ export async function GET(req: NextRequest) {
         });
 
         // Compute batch-wise attendance
-        const totalClasses = batchClassCounts[enr.bthId.toString()] || 0;
-        const classIds = batchClassIds[enr.bthId.toString()] || [];
+        const totalClasses = batchClassCounts[enr.bthId._id] || 0;
+        const classIds = batchClassIds[enr.bthId._id] || [];
 
         const attendedClasses = await Attendance.countDocuments({
           bthId: enr.bthId,
@@ -98,9 +103,9 @@ export async function POST(req: NextRequest) {
     try {
   
       await dbConnect();
-      const { enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, createdBy }: EnrType = await req.json();
+      const { enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy }: EnrType = await req.json();
   
-      const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, createdBy});
+      const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy});
       const savedEnr = await newEnr.save();
 
       if(savedEnr){

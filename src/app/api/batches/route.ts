@@ -29,10 +29,14 @@ export async function GET(req:NextRequest){
       .populate('corId', 'coName coNick')
       .populate('bthVtr', 'sdkFstName')
       .populate('createdBy', 'sdkFstName')
-      .populate('updatedBy', 'sdkFstName');
+      .populate('updatedBy', 'sdkFstName')
+      .sort({ createdAt: -1 });
 
-      return NextResponse.json({ bthList, success: true }, {status:200});
-  
+      if(Array.isArray(bthList) && bthList.length > 0){
+        return NextResponse.json({ bthList, success: true }, {status:200});
+      } else {
+        return NextResponse.json({ success: false, msg:"No batch found." }, {status:404});
+      } 
     } catch (error) {
       return new NextResponse("Error while fetching batchData: " + error, {status:500});
     }

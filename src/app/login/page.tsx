@@ -1,14 +1,14 @@
-"use client"
-import { NextPage } from 'next'
-import React from 'react'
-import Container from '../components/Container'
-import Link from 'next/link'
+"use client";
+import { NextPage } from 'next';
+import React from 'react';
+import Container from '../components/Container';
+import Link from 'next/link';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { BASE_API_URL } from '../utils/constant';
-import NavMenu from '../components/navbar/navBar'
+import NavMenu from '../components/navbar/navBar';
 
 
 interface LoginType {
@@ -45,45 +45,50 @@ const LoginPage : NextPage = () => {
       }); 
     }
     
-    const handleSubmit = async (e:React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(''); //Clear the previous erro
-    
-    if (!user.sdkCred?.trim() || '') {
-        setErrorMessage('Please enter email or phone.');    
-    } else if (!user.sdkPwd?.trim() || '') {
-        setErrorMessage('Please enter password.');    
-    } else {
-      try
-      {
-        const result = await fetch (`${BASE_API_URL}/api/login`, 
-        {
-          method:'POST',
-          headers:{
-            'Content-Type':'application/json'
-          },
-          body:JSON.stringify({
-            sdkCred: user.sdkCred, 
-            sdkPwd:user.sdkPwd
-          }),
-        });    
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setErrorMessage(''); // Clear the previous error
+  
+      if (!user.sdkCred?.trim()) {
+          setErrorMessage('Please enter email or phone.');
+      } else if (!user.sdkPwd?.trim()) {
+          setErrorMessage('Please enter password.');
+      } else {
+        try {
+            const result = await fetch(`${BASE_API_URL}/api/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sdkCred: user.sdkCred,
+                    sdkPwd: user.sdkPwd
+                }),
+            });
 
-        const post = await result.json();        
-        if(post.success === false){   
-            toast.error(post.msg);    
-          }else{  
-              Cookies.set("loggedInUserId", post.result.id);
-              Cookies.set("loggedInUserName", post.result.usrName); 
-              Cookies.set("loggedInUserRole", post.result.usrRole);
-              Cookies.set("token", post.result.usrToken);
-              toast.success("Logged in successfully."); 
-              router.push('/account/dashboard');
-          }            
-      } catch (error) {
-        toast.error('Error while logging in.');
-      } 
-    }  
-  }
+            const post = await result.json();
+            
+            if (post.success === false) {
+                toast.error(post.msg);
+            } else {
+                Cookies.set("loggedInUserId", post.result.id);
+                Cookies.set("loggedInUserName", post.result.usrName);
+                Cookies.set("loggedInUserRole", post.result.usrRole);
+                Cookies.set("token", post.result.usrToken);
+                toast.success("Logged in successfully.");
+                
+                // Redirect conditionally based on user role
+                if (post.result.usrRole === "Admin") {
+                    router.push("/account/admin-dashboard");
+                } else {
+                    router.push("/account/sadhak-dashboard");
+                }
+              }
+          } catch (error) {
+              toast.error('Error while logging in.');
+          }
+        }
+      };
 
   return (
     <div>

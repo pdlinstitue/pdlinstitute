@@ -10,10 +10,19 @@ import { PiFolderLockFill } from "react-icons/pi";
 import { MdLogout } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import Loading from '@/app/account/Loading';
+import { BASE_API_URL } from '@/app/utils/constant';
+import Image from 'next/image';
+
+
+interface UserProfileProps {
+  _id:string;
+  sdkImg:string
+}
 
 const ProfMenu = () => {
 
   const router = useRouter();
+  const [userProfile, setUserProfile] = useState<UserProfileProps>({_id:'', sdkImg:''})
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
@@ -42,6 +51,21 @@ const ProfMenu = () => {
     }
   }, []);
 
+  useEffect(() => {
+    async function fetchUserProfileById() {
+      try {  
+          const res = await fetch(`${BASE_API_URL}/api/users/${Cookies.get("loggedInUserId")}/view-sadhak`);
+          const userData = await res.json();
+          setUserProfile(userData.sdkById);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    fetchUserProfileById();
+  }, []);
+
   const handleLogOut = () => {
     Cookies.remove("loggedInUserId");
     Cookies.remove("loggedInUserName");
@@ -63,7 +87,10 @@ const ProfMenu = () => {
         <p>Hello, {loggedInUser.result?.usrName}</p>
       </div>
       <div className="relative group transition-all"> 
-        <RxAvatar size={44} className="text-orange-500 cursor-pointer" />
+        {
+          userProfile.sdkImg ? (<Image src={userProfile.sdkImg} width={60} height={60} alt='sdkImg'/>)
+          : <RxAvatar size={44} className="text-orange-500 cursor-pointer" />
+        }
         <div className="absolute z-50 group-hover:flex right-0 top-10 hidden w-[230px] flex-col transition-all py-3 px-3 bg-white rounded-md shadow-xl">
             <Link href={`/account/profile-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
               <RiProfileLine size={24} />

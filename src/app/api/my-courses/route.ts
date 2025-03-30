@@ -76,7 +76,12 @@ export async function GET(req: NextRequest) {
         const activeCourseList = filteredCourses.filter((item:any) => item.isActive === true);
         return NextResponse.json({ coList: activeCourseList, success: true }, { status: 200 });
 
-    } catch (error) {
-        return NextResponse.json({ error: "Error while fetching course data", details: error }, { status: 500 });
+    } catch (error:any) {
+        if (error.name === 'ValidationError') {
+          const messages = Object.values(error.errors).map((val:any) => val.message);
+          return NextResponse.json({ success: false, msg: messages }, {status:400});
+        }else{
+          return new NextResponse ("Error while saving enrData: " + error, {status: 400});
+        }
     }
 }
