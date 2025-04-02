@@ -149,8 +149,8 @@ const EnrollmentList : React.FC = () => {
       try {
           const res = await fetch(`${BASE_API_URL}/api/courses`, {cache: "no-store"});
           const coData = await res.json();
-          setCourseList(coData.coList);
-      } catch (error) {
+          setCourseList(coData.coList.sort((a:any, b:any) => a.coName.localeCompare(b.coName)));
+        } catch (error) {
           console.error("Error fetching course data:", error);
       } finally {
           setIsLoading(false);

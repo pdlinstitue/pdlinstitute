@@ -192,7 +192,7 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
       setEnrollData((prevData) =>
         prevData.map((item) =>
           selectedData.some((row) => row.sdkId === item.sdkId)
-            ? { ...item, status: "Present" }
+            ? { ...item, status: "Present", absRemarks:"" }
             : item
         )
       );

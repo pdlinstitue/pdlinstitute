@@ -7,6 +7,8 @@ type SdkType = {
     sdkFstName: string
     sdkMdlName: string
     sdkLstName: string
+    sdkEdc:string,
+    sdkOcp:string,
     sdkBthDate: Date
     sdkGender: string
     sdkMarStts: string
@@ -37,6 +39,8 @@ export async function POST(req: NextRequest) {
         sdkFstName,
         sdkMdlName,
         sdkLstName,
+        sdkEdc,
+        sdkOcp,
         sdkBthDate,
         sdkGender,
         sdkMarStts,
@@ -78,6 +82,8 @@ export async function POST(req: NextRequest) {
             sdkMdlName,
             sdkLstName,
             sdkBthDate,
+            sdkEdc,
+            sdkOcp,
             sdkGender,
             sdkMarStts,
             sdkSpouce,

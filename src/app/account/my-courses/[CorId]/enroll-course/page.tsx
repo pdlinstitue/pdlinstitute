@@ -59,11 +59,13 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
     sdkId: "",
     createdBy: "",
   });
+
   const [bthData, setBthData] = useState<{ [key: string]: string }>({
     id: "",
     bthBank: "",
     bthQr: "",
   });
+  
   const [batchList, setBatchList] = useState<BatchListProps[] | null>([]);
   const [loggedInUser, setLoggedInUser] = useState({
     result: {

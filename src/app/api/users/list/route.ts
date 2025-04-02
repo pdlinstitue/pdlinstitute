@@ -6,6 +6,8 @@ type SdkType = {
     sdkFstName: string
     sdkMdlName: string
     sdkLstName: string
+    sdkEdc:string,
+    sdkOcp:string,
     sdkBthDate: Date
     sdkGender: string
     sdkMarStts: string

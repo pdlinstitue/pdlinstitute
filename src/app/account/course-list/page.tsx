@@ -42,7 +42,7 @@ const CourseList : React.FC = () => {
       { header: 'Course', accessorKey: 'coName'}, 
       { header: 'Category', accessorKey: 'coCat'},   
       { header: 'Type', accessorKey: 'coType'}, 
-      { header: 'Elegibility', accessorKey: 'coElg'}, 
+      { header: 'Elegibility', accessorKey: 'eligibilityName'}, 
       { header: 'Donation', accessorKey: 'coDon'},    
       { header: 'Created By', accessorKey: 'createdBy'},
       { header: 'Updated By', accessorKey: 'updatedBy'}, 

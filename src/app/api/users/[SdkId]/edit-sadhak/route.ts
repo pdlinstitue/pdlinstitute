@@ -7,6 +7,8 @@ type SdkType = {
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
+  sdkEdc:string,
+  sdkOcp:string,
   sdkFthName: string;
   sdkMthName: string;
   sdkAbout: string;
@@ -40,6 +42,8 @@ export async function PUT(
       sdkFstName,
       sdkMdlName,
       sdkLstName,
+      sdkEdc,
+      sdkOcp,
       sdkFthName,
       sdkMthName,
       sdkAbout,
@@ -86,6 +90,8 @@ export async function PUT(
         sdkFstName,
         sdkMdlName,
         sdkLstName,
+        sdkEdc,
+        sdkOcp,
         sdkFthName,
         sdkMthName,
         sdkAbout,

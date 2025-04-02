@@ -27,6 +27,18 @@ const usrSchema = new mongoose.Schema({
     sdkAbout: { 
         type: String, 
     },
+    sdkRefName:{
+        type:String
+    },
+    sdkRefCont:{
+        type:String
+    },
+    isEmailVerified:{
+        type:Boolean
+    },
+    isPhoneVerified:{
+        type:Boolean
+    },
     isMedIssue: { 
         type: String,
     },
@@ -73,6 +85,12 @@ const usrSchema = new mongoose.Schema({
         validate: [validator.isEmail, 'Please enter a valid email.'],
         required: [true, "Email is required."]
     },
+    sdkEdc:{
+        type:String
+    },
+    sdkOcp:{
+        type:String
+    },
     sdkCountry: { 
         type: String, 
         ref: Countries,
@@ -86,6 +104,9 @@ const usrSchema = new mongoose.Schema({
     sdkCity: { 
         type: String, 
         required: [true, "Please select city."]
+    },
+    sdkPinCode:{
+        type:Number
     },
     sdkComAdds: { 
         type: String, 
