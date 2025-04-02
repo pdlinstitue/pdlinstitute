@@ -164,7 +164,7 @@ const usrSchema = new mongoose.Schema({
     pwdResetToken: String,
     pwdResetTokenExpires: Date,
     sdkRegPwd:String,
-    sdkRegPwdExpiry:String
+    sdkRegPwdExpiry:Date
 }, { timestamps: true });
 
 const Users = mongoose.models.Users || mongoose.model('Users', usrSchema);
