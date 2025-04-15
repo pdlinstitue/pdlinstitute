@@ -47,6 +47,8 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
 
   const router = useRouter();
   const {BthId} = use(params);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [image, setImage] = useState<File | string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [data, setData] = useState<EditBatchProps>({
@@ -124,6 +126,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
       return;
     }
 
+    setIsUploading(true);
     const formData = new FormData();
     formData.append("qrImage", image);
 
@@ -142,6 +145,8 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
       }
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -222,23 +227,25 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
   
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+
     e.preventDefault();
+    setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
 
-    if (!data.bthShift.trim()) {
-      setErrorMessage("Please select shift.");
-    } else if (!data.corId.trim()) {
-      setErrorMessage("Please select course.");
-    } else if (!data.bthMode.trim()) {
-      setErrorMessage("Please select mode.");
-    } else if (!data.bthLang.trim()) {
-      setErrorMessage("Please select language.");
-    } else if (data.bthMode === "Online" && !data.bthLink.trim()) {
-      setErrorMessage("Please provide meeting link.");
-    } else if (data.bthMode !== "Online" && !data.bthLoc.trim()) {
-      setErrorMessage("Please provide location details.");
-    } else {
-      try {
+    try {
+      if (!data.bthShift.trim()) {
+        setErrorMessage("Please select shift.");
+      } else if (!data.corId.trim()) {
+        setErrorMessage("Please select course.");
+      } else if (!data.bthMode.trim()) {
+        setErrorMessage("Please select mode.");
+      } else if (!data.bthLang.trim()) {
+        setErrorMessage("Please select language.");
+      } else if (data.bthMode === "Online" && !data.bthLink.trim()) {
+        setErrorMessage("Please provide meeting link.");
+      } else if (data.bthMode !== "Online" && !data.bthLoc.trim()) {
+        setErrorMessage("Please provide location details.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/batches/${BthId}/edit-batch`, {
           method: "PUT",
           body: JSON.stringify({
@@ -268,11 +275,13 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
           toast.success(post.msg);
           router.push("/account/batch-list");
         }
-      } catch (error) {
-        toast.error("Error creating batch.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error creating batch.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -284,10 +293,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
 
   return (
     <div>
-      <form
-        className="flex flex-col gap-4 h-auto border-[1.5px] border-orange-500 p-6 rounded-md"
-        onSubmit={handleSubmit}
-      >
+      <form className="formStyle w-full" onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
@@ -483,8 +489,8 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
               ></input>
-              <button type="button" className="btnLeft" onClick={handleUpload}>
-                UPLOAD
+              <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+                {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>
           </div>
@@ -493,8 +499,8 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
           <p className="text-sm text-red-600 italic">{errorMessage}</p>
         )}
         <div className="flex gap-1 w-full">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

@@ -40,6 +40,8 @@ interface AddNewCourseProps {
 const AddNewCourse: React.FC = () => {
 
   const router = useRouter();
+  const [isCreating, setIsCreating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [cat, setCat] = useState<CatListType[]>([]);
   const [courseList, setCourseList] = useState<CoListType[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -151,14 +153,8 @@ const AddNewCourse: React.FC = () => {
       toast.error("Please select an image!");
       return;
     }
-    
-    // Validate file size (≤ 100 KB)
-    if (image instanceof File && image.size > 100 * 1024) {
-      toast.error("File size must be 100 KB or less!");
-      return;
-    }
 
-    // Validate image type
+    setIsUploading(true);
     const img = new window.Image();
     if (image instanceof File) {
         img.src = URL.createObjectURL(image);
@@ -166,60 +162,55 @@ const AddNewCourse: React.FC = () => {
         toast.error("Invalid image format!");
         return;
     }
-    
-    // Validate image resolution
-    img.onload = async () => {
-      if (img.width !== 600 || img.height !== 350) {
-        toast.error("Image must be 600x350 pixels!");
-        return;
+
+    const formData = new FormData();
+    formData.append("courseImage", image);
+    try {
+      const res = await fetch("/api/image-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Image uploaded successfully!");
+        setImage(data.imageUrl);
+      } else {
+        throw new Error(data.error || "Upload failed");
       }
-  
-      const formData = new FormData();
-      formData.append("courseImage", image);
-  
-      try {
-        const res = await fetch("/api/image-upload", {
-          method: "POST",
-          body: formData,
-        });
-  
-        const data = await res.json();
-        if (data.success) {
-          toast.success("Image uploaded successfully!");
-          setImage(data.imageUrl);
-        } else {
-          throw new Error(data.error || "Upload failed");
-        }
-      } catch (error:any) {
-        toast.error(error.message);
-      }
-    };
+    } catch (error:any) {
+      toast.error(error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+
     e.preventDefault();
+    setIsCreating(true);
     setErrorMessage(""); // Clear the previous error
 
-    if (!data.coName.trim()) {
-      setErrorMessage("Course title is must.");
-    } else if (!data.coNick.trim()) {
-      setErrorMessage("Nick name is must.");
-    } else if (!data.coCat.trim()) {
-      setErrorMessage("Please select category.");
-    } else if (!data.coShort.trim()) {
-      setErrorMessage("Course intro is must.");
-    } else if (!data.coElgType.trim()) {
-      setErrorMessage("Please select elegibility type.");
-    } else if (!data.coElg.trim()) {
-      setErrorMessage("Please select elegibility.");
-    } else if (data.durDays <= 1) {
-      setErrorMessage("Please duration days.");
-    } else if (data.durHrs <= 1) {
-      setErrorMessage("Please duration hours.");
-    } else if (!data.coType.trim()) {
-      setErrorMessage("Please select course type.");
-    } else {
-      try {
+    try {
+      if (!data.coName.trim()) {
+        setErrorMessage("Course title is must.");
+      } else if (!data.coNick.trim()) {
+        setErrorMessage("Nick name is must.");
+      } else if (!data.coCat.trim()) {
+        setErrorMessage("Please select category.");
+      } else if (!data.coShort.trim()) {
+        setErrorMessage("Course intro is must.");
+      } else if (!data.coElgType.trim()) {
+        setErrorMessage("Please select elegibility type.");
+      } else if (!data.coElg.trim()) {
+        setErrorMessage("Please select elegibility.");
+      } else if (data.durDays <= 1) {
+        setErrorMessage("Please duration days.");
+      } else if (data.durHrs <= 1) {
+        setErrorMessage("Please duration hours.");
+      } else if (!data.coType.trim()) {
+        setErrorMessage("Please select course type.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/courses`, {
           method: "POST",
           body: JSON.stringify({
@@ -250,11 +241,13 @@ const AddNewCourse: React.FC = () => {
           toast.success(post.msg);
           router.push("/account/course-list");
         }
-      } catch (error) {
-        toast.error("Error creating course.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error creating course.");
+      } finally {
+        setIsCreating(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -269,9 +262,13 @@ const AddNewCourse: React.FC = () => {
       <form onSubmit={handleSubmit} className="formStyle w-full h-auto">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
-            <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image src={preview || "/images/uploadImage.jpg"} alt="course" width={600} height={350} />
-            </div>
+          <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+            <img
+              src={preview || "/images/uploadImage.jpg"}
+              alt="Preview"
+              className="w-full h-full object-contain"
+            />
+          </div>
             <div className="flex items-center gap-1">
               <input
                 type="file"
@@ -279,8 +276,8 @@ const AddNewCourse: React.FC = () => {
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
               ></input>
-              <button type="button" className="btnLeft" onClick={handleUpload}>
-                UPLOAD
+              <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>               
+                {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>
           </div>
@@ -317,7 +314,7 @@ const AddNewCourse: React.FC = () => {
                   <option className="text-center">
                     --- Select Category ---
                   </option>
-                  {cat.map((item) => {
+                  {cat?.map((item) => {
                     return (
                       <option key={item._id} value={item._id}>
                         {item.catName}
@@ -365,7 +362,7 @@ const AddNewCourse: React.FC = () => {
                     --- Select Elegibility ---
                   </option>
                   <option value="None">None</option>
-                  {data.coElgType === "Course"
+                  {data?.coElgType === "Course"
                     ? courseList.map((item:any) => (
                         <option key={item._id} value={item._id}>
                           {item.coNick}
@@ -464,8 +461,8 @@ const AddNewCourse: React.FC = () => {
         </div>
         {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
         <div className="flex gap-1 w-full">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isCreating}>
+            {isCreating ? "Creating..." : "Create"}
           </button>
           <button
             type="button"

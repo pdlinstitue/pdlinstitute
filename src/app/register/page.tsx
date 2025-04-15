@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { BASE_API_URL } from '../utils/constant';
 
 interface UserDataProps {
+
   sdkRegNo?: string;
   sdkFstName: string;
   sdkMdlName: string;
@@ -27,10 +28,14 @@ interface UserDataProps {
   sdkCountry: string;
   sdkState: string;
   sdkCity: string;
+  sdkPinCode:number;
+  sdkComPinCode:number;
   sdkComAdds: string;
   sdkParAdds: string;
   sdkPwd: string;
   sdkConfPwd: string;
+  sdkPhoneOtp:string; 
+  sdkEmailOtp:string;
 }
 
 const Register = () => {
@@ -48,13 +53,17 @@ const Register = () => {
     sdkWhtNbr: "",
     sdkPhone: "",
     sdkEmail: "",
+    sdkPinCode: 0,
+    sdkComPinCode: 0,
     sdkCountry:"",
     sdkState:"",
     sdkCity:"",
     sdkComAdds:"",
     sdkParAdds:"",
     sdkPwd: "",
-    sdkConfPwd: ""
+    sdkConfPwd: "",
+    sdkPhoneOtp:"", 
+  sdkEmailOtp:"",
   });
   const [finalData, setFinalData] = useState<any[]>([]);
   const [errorMessage,setErrorMessage] = useState<string>("");
@@ -98,9 +107,6 @@ const Register = () => {
       }else if ( !userData || !("sdkMarStts" in userData) || userData.sdkMarStts === null || userData.sdkMarStts.trim() === ""){
         setErrorMessage("Marital status is required.");
         return false;
-      }else if (userData && ("sdkMarStts" in userData) && userData.sdkMarStts === "Married" && (!userData || !("sdkSpouce" in userData) || userData.sdkSpouce === null || userData.sdkSpouce?.trim() === "")){
-          setErrorMessage("Spouce name is required.");
-          return false;
       }
     }else if(step === 2){   
       if(!userData || !("sdkCountry" in userData) || userData.sdkCountry === null || userData.sdkCountry.trim() === ""){
@@ -121,6 +127,14 @@ const Register = () => {
       }
       if(!userData || !("sdkComAdds" in userData) || userData.sdkComAdds === null || userData.sdkComAdds.trim() === ""){
         setErrorMessage("Communication address is must.");
+        return false;
+      }
+      if(!userData || !("sdkPinCode" in userData) || userData.sdkPinCode === null){
+        setErrorMessage("Pincode for permanent address is must.");
+        return false;
+      }
+      if(!userData || !("sdkComPinCode" in userData) || userData.sdkComPinCode === null){
+        setErrorMessage("Pincode for communication address is must");
         return false;
       }
     } else if(step === 3){   
@@ -186,6 +200,8 @@ const Register = () => {
               sdkCity:userData.sdkCity,
               sdkComAdds: userData.sdkComAdds,
               sdkParAdds: userData.sdkParAdds,
+              sdkPinCode: userData.sdkPinCode,
+              sdkComPinCode: userData.sdkComPinCode,
               sdkPwd: userData.sdkPwd,
               sdkConfPwd: userData.sdkConfPwd,
             }),

@@ -5,11 +5,8 @@ import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import Link from 'next/link';
-import { FaWhatsapp, FaTelegram } from 'react-icons/fa';
 import { PiChalkboardTeacher } from "react-icons/pi";
 import { useState, useEffect } from 'react';
-import { FiEye } from 'react-icons/fi';
 import Loading from '../Loading';
 import Cookies from 'js-cookie';
 

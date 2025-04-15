@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const volSchema = new mongoose.Schema({
     volName: {
         type : String

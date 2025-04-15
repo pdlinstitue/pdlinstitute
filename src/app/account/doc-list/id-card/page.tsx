@@ -1,7 +1,6 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
-import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
-import { BsCalendarEvent } from "react-icons/bs";
+import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Loading from '../../Loading';
@@ -53,8 +52,8 @@ const IdCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'Sadhak', accessorKey: 'sdkName'},
-    {header: 'Sdk Id', accessorKey: 'sdkId'},
+    {header: 'Sadhak', accessorKey: 'sdkFstName'},
+    {header: 'Sdk Id', accessorKey: 'sdkRegNo'},
     {header: 'ID Number', accessorKey: 'sdkIdNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
     {header: 'Relation', accessorKey: 'sdkDocRel'},
@@ -75,8 +74,7 @@ const IdCard : React.FC = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
-
+ 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
     };
@@ -92,7 +90,7 @@ const IdCard : React.FC = () => {
         state: {
           sorting: sorting,
           globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+          pagination: { pageIndex: pageInput - 1, pageSize: 100 }
         },
         onSortingChange: setSorting,
         getFilteredRowModel: getFilteredRowModel(),
@@ -115,7 +113,7 @@ const IdCard : React.FC = () => {
         // const updatedEveList = docData.docList.map((item:any) => { 
         //   return { ...item, eveCatId: item.eveCatId.eveCatName };
         // });
-        setIdData(docData.idList);
+        setIdData(docData?.idList);
       } catch (error) {
           console.error("Error fetching doc data:", error);
       } finally {
@@ -136,11 +134,6 @@ const IdCard : React.FC = () => {
       <div>
         <div className='flex mb-2 items-center justify-between'>
           <div className='flex gap-2 items-center'>
-          {data.length === 0 && (
-            <Link href="/account/add-new-id" title="Upload Id" className="btnLeft">
-              UPLOAD ID
-            </Link>)
-          }
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
           </div>
         </div>

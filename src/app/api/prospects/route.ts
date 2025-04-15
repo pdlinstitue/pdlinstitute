@@ -10,6 +10,7 @@ type ProsType = {
     prosOptMonth: string, 
     prosOptShift:string,
     prosOptWeek:number,
+    sdkId:string,
     corId:string, 
     createdBy:string
 }
@@ -19,21 +20,21 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const prosList:ProsType[] = await Prospects.find()
-      .populate('corId', 'coName')
+      const prosList:ProsType[] = await Prospects.find({isActive:true})
+      .populate('corId', 'coNick')
       .populate('createdBy', 'sdkFstName')
       .populate('updatedBy', 'sdkFstName')
+      .populate('sdkId', 'sdkRegNo sdkPhone')
       .sort({createdAt:-1});
 
       if(prosList && prosList.length > 0){
-        const activeProsList = prosList.filter((item:any)=> item.isActive === true);
-        return NextResponse.json({ prosList:activeProsList, success: true }, {status:200});
+        return NextResponse.json({ prosList, success: true }, {status:200});
       } else {
         return NextResponse.json({ msg:"No prospect list found", success: false }, {status:404});
       }
   
     } catch (error) {
-      return new NextResponse("Error while fetching courseData: " + error, {status:500});
+      return new NextResponse("Error while fetching prospectData: " + error, {status:500});
     }
   }
   

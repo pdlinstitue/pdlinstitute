@@ -33,6 +33,7 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
   const { CorId } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [payThrough, setPaythrough] = useState<string>('QR');
   const [corData, setCorData] = useState<{ [key: string]: string }>({coDon:'', coType:''});
   const [enrData, setEnrData] = useState<BatchDataProps>({enrSrnShot:'', enrTnsNo:'', corId:'', bthId:'', createdBy:'', sdkId:'', isApproved:''})
@@ -113,42 +114,43 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
   },[]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-  e.preventDefault();   
-  try 
-    {
-      const response = await fetch(`${BASE_API_URL}/api/enrollments`, {
-        method: 'POST',
-        body: JSON.stringify({
-          enrTnsNo:enrData.enrTnsNo,
-          enrSrnShot:bthData.enrSrnShot,
-          bthId: enrData.bthId,
-          corId: CorId,
-          sdkId: enrData.sdkId,
-          isApproved: "Approved",
-          createdBy: loggedInUser.result?._id,
-        }),
-      });
-  
-      const post = await response.json();
-   
-      if (post.success === false) {
-          toast.error(post.msg);
-      } else {
-        if(payThrough==="CCA"){
-          handlePayment(post.savedEnr._id);
-        }
-        else{
-          toast.success(post.msg);
-          router.push('/account/course-list');
-        }
+    e.preventDefault();   
+    setIsSaving(true);
+    try 
+      {
+        const response = await fetch(`${BASE_API_URL}/api/enrollments`, {
+          method: 'POST',
+          body: JSON.stringify({
+            enrTnsNo:enrData.enrTnsNo,
+            enrSrnShot:bthData.enrSrnShot,
+            bthId: enrData.bthId,
+            corId: CorId,
+            sdkId: enrData.sdkId,
+            isApproved: "Approved",
+            createdBy: loggedInUser.result?._id,
+          }),
+        });
+    
+        const post = await response.json();
+    
+        if (post.success === false) {
+            toast.error(post.msg);
+        } else {
+          if(payThrough==="CCA"){
+            handlePayment(post.savedEnr._id);
+          } else{
+            toast.success(post.msg);
+            router.push('/account/course-list');
+          }
         }
       } catch (error) {
-        toast.error('Error enrolling batch.');
-      } 
-    };
+          toast.error('Error enrolling batch.');
+        } finally {
+          setIsSaving(false);
+        }
+      };
 
     const handlePayment = async (enrId: any) => { 
-      debugger;
       const response = await fetch(`/api/payment?enrId=${enrId}&corId=${CorId}`, {
         method: "POST",
         headers: {
@@ -162,7 +164,6 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
         }),
       });
     
-      debugger;
       const data = await response.json();
     
       if (data.encryptedData) {
@@ -197,7 +198,9 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
   return (
     <div>
       <div>
-        {batchList && batchList.length > 0 ? (
+      {!batchList ? (
+          <NoBatchAdmin CourseId={CorId} />
+        ) : ( 
           <form className={`formStyle w-[600px] mx-auto my-24`} onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <h1 className="text-2xl font-bold text-center text-orange-600 italic">
@@ -270,8 +273,8 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
               )}
             </div>
             <div className="grid grid-cols-2 gap-1">
-              <button type="submit" className="btnLeft">
-                SUBMIT
+              <button type="submit" className="btnLeft" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save"}
               </button>
               <button
                 type="button"
@@ -282,9 +285,7 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
               </button>
             </div>
           </form>
-        ) : (
-          <NoBatchAdmin CourseId={CorId}/>
-        )}
+        )};
       </div>
     </div>
   );

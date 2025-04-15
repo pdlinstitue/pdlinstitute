@@ -30,6 +30,10 @@ const AddNewPractice = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [image , setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
   const [pracDays, setPracDays] = useState<string[] | null>([]);
   const [courseList, setCourseList] = useState<CourseListProps[] | null>([]);
   const [data, setData] = useState<AddNewPracticeProps>({
@@ -105,6 +109,52 @@ const AddNewPractice = () => {
     });
   };
 
+  const handleFileChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+
+    if (!image) {
+      toast.error("Please select an image!");
+      return;
+    }
+
+    setIsUploading(true);
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("prcImage", image);
+    try {
+      const res = await fetch("/api/prc-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Image uploaded successfully!");
+        setImage(data.imageUrl);
+      } else {
+        throw new Error(data.error || "Upload failed");
+      }
+    } catch (error:any) {
+      toast.error(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleCheckboxChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     day: string
@@ -121,25 +171,26 @@ const AddNewPractice = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
 
-    if (!data.prcName.trim()) {
-      setErrorMessage("Class name is must.");
-    } else if (!data.prcStartsAt.trim()) {
-      setErrorMessage("Please provide start time.");
-    } else if (!data.prcEndsAt.trim()) {
-      setErrorMessage("Please provide end time.");
-    } else if (!data.prcLang.trim()) {
-      setErrorMessage("Please Choose language.");
-    } else if (!data.prcLink.trim()) {
-      setErrorMessage("Please provide meeting link.");
-    } else {
-      try {
+    try {
+      if (!data.prcName.trim()) {
+        setErrorMessage("Class name is must.");
+      } else if (!data.prcStartsAt.trim()) {
+        setErrorMessage("Please provide start time.");
+      } else if (!data.prcEndsAt.trim()) {
+        setErrorMessage("Please provide end time.");
+      } else if (!data.prcLang.trim()) {
+        setErrorMessage("Please Choose language.");
+      } else if (!data.prcLink.trim()) {
+        setErrorMessage("Please provide meeting link.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/course-practice`, {
           method: "POST",
           body: JSON.stringify({
             prcName: data.prcName,
-            prcImg: data.prcImg,
+            prcImg: image,
             prcLang: data.prcLang,
             prcDays: pracDays,
             prcStartsAt: data.prcStartsAt,
@@ -159,11 +210,13 @@ const AddNewPractice = () => {
           toast.success(post.msg);
           router.push("/account/course-practice");
         }
-      } catch (error) {
-        toast.error("Error creating practice class.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error creating practice class.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -175,14 +228,25 @@ const AddNewPractice = () => {
 
   return (
     <div className="flex justify-center items-center my-4 ">
-      <form onSubmit={handleSubmit} className="formStyle w-[500px]">
-        <div className=" w-full h-auto">
-          <Image
-            src="/images/sadhak.jpg"
-            alt="practice"
-            width={450}
-            height={275}
+      <form onSubmit={handleSubmit} className="formStyle w-[500px]">    
+        <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+          <img
+            src={preview ? preview : "/images/uploadImage.jpg"}
+            alt="CourseImage"
+            className="w-full h-full object-contain"
           />
+        </div>    
+        <div className="flex flex-col gap-2">
+          <label className="text-lg">Image:</label>
+          <input
+              type="file"
+              className="inputBox w-full"
+              name="prcImg"
+              onChange={handleFileChange}
+          />
+          <button type="button" className="btnRight" onClick={handleUpload} disabled={isUploading}>
+            {isUploading ? "Uploading..." : "Upload"}
+          </button>
         </div>
         <div className="flex flex-col gap-2 w-full">
           <label>Class Name:</label>
@@ -240,7 +304,7 @@ const AddNewPractice = () => {
         <div className="flex flex-col gap-2 w-full mb-2">
           <label>Practice Days:</label>
           <div className="grid grid-cols-7 gap-1 w-full">
-            {practiceDays.map((day, index) => (
+            {practiceDays?.map((day, index) => (
               <div key={index} className="flex items-center gap-2 w-full">
                 <input
                   type="checkbox"
@@ -276,8 +340,8 @@ const AddNewPractice = () => {
         </div>
         {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
         <div className="flex gap-1 w-full mt-4">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

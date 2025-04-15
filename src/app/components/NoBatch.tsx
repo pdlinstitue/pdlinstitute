@@ -1,10 +1,11 @@
 'use client';
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { BASE_API_URL } from '../utils/constant';
 import Cookies from 'js-cookie';
+import Loading from '../account/Loading';
 
 
 interface INoBatchParams {
@@ -18,6 +19,7 @@ interface NoBatchProps {
   prosOptMonth:string,
   prosOptShift:string,
   prosOptWeek:number,
+  sdkId:string,
   corId:string,
   createdBy:string
 }
@@ -25,14 +27,35 @@ interface NoBatchProps {
 const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
 
   const router = useRouter();
-  const [enrData, setEnrData] = useState<NoBatchProps>({prosMonth:'', prosShift:'', corId:'', prosWeek:0, prosOptMonth:'', prosOptShift:'', prosOptWeek:0, createdBy:''});
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [enrData, setEnrData] = useState<NoBatchProps>({prosMonth:'', prosShift:'', corId:'', prosWeek:0, prosOptMonth:'', prosOptShift:'', prosOptWeek:0, createdBy:'', sdkId:''});
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
     }
-  }; 
+  }, []);
 
   const handleChange = (e:any) => {
     const name = e.target.name;
@@ -46,6 +69,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();   
+    setIsSaving(true);
     try 
       {
         const response = await fetch(`${BASE_API_URL}/api/my-courses/${CourseId}/prospect`, {
@@ -58,6 +82,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
             prosOptShift: enrData.prosOptShift,
             prosOptWeek:enrData.prosOptWeek,
             corId: CourseId,
+            sdkId:loggedInUser.result._id,
             createdBy: loggedInUser.result._id,
           }),
         });
@@ -73,8 +98,16 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
         }
       } catch (error) {
         toast.error('Error enrolling parking batch.');
-      } 
+      } finally {
+        setIsSaving(false);
+      }
     };
+  
+    if(isLoading){
+      return <div>
+        <Loading/>
+      </div>
+    }
 
   return (
     <div className='flex justify-center'>
@@ -129,8 +162,8 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-1 mt-4 w-full">
-              <button type="submit" className="btnLeft">
-                SUBMIT
+              <button type="submit" className="btnLeft" disabled={isSaving}>
+                {isSaving ? "Submitting" : "Submit"}
               </button>
               <button
                 type="button"

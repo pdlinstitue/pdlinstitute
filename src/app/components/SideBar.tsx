@@ -1,31 +1,8 @@
-"use client"
+"use client";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import Link from 'next/link';
-import { MdDashboard } from "react-icons/md";
-import { MdPlaylistAddCheckCircle } from "react-icons/md";
-import { MdOutlineAppRegistration } from "react-icons/md";
-import { BiSolidUserRectangle } from "react-icons/bi";
-import { SiGoogleclassroom } from "react-icons/si";
-import { BiSolidDockTop } from "react-icons/bi";
-import { FaCalendarCheck } from "react-icons/fa6";
-import { HiOutlineDocumentReport } from "react-icons/hi";
-import { MdCastForEducation } from "react-icons/md";
-import { IoIosArrowDown } from "react-icons/io";
-import EnrollMenu from './submenus/EnrollMenu';
-import ClassMenu from './submenus/ClassMenu';
-import TrainingMenu from './submenus/TrainingMenu';
-import { SiAdblock } from "react-icons/si";
-import DocMenu from './submenus/DocMenu';
-import { PiChalkboardTeacher } from "react-icons/pi";
-import SadhakMenu from './submenus/SadhakMenu';
-import { RiCoupon3Line } from "react-icons/ri";
 import Cookies from 'js-cookie';
-import { BsFillQuestionOctagonFill } from "react-icons/bs";
-import MyCourseMenu from './submenus/MyCourseMenu';
-import { GiMeditation } from "react-icons/gi";
-import MyDocMenu from './submenus/MyDocMenu';
 import Loading from '../account/Loading';
 import SadhakSideMenu from './SadhakSideMenu';
 import AdminSideMenu from './AdminSideMenu';
@@ -36,7 +13,6 @@ const SideBar: React.FC = () => {
 
   const pathName = usePathname();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
       _id: '',
@@ -63,10 +39,6 @@ const SideBar: React.FC = () => {
       setIsLoading(false);
     }
   }, []);
-  
-  const handleToggle = (number: number) => { 
-    setSelectedNumber(number === selectedNumber ? null : number); 
-  };
 
   if(isLoading){
     return <div>
@@ -82,19 +54,15 @@ const SideBar: React.FC = () => {
           <p className='text-white font-bold'>PDL INSTITUTE</p>
         </div>
         <div className='flex flex-col gap-2'>
-        {
-          loggedInUser.result.usrRole === 'Sadhak' && (
-            <SadhakSideMenu/>
-          )
-        }
-        {
-          loggedInUser.result.usrRole === 'Admin' && (
-            <AdminSideMenu/>
-          )
-        }
+          {(loggedInUser.result.usrRole === 'Sadhak' || loggedInUser.result.usrRole === 'Volunteer') && (
+            <SadhakSideMenu />
+          )}
+          {(loggedInUser.result.usrRole === 'Admin' || loggedInUser.result.usrRole === 'View-Admin') && (
+            <AdminSideMenu />
+          )}
+        </div>
       </div>
     </div>
-  </div>
   )
 }
 

@@ -22,6 +22,7 @@ const EditCategory: React.FC<ICatParams> = ({ params }) => {
 
     const { CatId } = use(params);
     const router = useRouter();
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [data, setData] = useState<CatType>({ catName: '', updatedBy: '' });
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -76,12 +77,13 @@ const EditCategory: React.FC<ICatParams> = ({ params }) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
+        setIsSaving(true);
         setErrorMessage(''); // Clear the previous error message
 
-        if (!data.catName.trim()) {
-            setErrorMessage('Category name is required.');
-        } else{
-            try {
+        try {
+            if (!data.catName.trim()) {
+                setErrorMessage('Category name is required.');
+            } else{
                 const response = await fetch(`${BASE_API_URL}/api/categories/${CatId}/edit-category`, {
                     method: 'PUT',
                     body: JSON.stringify({
@@ -97,11 +99,13 @@ const EditCategory: React.FC<ICatParams> = ({ params }) => {
                     toast.success(post.msg);
                     router.push('/account/category-list');
                 }
-            } catch (error) {
+            } 
+        }   catch (error) {
                 toast.error('Error updating category.');
+            } finally {
+                setIsSaving(false);
             }
-        }
-    };
+        };
 
     if (isLoading) {
         return (
@@ -121,8 +125,8 @@ const EditCategory: React.FC<ICatParams> = ({ params }) => {
                 </div>
                 {errorMessage && <p className='text-red-600 italic text-xs '>{errorMessage}</p>}
                 <div className="flex items-center gap-1 mt-3">
-                    <button type="submit" className="btnLeft">
-                        UPDATE
+                    <button type="submit" className="btnLeft" disabled={isSaving}>
+                        {isSaving ? "Saving..." : "Save"}
                     </button>
                     <button type="button" className="btnRight" onClick={()=> router.push("/account/category-list")}>
                         BACK

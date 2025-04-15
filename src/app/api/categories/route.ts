@@ -18,10 +18,13 @@ export async function GET(req:NextRequest){
       .populate('updatedBy', 'sdkFstName')
       .sort({ createdAt: -1 });
       
-      return NextResponse.json({ catList, success: true }, {status:200});
-  
+      if (!catList) {
+        return NextResponse.json({success:false, msg: "No categories found" }, { status: 404 });
+      } else {
+        return NextResponse.json({ catList, success: true }, {status:200});
+      }
     } catch (error) {
-      return new NextResponse("Error while fetching catData: " + error, {status:500});
+        return new NextResponse("Error while fetching catData: " + error, {status:500});
     }
   }
   

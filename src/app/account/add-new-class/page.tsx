@@ -26,6 +26,7 @@ const AddNewClass: React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [course, setCourse] = useState<string[] | null>([]);
   const [clsBatch, setClsBatch] = useState<string[] | null>([]);
   const [courseById, setCourseById] = useState({ coName: "", durDays: 0 });
@@ -130,7 +131,7 @@ const AddNewClass: React.FC = () => {
         });
         const batchData = await res.json();
         const bthByCorId = batchData.bthList.filter(
-          (b: any) => b.corId._id === data.corId
+          (b: any) => b.corId._id === data.corId && new Date(b.bthStart).getDate() >= new Date().getDate()
         );
         setClsBatch(bthByCorId);
       } catch (error) {
@@ -176,16 +177,17 @@ const AddNewClass: React.FC = () => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+
     e.preventDefault();
-    debugger
+    setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
     
-    if (!data.corId.trim()) {
-      setErrorMessage("Please select course.");
-    } else if (!data.bthId.trim()) {
-      setErrorMessage("Please select batch.");
-    } else {
-      try {
+    try {
+      if (!data.corId.trim()) {
+        setErrorMessage("Please select course.");
+      } else if (!data.bthId.trim()) {
+        setErrorMessage("Please select batch.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/classes`, {
           method: "POST",
           body: JSON.stringify({ 
@@ -203,11 +205,13 @@ const AddNewClass: React.FC = () => {
           toast.success(post.msg);
           router.push("/account/class-list");
         }
-      } catch (error) {
-        toast.error("Error creating classes.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error creating classes.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -366,31 +370,14 @@ const AddNewClass: React.FC = () => {
                 handleInputChange(index, "clsLink", e.target.value)
               }
             />
-            {/* <select
-              className="inputBox"
-              name="clsAssignments"
-              value={cls.clsAssignments}
-              onChange={(e) =>
-                handleInputChange(index, "clsAssignments", e.target.value)
-              }
-            >
-              <option>--- Select ---</option>
-              {assignList?.map((item: any) => {
-                return (
-                  <option key={item._id} value={item._id}>
-                    {item.asnName}
-                  </option>
-                );
-              })}
-            </select> */}
           </div>
         ))}
         {errorMessage && (
           <p className="text-red-600 italic text-xs">{errorMessage}</p>
         )}
         <div className="flex gap-6 w-full mt-3">
-          <button type="submit" className="btnRight w-full">
-            Save
+          <button type="submit" className="btnRight w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

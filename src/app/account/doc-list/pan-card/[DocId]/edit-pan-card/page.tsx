@@ -27,6 +27,7 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
 
   const router = useRouter();
   const {DocId} = use(params);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [data, setData] = useState<EditPanCardProps>({sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkPan:'', sdkPanNbr:'', updatedBy:''});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -65,7 +66,8 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
   };
 
   const handleSubmit = async (e:FormEvent<HTMLFormElement>):Promise<void> => {
-  e.preventDefault();      
+  e.preventDefault();    
+  setIsSaving(true);  
     try 
       {
           const response = await fetch(`${BASE_API_URL}/api/documents/${DocId}/edit-doc`, {
@@ -91,7 +93,9 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
           }
         } catch (error) {
             toast.error('Error updating pan.');
-          } 
+        } finally {
+          setIsSaving(false);
+        }
       };  
   
     if(isLoading){
@@ -123,8 +127,8 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
           <input type='text' className='inputBox'name="sdkPanNbr" value={data.sdkPanNbr} onChange={handleChange}/>
         </div>
         <div className="flex gap-1 w-full mt-3">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+           {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

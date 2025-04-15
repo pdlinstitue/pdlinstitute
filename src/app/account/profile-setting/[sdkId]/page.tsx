@@ -1,6 +1,5 @@
 "use client";
 import React, { FormEvent, use, useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loading from "../../Loading";
 import { BASE_API_URL } from "@/app/utils/constant";
@@ -53,10 +52,18 @@ interface cityListProps {
   city_name: string;
 }
 
+interface RoleListProps {
+  _id:string;
+  roleType:string;
+}
+
 const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
 
   const router = useRouter();
   const { SdkId } = use(params);
+  const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [image, setImage] = useState<File | string | null>(null);
   const [preview, setPreview] = useState<string>('');
@@ -93,8 +100,22 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
   const handleMedIssue = (medIssue:string) => {
     setSdkData((prev) => ({ ...prev, isMedIssue: medIssue }));
   };
-  
 
+  useEffect(() => {
+    async function fetchRoleList() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/role-list`);
+        const roleData = await res.json();
+        setRoleList(roleData?.rolList);
+      } catch (error) {
+        console.error("Error fetching role data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  fetchRoleList();
+  },[])
+  
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
       _id: '',
@@ -130,7 +151,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
           { cache: "no-store" }
         );
         const sadhakData = await res.json();
-        setSdkData(sadhakData.sdkById);
+        setSdkData(sadhakData?.sdkById);
       } catch (error) {
         console.error("Error fetching sadhak data:", error);
       } finally {
@@ -145,7 +166,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
       try {
         const res = await fetch(`${BASE_API_URL}/api/countries`);
         const countryData = await res.json();
-        setCountryList(countryData.ctrList);
+        setCountryList(countryData?.ctrList);
       } catch (error) {
         console.error("Error fetching country data:", error);
       } finally {
@@ -163,7 +184,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             `${BASE_API_URL}/api/states?country_id=${sdkData.sdkCountry}`
           );
           const stateData = await res.json();
-          setStateList(stateData.sttList);
+          setStateList(stateData?.sttList);
         }
       } catch (error) {
         console.error("Error fetching state data:", error);
@@ -182,7 +203,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             `${BASE_API_URL}/api/cities?state_id=${sdkData.sdkState}`
           );
           const cityData = await res.json();
-          setCityList(cityData.cityList);
+          setCityList(cityData?.cityList);
         }
       } catch (error) {
         console.error("Error fetching city data:", error);
@@ -213,11 +234,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         return;
     }
 
-    // Validate file size (≤ 100 KB)
-    if (image instanceof File && image.size > 100 * 1024) {
-      toast.error("File size must be 100 KB or less!");
-      return;
-    }
+    setIsUploading(true);
   
     // Validate image type
     const img = new window.Image();
@@ -227,13 +244,6 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         toast.error("Invalid image format!");
         return;
     }
-
-    // Validate image resolution
-    img.onload = async () => {
-      if (img.width !== 600 || img.height !== 350) {
-        toast.error("Image must be 600x350 pixels!");
-        return;
-      }
 
     const formData = new FormData();
     formData.append("profileImage", image);
@@ -254,133 +264,118 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         }
     } catch (error:any) {
         toast.error(error.message);
+    } finally {
+        setIsUploading(false);
     }
-  }
-};
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    
     e.preventDefault();
-    if (
-      !sdkData ||
-      !("sdkFstName" in sdkData) ||
-      sdkData.sdkFstName === null ||
-      sdkData.sdkFstName.trim() === ""
-    ) {
-      setErrorMessage("First name is required.");
-    } else if (
-      !sdkData ||
-      !("sdkLstName" in sdkData) ||
-      sdkData.sdkLstName === null ||
-      sdkData.sdkLstName.trim() === ""
-    ) {
-      setErrorMessage("Last name is required.");
-    } else if (
-      !sdkData ||
-      !("sdkBthDate" in sdkData) ||
-      sdkData.sdkBthDate === null ||
-      sdkData.sdkBthDate.trim() === ""
-    ) {
-      setErrorMessage("DOB name is required.");
-    } else if (
-      !sdkData ||
-      !("sdkGender" in sdkData) ||
-      sdkData.sdkGender === null ||
-      sdkData.sdkGender.trim() === ""
-    ) {
-      setErrorMessage("Gender is required.");
-    } else if (
-      !sdkData ||
-      !("sdkMarStts" in sdkData) ||
-      sdkData.sdkMarStts === null ||
-      sdkData.sdkMarStts.trim() === ""
-    ) {
-      setErrorMessage("Marital status is required.");
-    } else if (
-      sdkData &&
-      "sdkMarStts" in sdkData &&
-      sdkData.sdkMarStts === "Married" &&
-      (!sdkData ||
-        !("sdkSpouce" in sdkData) ||
-        sdkData.sdkSpouce === null ||
-        sdkData.sdkSpouce?.trim() === "")
-    ) {
-      setErrorMessage("Spouce name is required.");
-    } else if (
-      !sdkData ||
-      !("sdkCountry" in sdkData) ||
-      sdkData.sdkCountry === null ||
-      sdkData.sdkCountry.trim() === ""
-    ) {
-      setErrorMessage("Country is required.");
-    } else if (
-      !sdkData ||
-      !("sdkState" in sdkData) ||
-      sdkData.sdkState === null ||
-      sdkData.sdkState.trim() === ""
-    ) {
-      setErrorMessage("State is required.");
-    } else if (
-      !sdkData ||
-      !("sdkCity" in sdkData) ||
-      sdkData.sdkCity === null ||
-      sdkData.sdkCity.trim() === ""
-    ) {
-      setErrorMessage("City is required.");
-    } else if (
-      !sdkData ||
-      !("sdkParAdds" in sdkData) ||
-      sdkData.sdkParAdds === null ||
-      sdkData.sdkParAdds.trim() === ""
-    ) {
-      setErrorMessage("Permanent address is must.");
-    } else if (
-      !sdkData ||
-      !("sdkComAdds" in sdkData) ||
-      sdkData.sdkComAdds === null ||
-      sdkData.sdkComAdds.trim() === ""
-    ) {
-      setErrorMessage("Communication address is must.");
-    } else if (
-      !sdkData ||
-      !("sdkWhtNbr" in sdkData) ||
-      sdkData.sdkWhtNbr === null ||
-      sdkData.sdkWhtNbr.trim() === ""
-    ) {
-      setErrorMessage("Whatsapp number is required.");
-    } else if (
-      !sdkData ||
-      !("sdkPhone" in sdkData) ||
-      sdkData.sdkPhone === null ||
-      sdkData.sdkPhone.trim() === ""
-    ) {
-      setErrorMessage("Phone number is required.");
-    } else if (
-      !sdkData ||
-      !("sdkEmail" in sdkData) ||
-      sdkData.sdkEmail === null ||
-      sdkData.sdkEmail.trim() === ""
-    ) {
-      setErrorMessage("Email is required.");
-    } else if (
-      !sdkData ||
-      !("isMedIssue" in sdkData) ||
-      sdkData.isMedIssue === null ||
-      sdkData.isMedIssue.trim() === ""
-    ) {
-      setErrorMessage("Please check medical issue.");
-    } else if (
-      sdkData && "isMedIssue" in sdkData &&
-      sdkData.isMedIssue === "Yes" &&
-      ( !sdkData ||
-        !("sdkMedIssue" in sdkData) ||
-        sdkData.sdkMedIssue === null ||
-        sdkData.sdkMedIssue?.trim() === "")
-    ) {
-      setErrorMessage("Please describe medical issue.");
-    } else {
-      try {
-        const response = await fetch(
-          `${BASE_API_URL}/api/users/${SdkId}/edit-sadhak`,
+    setIsSaving(true);
+  
+    try {
+      if (
+        !sdkData ||
+        !("sdkFstName" in sdkData) ||
+        sdkData.sdkFstName === null ||
+        sdkData.sdkFstName.trim() === ""
+      ) {
+        setErrorMessage("First name is required.");
+      } else if (
+        !("sdkLstName" in sdkData) ||
+        sdkData.sdkLstName === null ||
+        sdkData.sdkLstName.trim() === ""
+      ) {
+        setErrorMessage("Last name is required.");
+      } else if (
+        !("sdkBthDate" in sdkData) ||
+        sdkData.sdkBthDate === null ||
+        sdkData.sdkBthDate.trim() === ""
+      ) {
+        setErrorMessage("DOB name is required.");
+      } else if (
+        !("sdkGender" in sdkData) ||
+        sdkData.sdkGender === null ||
+        sdkData.sdkGender.trim() === ""
+      ) {
+        setErrorMessage("Gender is required.");
+      } else if (
+        !("sdkMarStts" in sdkData) ||
+        sdkData.sdkMarStts === null ||
+        sdkData.sdkMarStts.trim() === ""
+      ) {
+        setErrorMessage("Marital status is required.");
+      } else if (
+        sdkData.sdkMarStts === "Married" &&
+        (!("sdkSpouce" in sdkData) ||
+          sdkData.sdkSpouce === null ||
+          sdkData.sdkSpouce.trim() === "")
+      ) {
+        setErrorMessage("Spouce name is required.");
+      } else if (
+        !("sdkCountry" in sdkData) ||
+        sdkData.sdkCountry === null ||
+        sdkData.sdkCountry.trim() === ""
+      ) {
+        setErrorMessage("Country is required.");
+      } else if (
+        !("sdkState" in sdkData) ||
+        sdkData.sdkState === null ||
+        sdkData.sdkState.trim() === ""
+      ) {
+        setErrorMessage("State is required.");
+      } else if (
+        !("sdkCity" in sdkData) ||
+        sdkData.sdkCity === null ||
+        sdkData.sdkCity.trim() === ""
+      ) {
+        setErrorMessage("City is required.");
+      } else if (
+        !("sdkParAdds" in sdkData) ||
+        sdkData.sdkParAdds === null ||
+        sdkData.sdkParAdds.trim() === ""
+      ) {
+        setErrorMessage("Permanent address is must.");
+      } else if (
+        !("sdkComAdds" in sdkData) ||
+        sdkData.sdkComAdds === null ||
+        sdkData.sdkComAdds.trim() === ""
+      ) {
+        setErrorMessage("Communication address is must.");
+      } else if (
+        !("sdkWhtNbr" in sdkData) ||
+        sdkData.sdkWhtNbr === null ||
+        sdkData.sdkWhtNbr.trim() === ""
+      ) {
+        setErrorMessage("Whatsapp number is required.");
+      } else if (
+        !("sdkPhone" in sdkData) ||
+        sdkData.sdkPhone === null ||
+        sdkData.sdkPhone.trim() === ""
+      ) {
+        setErrorMessage("Phone number is required.");
+      } else if (
+        !("sdkEmail" in sdkData) ||
+        sdkData.sdkEmail === null ||
+        sdkData.sdkEmail.trim() === ""
+      ) {
+        setErrorMessage("Email is required.");
+      } else if (
+        !("isMedIssue" in sdkData) ||
+        sdkData.isMedIssue === null ||
+        sdkData.isMedIssue.trim() === ""
+      ) {
+        setErrorMessage("Please check medical issue.");
+      } else if (
+        sdkData.isMedIssue === "Yes" &&
+        (!("sdkMedIssue" in sdkData) ||
+          sdkData.sdkMedIssue === null ||
+          sdkData.sdkMedIssue.trim() === "")
+      ) {
+        setErrorMessage("Please describe medical issue.");
+      } else {
+        const response = await fetch(`${BASE_API_URL}/api/users/${SdkId}/edit-sadhak`,
           {
             method: "PUT",
             body: JSON.stringify({
@@ -416,13 +411,19 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
           toast.error(post.msg);
         } else {
           toast.success(post.msg);
-          router.push("/account/dashboard");
+          if (loggedInUser.result.usrRole === "Admin") {
+            router.push("/account/admin-dashboard");
+          } else {
+            router.push("/account/sadhak-dashboard");
+          }
         }
-      } catch (error) {
-          toast.error("Error updating profile.");
+      } 
+    } catch (error) {
+      toast.error("Error updating profile.");
+    } finally {
+        setIsSaving(false);
       }
-    }
-  };
+    };  
 
   if (isLoading) {
     return (
@@ -434,26 +435,27 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
 
   return (
     <div>
-      <form
-        className="flex flex-col gap-4 h-auto border-[1.5px] border-orange-500 p-9 rounded-md"
-        onSubmit={handleSubmit}
-      >
+      <form className="formStyle w-full" onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 gap-6">
-          <div className="flex flex-col gap-1">
-            <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image src={sdkData.sdkImg || preview || "/images/uploadImage.jpg"}  alt="sadhakImage" width={600} height={350} />
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="file"
-                accept="image/*"
-                className="inputBox w-full h-[45px]"
-                onChange={handleFileChange}
-              />
-              <button type="button" className="btnLeft" onClick={handleUpload}>
-                UPLOAD
-              </button>
-            </div>
+        <div className="flex flex-col gap-1">
+          <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+            <img
+              src={preview || sdkData.sdkImg || "/images/uploadImage.jpg"}
+              alt="Preview"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <input
+              type="file"
+              accept="image/*"
+              className="inputBox w-full h-[45px]"
+              onChange={handleFileChange}
+            />
+            <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+              {isUploading ? "Uploading..." : "Upload"}
+            </button>
+          </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-3 gap-2">
@@ -674,13 +676,18 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             <select
               className="inputBox"
               name="sdkRole"
-              value={sdkData.sdkRole}
+              disabled
+              value={sdkData?.sdkRole}
               onChange={handleChange}
             >
-              <option className="text-center"> --- Select --- </option>
-              <option value="Admin">Admin</option>
-              <option value="Sadhak">Sadhak</option>
-              <option value="Volunteer">Volunteer</option>
+              <option className="text-center"> --- Select Role --- </option>
+              {
+                roleList?.map((item:any)=>{
+                  return (
+                    <option key={item._id} value={item._id}>{item.roleType}</option>
+                  )
+                })
+              }
             </select>
           </div>
         </div>
@@ -745,22 +752,21 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             </div>
           )
         }
-        <div className="flex flex-col gap-2">
-          <h2 className="text-lg text-center p-3 bg-gray-200 rounded-md font-semibold uppercase">
-            List of Courses Done
-          </h2>
-          <p>BSK 1</p>
-          <p>GK 1</p>
-        </div>
         {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
         <div className="grid grid-cols-2 gap-1">
-          <button type="submit" className="btnLeft">
-            Save
+          <button type="submit" className="btnLeft" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
             className="btnRight"
-            onClick={() => router.push("/account/dashboard")}
+            onClick={() => {
+              if (loggedInUser.result.usrRole === "Admin" || loggedInUser.result.usrRole === "View-Admin") {
+                router.push("/account/admin-dashboard");
+              } else {
+                router.push("/account/sadhak-dashboard");
+              }
+            }}
           >
             Back
           </button>

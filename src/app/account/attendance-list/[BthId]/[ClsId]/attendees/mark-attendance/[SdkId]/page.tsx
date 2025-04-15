@@ -25,6 +25,7 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
 
   const router = useRouter();
   const {BthId, ClsId, SdkId} = use(params);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [status, setStatus] = useState<string>('')
   const [attdStatus, setAttdStatus] = useState<MarkAttendanceProps>({status:'', absRemarks:'', markedBy:''});
@@ -70,8 +71,8 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     try {
-
       const response = await fetch(`${BASE_API_URL}/api/mark-attendance/${BthId}/${ClsId}/${SdkId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,6 +94,8 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
       }
     } catch (error) {
       toast.error("Error marking attendance.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -101,8 +104,6 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
       <Loading/>
     </div>
   }
-
-  
 
   return (
     <div className='flex justify-center items-center'>
@@ -144,7 +145,9 @@ const MarkAttendance : React.FC<IAttdParams> = ({params}) => {
           )
         }
         <div className='grid grid-cols-2 gap-1'>
-          <button type='submit' className='btnLeft'>SUBMIT</button>
+          <button type='submit' className='btnLeft' disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
           <button type='button' className='btnRight' onClick={()=>router.push(`/account/attendance-list/${BthId}/${ClsId}/attendees`)}>BACK</button>
         </div>
       </form>

@@ -1,10 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { RxAvatar } from 'react-icons/rx';
-import { RiProfileLine } from "react-icons/ri";
-import { MdSettingsBrightness } from "react-icons/md";
-import { PiFolderLockFill } from "react-icons/pi";
-import { MdLogout } from "react-icons/md";
 
 
 
@@ -19,12 +14,18 @@ const LogMenu = () => {
     <div className="flex p-4 items-center w-auto">
       <div className="relative group transition-all"> 
         <RxAvatar size={44} className="text-orange-500 cursor-pointer" />
-        <div className="absolute z-50 group-hover:flex right-0 top-10 hidden w-[150px] flex-col transition-all py-3 px-3 bg-white rounded-md shadow-xl">
-            <Link href="/login" className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">            
-              Login
+        <div className="absolute  border-[1.5px] border-gray-200 divide-y z-50 group-hover:flex right-0 top-10 hidden w-[190px] flex-col transition-all py-2 px-2 bg-white rounded-md shadow-xl">
+            <Link href="/login" className="flex text-black text-sm uppercase font-semibold hover:text-white px-4 py-1 hover:bg-orange-500">            
+              Admin Login
             </Link>
-            <Link href="/register" className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
-              Register
+            <Link href="/sadhak-login" className="flex text-black text-sm uppercase font-semibold hover:text-white px-4 py-1 hover:bg-orange-500">            
+              Sadhak Login
+            </Link>
+            <Link href="/volunteer-login" className="flex text-black text-sm uppercase font-semibold hover:text-white px-4 py-1 hover:bg-orange-500">            
+              Volunteer Login
+            </Link>
+            <Link href="/register" className="flex text-black text-sm uppercase font-semibold hover:text-white px-4 py-1 hover:bg-orange-500">
+              Register here
             </Link>
         </div>
       </div>

@@ -61,14 +61,14 @@ const Practice: React.FC = () => {
 
   const data = React.useMemo(() => prcData, [prcData]);
 
-  const convertTimeToDate = (timeStr: string) => {
-    // Replace '.' with ':' to match valid time format (21:14 instead of 21.14)
+  const convertDateTime = (dateStr: string, timeStr: string) => {
+    const date = new Date(dateStr); // Already a valid ISO date
     const formattedTime = timeStr.replace('.', ':');
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split('T')[0];
-    // Create a full timestamp string (YYYY-MM-DDTHH:mm)
-    const dateTimeString = `${today}T${formattedTime}:00`;
-    return new Date(dateTimeString);
+    const [hours, minutes] = formattedTime.split(':').map(Number);
+  
+    // Set hours and minutes safely
+    date.setHours(hours, minutes, 0, 0);
+    return date;
   };
 
   const columns = React.useMemo(() => [
@@ -80,26 +80,33 @@ const Practice: React.FC = () => {
       header: 'Class',
       accessorKey: 'prcLink',
       cell: ({ row }: { row: any }) => {
-        const { prcStartsAt, prcEndsAt, prcLink } = row.original;
-        const startTime = convertTimeToDate(prcStartsAt);
-        const endTime = convertTimeToDate(prcEndsAt);
-
-        if (prcLink  && currentTime >= startTime && currentTime <= endTime) {
-          return (
-            <div className='flex items-center gap-3'>
-              <button
-                type='button'
-                title='Join'
-                onClick={() => window.open(prcLink, '_blank')}
-                className='bg-orange-600 py-1 px-2 font-semibold rounded-sm text-white text-sm'
-              >
-                JOIN
-              </button>
-            </div>
-          );
-        } else {
-          return <div className='flex items-center gap-3'>N/A</div>;
-        }
+        const { prcStartsAt, prcEndsAt, prcDate, prcLink } = row.original;
+        const startTime = convertDateTime(prcDate, prcStartsAt);
+        const endTime = convertDateTime(prcDate, prcEndsAt);
+      
+        const diffInMs = startTime.getTime() - currentTime.getTime();
+        const diffInMin = diffInMs / (1000 * 60);
+          
+          if ((diffInMin <= 15 && currentTime < endTime) || (currentTime >= startTime && currentTime <= endTime)) {
+            return (
+              <div className='flex items-center gap-3'>
+                <button
+                  type='button'
+                  title='Join'
+                  onClick={() => window.open(prcLink, '_blank')}
+                  className='bg-orange-600 py-1 px-2 font-semibold rounded-sm text-white text-sm'
+                >
+                  JOIN
+                </button>
+              </div>
+            );
+          }else if (diffInMin > 15) {
+            return <span className='text-blue-500 font-medium italic'>Upcoming</span>;        
+          } else if (currentTime > endTime) {
+            return <span className='text-gray-500 italic'>Ended</span>;
+          }      
+    
+        return <span className='text-gray-400'>N/A</span>;
       },
     },
     {

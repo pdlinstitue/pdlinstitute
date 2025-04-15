@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
       await dbConnect();
       const { enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy }: EnrType = await req.json();
   
-      const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy});
+      const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy, isApproved:corId.toString()=="67d262857db737af7a47a679"?"Approved":"Pending"});
       const savedEnr = await newEnr.save();
 
       if(savedEnr){

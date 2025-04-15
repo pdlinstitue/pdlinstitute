@@ -1,10 +1,8 @@
 "use client"
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link';
 import { MdDashboard } from "react-icons/md";
-import { MdPlaylistAddCheckCircle } from "react-icons/md";
 import { MdOutlineAppRegistration } from "react-icons/md";
 import { BiSolidUserRectangle } from "react-icons/bi";
 import { SiGoogleclassroom } from "react-icons/si";
@@ -18,15 +16,9 @@ import ClassMenu from './submenus/ClassMenu';
 import TrainingMenu from './submenus/TrainingMenu';
 import { SiAdblock } from "react-icons/si";
 import DocMenu from './submenus/DocMenu';
-import { PiChalkboardTeacher } from "react-icons/pi";
 import SadhakMenu from './submenus/SadhakMenu';
-import { RiCoupon3Line } from "react-icons/ri";
-import Cookies from 'js-cookie';
 import { BsFillQuestionOctagonFill } from "react-icons/bs";
-import MyCourseMenu from './submenus/MyCourseMenu';
-import { GiMeditation } from "react-icons/gi";
-import MyDocMenu from './submenus/MyDocMenu';
-import Loading from '../account/Loading';
+import PermitMenu from './submenus/PermitMenu';
 
 
 
@@ -98,10 +90,18 @@ const AdminSideMenu: React.FC = () => {
             <FaCalendarCheck size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>ATTENDANCE</p>
           </Link>
-          <Link href='/account/role-list' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+          <button type='button' onClick={() =>handleToggle(11)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <SiAdblock size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>PERMISSION</p>
-          </Link>
+            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 11 ? 'rotate-180 duration-500' : ''}`} />      
+          </button>
+          {
+            selectedNumber === 11 && (
+              <div className='flex w-full px-[35px]'>
+                <PermitMenu/>
+              </div>
+            )
+          } 
           <button type='button' onClick={() =>handleToggle(7)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <BiSolidDockTop size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>DOCUMENTS</p>
@@ -118,7 +118,7 @@ const AdminSideMenu: React.FC = () => {
           <BsFillQuestionOctagonFill size={24} className=' group-hover:text-black'/>
           <p className='font-semibold group-hover:text-black'>ENQUIRIES</p>
         </Link>
-        <Link href='/account/dashboard' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
+        <Link href='/account/reports' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
           <HiOutlineDocumentReport size={24} className=' group-hover:text-black'/>
           <p className='font-semibold group-hover:text-black'>REPORTS</p>
         </Link>

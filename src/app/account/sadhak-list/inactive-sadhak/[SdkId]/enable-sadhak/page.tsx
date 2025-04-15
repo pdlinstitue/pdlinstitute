@@ -22,6 +22,7 @@ const EnableSadhak : React.FC <ISdkParams>= ({params}) => {
 
   const router = useRouter();
   const { SdkId } = use(params);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [sadhakName, setSadhakName] = useState<SdkNameProps>({sdkFstName:'', updatedBy:''});
   const [loggedInUser, setLoggedInUser] = useState({
@@ -68,6 +69,7 @@ const EnableSadhak : React.FC <ISdkParams>= ({params}) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/inactive-users/${SdkId}/enable-sadhak`, {
@@ -87,6 +89,8 @@ const EnableSadhak : React.FC <ISdkParams>= ({params}) => {
             }
         } catch (error) {
             toast.error('Error enabling sadhak.');
+        } finally{
+            setIsSaving(false);
         }
     };
 
@@ -106,7 +110,9 @@ const EnableSadhak : React.FC <ISdkParams>= ({params}) => {
                     <p className="font-bold text-xl text-green-600">{sadhakName.sdkFstName}</p>
                 </div>
                 <div className="flex gap-1">
-                    <button type="submit"  className="btnLeft w-full">CONFIRM</button>
+                    <button type="submit"  className="btnLeft w-full" disabled={isSaving}>
+                       {isSaving ? "Confirming..." : "Confirm"}
+                    </button>
                     <button type="button" onClick={() => router.push('/account/sadhak-list/inactive-sadhak')} className="btnRight w-full">CANCEL</button>
                 </div>
             </form>

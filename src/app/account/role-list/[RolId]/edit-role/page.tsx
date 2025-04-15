@@ -22,6 +22,7 @@ const EditRole: React.FC<IRoleParams> = ({ params }) => {
 
     const { RolId } = use(params);
     const router = useRouter();
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [data, setData] = useState<CatType>({ roleType: '', updatedBy: '' });
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -74,13 +75,15 @@ const EditRole: React.FC<IRoleParams> = ({ params }) => {
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+        
         e.preventDefault();
+        setIsSaving(true);
         setErrorMessage(''); // Clear the previous error message
-
-        if (!data.roleType.trim()) {
-            setErrorMessage('Role type is required.');
-        } else{
-            try {
+ 
+        try {
+            if (!data.roleType.trim()) {
+                setErrorMessage('Role type is required.');
+            } else{
                 const response = await fetch(`${BASE_API_URL}/api/role-list/${RolId}/edit-role`, {
                     method: 'PUT',
                     body: JSON.stringify({
@@ -96,11 +99,13 @@ const EditRole: React.FC<IRoleParams> = ({ params }) => {
                     toast.success(post.msg);
                     router.push('/account/role-list');
                 }
-            } catch (error) {
-                toast.error('Error updating role type.');
             }
-        }
-    };
+        }  catch (error) {
+                toast.error('Error updating role type.');
+            } finally {
+                setIsSaving(false);
+            }
+        };
 
     if (isLoading) {
         return (
@@ -120,11 +125,11 @@ const EditRole: React.FC<IRoleParams> = ({ params }) => {
                 </div>
                 {errorMessage && <p className='text-red-600 italic text-xs '>{errorMessage}</p>}
                 <div className="grid grid-cols-2 gap-1">
-                    <button type="submit" className="btnLeft">
-                        UPDATE
+                    <button type="submit" className="btnLeft" disabled={isSaving}>
+                        {isSaving ? "Saving..." : "Save"}
                     </button>
                     <button type="button" className="btnRight" onClick={()=> router.push("/account/role-list")}>
-                        BACK
+                        Back
                     </button>
                 </div>
             </form>

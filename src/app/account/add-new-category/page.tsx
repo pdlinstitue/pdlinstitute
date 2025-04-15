@@ -14,6 +14,7 @@ interface NewCategoryProps {
 const AddNewCategory: React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [data, setData] = useState<NewCategoryProps>({
     catName: "",
@@ -53,12 +54,13 @@ const AddNewCategory: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    setErrorMessage(""); // Clear the previous error
+    setIsSaving(true);
+    setErrorMessage(""); // Clear the previous error    
 
-    if (!data.catName.trim()) {
-      setErrorMessage("Category name is required.");
-    } else {
-      try {
+    try {
+      if (!data.catName.trim()) {
+        setErrorMessage("Category name is required.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/categories`, {
           method: "POST",
           body: JSON.stringify({
@@ -66,6 +68,7 @@ const AddNewCategory: React.FC = () => {
             createdBy: loggedInUser.result?._id,
           }),
         });
+
         const post = await response.json();
         if (post.success === false) {
           toast.error(post.msg);
@@ -73,9 +76,11 @@ const AddNewCategory: React.FC = () => {
           toast.success(post.msg);
           router.push("/account/category-list");
         }
-      } catch (error) {
-        toast.error("Error creating category.");
       }
+    } catch (error) {
+      toast.error("Error creating category.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -104,8 +109,8 @@ const AddNewCategory: React.FC = () => {
           <p className="text-red-600 italic text-sm">{errorMessage}</p>
         )}
         <div className="flex gap-1 w-full">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

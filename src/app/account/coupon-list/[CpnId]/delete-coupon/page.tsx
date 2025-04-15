@@ -21,8 +21,10 @@ const DelCoupon: React.FC<DelCpnParams> = ({ params }): JSX.Element => {
     
     const router = useRouter();
     const { CpnId } = use(params);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     
     const handleDelCoupon = async (): Promise<void> => {
+    setIsSaving(true);
     try 
         {
             const res = await fetch(`${BASE_API_URL}/api/coupons/${CpnId}/delete-coupon`, {
@@ -38,11 +40,13 @@ const DelCoupon: React.FC<DelCpnParams> = ({ params }): JSX.Element => {
             }
         } catch (error) {
             toast.error("Coupon deletion failed.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
     const [isLoading, setIsLoading] = useState(true);
-      const [couponName, setCouponName] = useState<CouponProps>({_id:'', cpnName:''});
+    const [couponName, setCouponName] = useState<CouponProps>({_id:'', cpnName:''});
     
       useEffect(() => { 
       async function fetchCouponById() { 
@@ -77,8 +81,10 @@ const DelCoupon: React.FC<DelCpnParams> = ({ params }): JSX.Element => {
                         <p className='text-green-600 font-bold text-xl'>{couponName.cpnName}</p>
                     </div>
                     <div className="flex gap-1">
-                        <button type="button" onClick={handleDelCoupon} className="btnLeft w-full">CONFIRM</button>
-                        <button type="button" onClick={() => router.push('/account/coupon-list')} className="btnRight w-full">CANCEL</button>
+                        <button type="button" onClick={handleDelCoupon} className="btnLeft w-full" disabled={isSaving}>
+                            {isSaving ? "Confirming..." : "Confirm"}
+                        </button>
+                        <button type="button" onClick={() => router.push('/account/coupon-list')} className="btnRight w-full">Cancel</button>
                     </div>
                 </div>
             </div>

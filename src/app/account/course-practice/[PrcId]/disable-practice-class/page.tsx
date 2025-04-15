@@ -23,6 +23,7 @@ const DisablePracticeClass : React.FC <IPrcParams>= ({params}) => {
   const router = useRouter();
   const { PrcId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [practiceName, setPracticeName] = useState<PracticeNameProps>({_id:'', prcName:''});
 
   useEffect(() => { 
@@ -42,7 +43,7 @@ const DisablePracticeClass : React.FC <IPrcParams>= ({params}) => {
 
    const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-
+    setIsSaving(true);
     try 
     {
         const response = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/disable-practice-class`, {
@@ -60,6 +61,8 @@ const DisablePracticeClass : React.FC <IPrcParams>= ({params}) => {
         }
     } catch (error) {
             toast.error('Error disabling practice class.');
+        } finally {
+            setIsSaving(false);
         }
    };
 
@@ -81,8 +84,10 @@ const DisablePracticeClass : React.FC <IPrcParams>= ({params}) => {
                     </div>
                 </div>
                 <div className="flex gap-1">
-                    <button type="submit"  className="btnLeft w-full">CONFIRM</button>
-                    <button type="button" onClick={() => router.push('/account/course-practice')} className="btnRight w-full">CANCEL</button>
+                    <button type="submit"  className="btnLeft w-full" disabled={isSaving}>
+                        {isSaving ? "Confirming..." : "Confirm"}
+                    </button>
+                    <button type="button" onClick={() => router.push('/account/course-practice')} className="btnRight w-full">Cancel</button>
                 </div>
             </form>
        </div>

@@ -2,6 +2,7 @@
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import { useRouter } from 'next/navigation';
+import { RiUpload2Fill } from "react-icons/ri";
 import React, { useEffect, useState } from 'react';
 import { FiEye } from 'react-icons/fi';
 import { BASE_API_URL } from '@/app/utils/constant';
@@ -18,6 +19,14 @@ interface AttendanceListProps {
  bthName:string,
  bthJoiners:number
 }
+interface SelectedCourseProps {
+  _id:string,
+  coName:string
+}
+interface SelectedBatchProps {
+  _id:string,
+  bthName:string
+}
 
 const AttendanceList : React.FC = () => {
 
@@ -26,6 +35,60 @@ const AttendanceList : React.FC = () => {
   const [clsData, setClsData] = useState<AttendanceListProps[] | null>([]);
   const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
   const data = React.useMemo(() => clsData ?? [], [clsData]);
+  const [selectedDuration, setSelectedDuration]=useState<number>(1);
+  const [selectedCourse, setSelectedCourse] = useState<string>(''); 
+  const [selectedBatch, setSelectedBatch] = useState<string>('');
+  const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
+    const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
+
+useEffect(() => {
+    async function fetchCourseData() {
+      try {
+          const res = await fetch(`${BASE_API_URL}/api/courses`, {cache: "no-store"});
+          const coData = await res.json();
+          setCourseList(coData.coList.sort((a:any, b:any) => a.coName.localeCompare(b.coName)));
+        } catch (error) {
+          console.error("Error fetching course data:", error);
+      } finally {
+          setIsLoading(false);
+      }
+    }
+  fetchCourseData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchBatchesByCorId() {
+      if (!selectedCourse) {
+        setBatchList([]); // Reset batch list if no course is selected
+        return;
+      }
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/batches`, { cache: 'no-store' });
+        const batchData = await res.json();
+        const filteredBatches = batchData.bthList.filter((batch: any) => batch.corId._id === selectedCourse);
+        setBatchList(filteredBatches);
+      } catch (error) {
+        console.error('Error fetching batch data:', error);
+      }
+    }
+    fetchBatchesByCorId();
+  }, [selectedCourse]); 
+
+  // Handle course change
+  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCourse(e.target.value);
+    setSelectedBatch(''); // Reset batch selection when course changes
+  };
+
+  // Handle batch change
+  const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedBatch(e.target.value);
+  };
+
+  const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDuration(Number(e.target.value));
+  };
+
   const columns = React.useMemo(() => [
     { header: 'Course', accessorKey: 'coNick'},
     { header: 'Batch', accessorKey: 'bthName'},
@@ -41,8 +104,9 @@ const AttendanceList : React.FC = () => {
     { header: 'Absent', accessorKey: 'clsAbsent'},
     { header: 'Action', accessorKey: 'action', 
         cell: ({ row }: { row: any }) => ( 
-          <div className='flex items-center justify-center'> 
+          <div className='flex items-center justify-center gap-3'> 
             <button type='button' title='Mark' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attendees`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+            <button type='button' title='Upload Screenshots' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attd-images`)} className='text-blue-600 border-[1.5px] border-blue-800 p-1 rounded-full hover:border-black'><RiUpload2Fill size={12}/></button>
           </div> 
         ), 
       },
@@ -51,7 +115,6 @@ const AttendanceList : React.FC = () => {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
@@ -60,7 +123,7 @@ const AttendanceList : React.FC = () => {
     useEffect(() => {
     async function fetchBatchData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/classes`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/classes?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
         const classData = await res.json();
         
         let updatedClassList: AttendanceListProps[] = classData.clsList.flatMap((item: any) => {
@@ -93,7 +156,7 @@ const AttendanceList : React.FC = () => {
       }
     }
     fetchBatchData();
-    }, []);
+    }, [selectedCourse, selectedBatch, selectedDuration]);
   
     const table = useReactTable(
       {
@@ -106,7 +169,7 @@ const AttendanceList : React.FC = () => {
         state: {
           sorting: sorting,
           globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+          pagination: { pageIndex: pageInput - 1, pageSize: 100 }
         },
         onSortingChange: setSorting,
         getFilteredRowModel: getFilteredRowModel(),
@@ -130,9 +193,32 @@ const AttendanceList : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center'>
-            <select className='inputBox w-[300px]'>--- Select Course ---</select>
-            <select className='inputBox w-[300px]'>--- Select Batch ---</select>
+          <div className='flex gap-2 items-center w-[900px]'>
+          <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+              <option value="1">Last One Month</option>
+              <option value="2">Last Two Month</option>
+              <option value="3">Last Three Month</option>
+            </select>
+            <select className="inputBox w-full" name="corId" value={selectedCourse} onChange={handleCourseChange}>
+              <option value="" className='text-center'>--- Select Course ---</option>
+              {courseList?.map((item: any) => {
+              return (
+                <option key={item._id} value={item._id}>
+                  {item.coName}
+                </option>
+              );
+             })}
+            </select>
+            <select className="inputBox w-full" name="corId" value={selectedBatch} onChange={handleBatchChange}>
+              <option value="" className='text-center'>--- Select Batch ---</option>
+              {batchList?.map((item: any) => {
+              return (
+                <option key={item._id} value={item._id}>
+                  {item.bthName}
+                </option>
+              );
+             })}
+            </select>
           </div>
           <div className='flex gap-2 items-center'>
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>

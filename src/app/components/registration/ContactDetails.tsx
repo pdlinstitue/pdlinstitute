@@ -1,21 +1,38 @@
 "use client";
 import { StepperContext } from '@/app/context/StepperContext';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
-const ContactDetails : React.FC = () => {
-    
+const ContactDetails: React.FC = () => {
+
   const stepperContext = useContext(StepperContext);
-    
+
   if (!stepperContext) {
     return null; // or handle the null case appropriately
   }
-  
-  const {userData, setUserData} = stepperContext;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const {name, value} = e.target;
-    setUserData({...userData, [name]: value});
+  const { userData, setUserData } = stepperContext;
+  const [isSameAsWhatsapp, setIsSameAsWhatsapp] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const {name, value} = e.target;
+      setUserData({...userData, [name]: value});
   }
+
+  const handleSameAsWhatsappToggle = () => {
+    const newValue = !isSameAsWhatsapp;
+    setIsSameAsWhatsapp(newValue);
+    if (newValue) {
+      setUserData(prev => ({
+        ...prev,
+        sdkPhone: prev.sdkWhtNbr
+      }));
+    } else {
+      setUserData(prev => ({
+        ...prev,
+        sdkPhone: ''
+      }));
+    }
+  };
 
   return (
     <div>
@@ -23,22 +40,75 @@ const ContactDetails : React.FC = () => {
         <div className='grid grid-cols-2 gap-2'>
           <div className='flex flex-col gap-2'>
             <label>Whatsapp Number:*</label>
-            <input type='text' name='sdkWhtNbr' value={userData.sdkWhtNbr} placeholder='with country code e.g. +91 if india' onChange={handleChange} className='inputBox' />
+            <input
+              type='text'
+              name='sdkWhtNbr'
+              value={userData.sdkWhtNbr}
+              placeholder='with country code e.g. +91 if india'
+              onChange={handleChange}
+              className='inputBox'
+            />
           </div>
           <div className='flex flex-col gap-2'>
-            <label>Phone Number:*</label>
-            <input type='text' name='sdkPhone' value={userData.sdkPhone} placeholder='with country code e.g. +91 if india' onChange={handleChange} className='inputBox' />
+            <label>Phone Number:*
+              <input
+                type='checkbox'
+                checked={isSameAsWhatsapp}
+                onChange={handleSameAsWhatsappToggle}
+              />Check if same
+            </label>
+            <input
+              type='text'
+              name='sdkPhone'
+              value={userData.sdkPhone}
+              placeholder='with country code e.g. +91 if india'
+              onChange={handleChange}
+              className='inputBox'
+              disabled={isSameAsWhatsapp}
+            />
           </div>
         </div>
+
         <div className='grid grid-cols-1 mt-2'>
           <div className='flex flex-col gap-2'>
             <label>Email:*</label>
-            <input type='email' name='sdkEmail' value={userData.sdkEmail} onChange={handleChange} className='inputBox' />
+            <input
+              type='email'
+              name='sdkEmail'
+              placeholder='pdlinstitute@gmail.com'
+              value={userData.sdkEmail}
+              onChange={handleChange}
+              className='inputBox'
+            />
+          </div>
+        </div>
+        <div className='grid grid-cols-2 gap-2 mt-4'>
+          <div className='flex flex-col gap-2'>
+            <label>Phone OTP:</label>
+            <input
+              type='text'
+              name='sdkPhoneOtp'
+              value={userData.sdkPhoneOtp || ''}
+              onChange={handleChange}
+              className='inputBox'
+              placeholder='Enter phone OTP'
+            />
+          </div>
+          <div className='flex flex-col gap-2'>
+            <label>Email OTP:</label>
+            <input
+              type='text'
+              name='sdkEmailOtp'
+              value={userData.sdkEmailOtp || ''}
+              onChange={handleChange}
+              className='inputBox'
+              placeholder='Enter email OTP'
+            />
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ContactDetails;

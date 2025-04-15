@@ -24,11 +24,12 @@ type ClassItem = {
 };
 
 const EditClass: React.FC<IClsParams> = ({ params }) => {
+
   const router = useRouter();
   const { ClsId, DayId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [assignList, setAssignList] = useState([]);
   const [corId, setCorId] = useState<string | undefined>();
   const [data, setData] = useState<ClassItem | null>({
     clsDay: "",
@@ -108,11 +109,15 @@ const EditClass: React.FC<IClsParams> = ({ params }) => {
 
   // Handle Form Submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+
     e.preventDefault();
+    setIsSaving(true);
     setErrorMessage("");
 
     try {
+      
       let postData = data;
+
       if (postData) {
         postData.updatedBy = loggedInUser.result._id;
       }
@@ -134,6 +139,8 @@ const EditClass: React.FC<IClsParams> = ({ params }) => {
       }
     } catch (error) {
       toast.error("Error updating class.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -190,8 +197,8 @@ const EditClass: React.FC<IClsParams> = ({ params }) => {
         </div>
         {errorMessage && (<p className="text-red-600 italic text-xs">{errorMessage}</p>)}
         <div className="flex gap-1 w-full mt-3">
-          <button type="submit" className="btnRight w-full">
-            Save
+          <button type="submit" className="btnRight w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : " Save"}
           </button>
           <button
             type="button"

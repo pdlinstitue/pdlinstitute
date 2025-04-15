@@ -20,6 +20,7 @@ const DelBatch: React.FC<DelBatchParams> = ({ params }): JSX.Element => {
     
     const router = useRouter();
     const { BthId } = use(params);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [data, setData] = useState<BatchNameProps>({ bthName: '' });
     const [isLoading, setIsLoading] = useState<boolean>(true);
     
@@ -40,6 +41,7 @@ const DelBatch: React.FC<DelBatchParams> = ({ params }): JSX.Element => {
     }, [BthId]);
     
     const handleDelBatch = async (): Promise<void> => {
+        setIsSaving(true);
         try {
             const res = await fetch(`${BASE_API_URL}/api/batches/${BthId}/delete-batch`, {
                 method: 'DELETE',
@@ -54,6 +56,8 @@ const DelBatch: React.FC<DelBatchParams> = ({ params }): JSX.Element => {
             }
         } catch (error) {
             toast.error("Batch deletion failed.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -79,8 +83,10 @@ const DelBatch: React.FC<DelBatchParams> = ({ params }): JSX.Element => {
                         </p>
                     </div>
                     <div className="flex gap-1">
-                        <button type="button" onClick={handleDelBatch} className="btnLeft w-full">CONFIRM</button>
-                        <button type="button" onClick={() => router.push('/account/batch-list')} className="btnRight w-full">CANCEL</button>
+                        <button type="button" onClick={handleDelBatch} className="btnLeft w-full" disabled={isSaving}>
+                            {isSaving ? "Confirming..." : "Confirm"}
+                        </button>
+                        <button type="button" onClick={() => router.push('/account/batch-list')} className="btnRight w-full">Cancel</button>
                     </div>
                 </div>
             </div>

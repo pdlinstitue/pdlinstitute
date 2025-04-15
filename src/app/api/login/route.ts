@@ -36,6 +36,16 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ success: false, token: '', msg: 'Invalid password!' }, { status: 400 });
     }
 
+    //Redirect Sadhak users to the service unavailable page
+    if (user.sdkRole === 'Sadhak') {
+      return NextResponse.json({
+        success: false,
+        redirect: true,
+        location: '/service-unavailable',
+        msg: 'Redirecting...',
+      }, { status: 200 });
+    }    
+
     const secretKey = crypto.randomBytes(32).toString('hex');
     const expiresIn = process.env.LOGIN_EXPIRES ? parseInt(process.env.LOGIN_EXPIRES) : 600;
     const token = jwt.sign({ id: user._id }, secretKey, { expiresIn });

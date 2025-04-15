@@ -30,8 +30,10 @@ interface EditCouponProps {
 }
 
 const EditCoupon: React.FC<ICpnParams> = ({ params }) => {
+
   const router = useRouter();
   const { CpnId } = use(params);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [coData, setCoData] = useState<CourseDataProps[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -149,24 +151,25 @@ const EditCoupon: React.FC<ICpnParams> = ({ params }) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
 
-    if (!data.cpnName.trim()) {
-      setErrorMessage("Coupon name is must.");
-    } else if (!data.cpnUse) {
-      setErrorMessage("Please enter number of uses.");
-    } else if (!data.cpnVal) {
-      setErrorMessage("Please enter validity.");
-    } else if (!data.cpnDisType.trim()) {
-      setErrorMessage("Please select discount type.");
-    } else if (!data.cpnDisc) {
-      setErrorMessage("Please enter discount.");
-    } else if (!data.cpnCourse.trim()) {
-      setErrorMessage("Please select course.");
-    } else if (!data.cpnFor.trim()) {
-      setErrorMessage("Please select coupon is for whom.");
-    } else {
-      try {
+    try {
+      if (!data.cpnName.trim()) {
+        setErrorMessage("Coupon name is must.");
+      } else if (!data.cpnUse) {
+        setErrorMessage("Please enter number of uses.");
+      } else if (!data.cpnVal) {
+        setErrorMessage("Please enter validity.");
+      } else if (!data.cpnDisType.trim()) {
+        setErrorMessage("Please select discount type.");
+      } else if (!data.cpnDisc) {
+        setErrorMessage("Please enter discount.");
+      } else if (!data.cpnCourse.trim()) {
+        setErrorMessage("Please select course.");
+      } else if (!data.cpnFor.trim()) {
+        setErrorMessage("Please select coupon is for whom.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/coupons/${CpnId}/edit-coupon`, {
           method: "PUT",
           body: JSON.stringify({
@@ -191,11 +194,13 @@ const EditCoupon: React.FC<ICpnParams> = ({ params }) => {
           toast.success(post.msg);
           router.push("/account/coupon-list");
         }
-      } catch (error) {
-        toast.error("Error updating coupon.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error updating coupon.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -345,8 +350,8 @@ const EditCoupon: React.FC<ICpnParams> = ({ params }) => {
           <p className="text-sm italic text-red-600">{errorMessage}</p>
         )}
         <div className="flex gap-1 w-full">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Saving.." : "Save"}
           </button>
           <button
             type="button"

@@ -47,8 +47,10 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
   const router = useRouter();
   const { CorId } = use(params);
   const [cat, setCat] = useState<CatType[]>([]);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [courseList, setCourseList] = useState<CoListType[]>([]);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [image, setImage] = useState<File | string | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState("");
@@ -129,12 +131,8 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
       toast.error("Please select an image!");
       return;
     }
-  
-    // Validate file size (≤ 100 KB)
-    if (image instanceof File && image.size > 100 * 1024) {
-      toast.error("File size must be 100 KB or less!");
-      return;
-    }
+
+    setIsUploading(true);
   
     // Validate image type
     const img = new window.Image();
@@ -145,16 +143,9 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         return;
     }
 
-    // Validate image resolution
-    img.onload = async () => {
-      if (img.width !== 600 || img.height !== 350) {
-        toast.error("Image must be 600x350 pixels!");
-        return;
-      }
-  
-      const formData = new FormData();
-      formData.append("courseImage", image);
-      formData.append("courseImageFileName", data.coImg);
+    const formData = new FormData();
+    formData.append("courseImage", image);
+    formData.append("courseImageFileName", data.coImg);
   
       try {
         const res = await fetch("/api/image-upload", {
@@ -171,8 +162,9 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         }
       } catch (error:any) {
         toast.error(error.message);
+      } finally {
+        setIsUploading(false);
       }
-    };
   };
 
   useEffect(() => {
@@ -200,7 +192,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
           cache: "no-store",
         });
         const corList = await courseData.json();
-        setCourseList(corList.coList);
+        setCourseList(corList?.coList);
       } catch (error) {
         console.error("Error fetching course data: ", error);
       } finally {
@@ -223,28 +215,29 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
-
-    if (!data.coName.trim()) {
-      setErrorMessage("Course title is must.");
-    } else if (!data.coNick.trim()) {
-      setErrorMessage("Nick name is must.");
-    } else if (!data.coCat.trim()) {
-      setErrorMessage("Please select category.");
-    } else if (!data.coType.trim()) {
-      setErrorMessage("Please select course type.");
-    } else if (!data.coElgType.trim()) {
-      setErrorMessage("Please select elegibility type.");
-    } else if (!data.coElg.trim()) {
-      setErrorMessage("Please select elegibility.");
-    } else if (data.durDays <= 1) {
-      setErrorMessage("Please duration days.");
-    } else if (data.durHrs <= 1) {
-      setErrorMessage("Please duration hours.");
-    } else if (!data.coShort.trim()) {
-      setErrorMessage("Please enter course introduction.");
-    } else {
-      try {
+  
+    try {
+      if (!data.coName.trim()) {
+        setErrorMessage("Course title is must.");
+      } else if (!data.coNick.trim()) {
+        setErrorMessage("Nick name is must.");
+      } else if (!data.coCat.trim()) {
+        setErrorMessage("Please select category.");
+      } else if (!data.coType.trim()) {
+        setErrorMessage("Please select course type.");
+      } else if (!data.coElgType.trim()) {
+        setErrorMessage("Please select elegibility type.");
+      } else if (!data.coElg.trim()) {
+        setErrorMessage("Please select elegibility.");
+      } else if (data.durDays <= 1) {
+        setErrorMessage("Please duration days.");
+      } else if (data.durHrs <= 1) {
+        setErrorMessage("Please duration hours.");
+      } else if (!data.coShort.trim()) {
+        setErrorMessage("Please enter course introduction.");
+      } else {
         const response = await fetch(
           `${BASE_API_URL}/api/courses/${CorId}/edit-course`,
           {
@@ -278,11 +271,13 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
           toast.success(post.msg);
           router.push("/account/course-list");
         }
-      } catch (error) {
-        toast.error("Error updating course.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error updating course.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -297,8 +292,12 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
       <form onSubmit={handleSubmit} className="formStyle w-full">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
-            <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-              <Image src={data.coImg || preview || "/images/uploadImage.jpg"}  alt="sadhak" width={600} height={350} />
+            <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+              <img
+                src={data.coImg || preview || "/images/uploadImage.jpg"}
+                alt="course"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -307,8 +306,8 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
               ></input>
-              <button type="button" className="btnLeft" onClick={handleUpload}>
-                UPLOAD
+              <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+                {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>
           </div>
@@ -494,8 +493,8 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
           <p className="text-xs italic text-red-600">{errorMessage}</p>
         )}
         <div className="flex gap-1 w-full">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

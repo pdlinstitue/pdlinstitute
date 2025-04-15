@@ -15,6 +15,7 @@ const practiceSchema = new mongoose.Schema({
         required: [true, "Please select language."]
     },
     prcDays: [String],
+    prcDate:Date,
     prcStartsAt: {
         type: String,
         required: [true, "Please provide start time."]

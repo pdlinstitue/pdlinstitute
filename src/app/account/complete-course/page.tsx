@@ -101,6 +101,7 @@ const CompleteCourse : React.FC = () => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [filtered, setFiltered] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [enrData, setEnrData] = useState<EnrollmentListProps[] | null>([]);
     const [selectedCourse, setSelectedCourse] = useState<string>(''); 
     const [selectedBatch, setSelectedBatch] = useState<string>('')
@@ -211,11 +212,15 @@ const CompleteCourse : React.FC = () => {
         </div>
       };
 
-  async function handleComplete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {  
+  async function handleComplete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> {
+
     e.preventDefault  
+    setIsSaving(true);
+
     const selectedRows = table.getSelectedRowModel().rows;
+
     if (selectedRows.length === 0) {
-      alert("Please select at least one row to mark as complete.");
+      alert("Select at least one row to mark as complete.");
       return;
     }
 
@@ -236,10 +241,12 @@ const CompleteCourse : React.FC = () => {
         throw new Error("Failed to mark enrollments as complete.");
       }
 
-      alert("Selected enrollments have been marked as complete.");      
+      alert("Selected enrollments marked as complete.");      
     } catch (error) {
       console.error("Error marking enrollments as complete:", error);
       alert("An error occurred while marking enrollments as complete.");
+    } finally {
+      setIsSaving(false);
     }
   }
 
@@ -248,7 +255,9 @@ const CompleteCourse : React.FC = () => {
       <div>
         <div className='flex mb-2 items-center justify-between'>
           <div className="flex gap-2 items-center w-[800px]">
-            <button type='button' className='btnLeft' onClick={handleComplete}>Complete</button>
+            <button type='button' className='btnLeft' onClick={handleComplete} disabled={isSaving}>
+              {isSaving ? "Completing" : "Complete"}
+            </button>
             <select className="inputBox w-full text-center" name="corId" value={selectedCourse} onChange={handleCourseChange}>
               <option value="" className='text-center'>--- Select Course ---</option>
               {courseList?.map((item: any) => {

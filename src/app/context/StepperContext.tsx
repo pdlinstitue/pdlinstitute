@@ -15,8 +15,12 @@ interface UserDataProps {
   sdkWhtNbr: string, 
   sdkPhone: string, 
   sdkEmail: string, 
+  sdkPinCode: number,
+  sdkComPinCode: number,
   sdkPwd: string, 
-  sdkConfPwd: string 
+  sdkConfPwd: string,
+  sdkPhoneOtp:string, 
+  sdkEmailOtp:string,
 }
 interface StepperContextProps {
   userData: UserDataProps;

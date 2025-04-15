@@ -36,15 +36,20 @@ interface CorDataProps {
 }
 
 const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
+
   const { CorId } = use(params);
   const router = useRouter();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [payThrough, setPaythrough] = useState<string>("QR");
+  const [payThrough, setPaythrough] = useState<string>("");
   const [image, setImage] = useState<File | string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const[isCoupanApplied, setIsCoupanApplied]=useState<boolean>(false);
   const [amtAfterCoupon, setAmtAfterCoupon] = useState<number>(0);
+  const [isScreeshotSelected, setIsScreeshotSelected] = useState<boolean>(false);
+  const [isUploaded, setIsUploaded] = useState<boolean>(false);
   const [corData, setCorData] = useState<CorDataProps>({
     coDon: 0,
     coDisc: 0,
@@ -91,6 +96,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
     if (file) {
       setImage(file);
       setPreview(URL.createObjectURL(file));
+      setIsScreeshotSelected(true);
     }
   };
 
@@ -99,7 +105,8 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       toast.error("Please select an image!");
       return;
     }
-
+   
+    setIsUploading(true);
     const formData = new FormData();
     formData.append("paymentImage", image);
 
@@ -113,11 +120,16 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       if (data.success) {
         toast.success("Screenshot uploaded.");
         setImage(data.imageUrl);
+        setIsUploaded(true);
       } else {
+        setIsUploaded(false);
         throw new Error(data.error || "Upload failed");
       }
     } catch (error: any) {
+      setIsUploaded(false);
       toast.error(error.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -190,7 +202,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
     async function fetchBatchesByCoId() {
       try {
         const response = await fetch(
-          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch`
+          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch?sdkId=${loggedInUser.result?._id}&excl=true`
         );
         const data = await response.json();
         setBatchList(data.bthListByCourseId);
@@ -201,7 +213,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       }
     }
     fetchBatchesByCoId();
-  }, []);
+  }, [loggedInUser]);
 
   useEffect(() => {
     async function fetchBatchDataById() {
@@ -241,6 +253,23 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    
+    if (!payThrough.trim()) {
+      setErrorMessage("Please select payment method.");
+      return;
+    }
+
+    if (payThrough === "QR" && !enrData.enrTnsNo.trim()) {
+      setErrorMessage("Please enter transaction number.");
+      return;
+    }
+
+    if(payThrough === "QR" && (!isScreeshotSelected || (isScreeshotSelected && !isUploaded))) {
+      setErrorMessage("Please upload payment screenshot.");
+      return;
+    }
+
+    setIsSaving(true);
     try {
       const response = await fetch(`${BASE_API_URL}/api/enrollments`, {
         method: "POST",
@@ -269,11 +298,12 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       }
     } catch (error) {
       toast.error("Error enrolling batch.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handlePayment = async (enrId: any) => {
-    debugger;
     const response = await fetch(`/api/payment?enrId=${enrId}&corId=${CorId}`, {
       method: "POST",
       headers: {
@@ -287,7 +317,6 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       }),
     });
 
-    debugger;
     const data = await response.json();
 
     if (data.encryptedData) {
@@ -324,7 +353,9 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
   return (
     <div>
       <div>
-        {batchList && batchList.length > 0 ? (
+        {!batchList ? (
+          <NoBatch CourseId={CorId} />
+        ) : (          
           <form
             className="formStyle w-[600px] mx-auto my-24"
             onSubmit={handleSubmit}
@@ -384,8 +415,8 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
                         className="inputBox w-full"
                         onChange={handleFileChange}
                       />
-                      <button type="button" className="btnLeft" onClick={handleUpload}>
-                        UPLOAD
+                      <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+                        {isUploading ? "Uploading..." : "Upload"}
                       </button>
                     </div>
                   </div>
@@ -435,21 +466,20 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
                 </div>
               )}
             </div>
+            {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
             <div className="grid grid-cols-2 gap-1">
-              <button type="submit" className="btnLeft">
-                SUBMIT
+              <button type="submit" className="btnLeft" disabled={isSaving}>
+                {isSaving ? "Submitting..." : "Submit"}
               </button>
               <button
                 type="button"
                 className="btnRight"
                 onClick={() => router.push("/account/my-courses/elg-courses")}
               >
-                BACK
+                Back
               </button>
             </div>
           </form>
-        ) : (
-          <NoBatch CourseId={CorId} />
         )}
       </div>
     </div>

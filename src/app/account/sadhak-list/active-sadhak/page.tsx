@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import DataTable from "../../../components/table/DataTable";
+import { FaUserCircle } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa6";
 import {
   useReactTable,
@@ -50,6 +51,28 @@ const ActiveSadhakList: React.FC = () => {
   const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
   const columns = React.useMemo(
     () => [
+      {
+        header: "Profile",
+        accessorKey: "sdkImg",
+        cell: ({ row }: { row: any }) => {
+          const { sdkImg, _id } = row.original;
+          const profileUrl = `/account/profile-setting/${_id}`;
+  
+          return (
+            <Link href={profileUrl} className="flex justify-center items-center">
+              {sdkImg ? (
+                <img
+                  src={sdkImg}
+                  alt="Profile"
+                  className="w-[50px] h-[50px] rounded-full object-cover"
+                />
+              ) : (
+                <FaUserCircle className="text-gray-400 w-[50px] h-[50px]" />
+              )}
+            </Link>
+          );
+        },
+      },
       { header: "Sadhak", accessorKey: "sdkFstName" },
       { header: "Sdk ID", accessorKey: "sdkRegNo" },
       { header: 'DOR', 
@@ -63,7 +86,7 @@ const ActiveSadhakList: React.FC = () => {
           </Link>
         )
        },
-      { header: "WhatsApp", accessorKey: "sdkWhtNbr" },
+      // { header: "WhatsApp", accessorKey: "sdkWhtNbr" },
       { header: "Medical", accessorKey: "isMedIssue" },
       { header: "State", accessorKey: "sdkState" },
       { header: "Country", accessorKey: "sdkCountry" },

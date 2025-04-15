@@ -21,6 +21,7 @@ const DisableBatch : React.FC <IBthParams>= ({params}) => {
 
     const router = useRouter();
     const { BthId } = use(params);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(true);
     const [batchName, setBatchName] = useState<BthNameProps>({bthName:''});
     const [loggedInUser, setLoggedInUser] = useState({
@@ -67,6 +68,7 @@ const DisableBatch : React.FC <IBthParams>= ({params}) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
         try 
         {
             const response = await fetch(`${BASE_API_URL}/api/batches/${BthId}/disable-batch`, {
@@ -86,6 +88,8 @@ const DisableBatch : React.FC <IBthParams>= ({params}) => {
             }
         } catch (error) {
             toast.error('Error disabling batch.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -105,8 +109,10 @@ const DisableBatch : React.FC <IBthParams>= ({params}) => {
                     <p className="font-bold text-xl pb-3 text-green-600">{batchName.bthName}</p>
                 </div>
                 <div className="flex gap-1">
-                    <button type="submit"  className="btnLeft w-full">CONFIRM</button>
-                    <button type="button" onClick={() => router.push('/account/batch-list')} className="btnRight w-full">CANCEL</button>
+                    <button type="submit"  className="btnLeft w-full" disabled={isSaving}>
+                        {isSaving ? "Confirming..." : "Confirm"}
+                    </button>
+                    <button type="button" onClick={() => router.push('/account/batch-list')} className="btnRight w-full">Cancel</button>
                 </div>
             </form>
        </div>

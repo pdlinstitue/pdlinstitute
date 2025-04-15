@@ -20,6 +20,7 @@ const DelCategory: React.FC<DelCatParams> = ({ params }): JSX.Element => {
     
     const router = useRouter();
     const { CatId } = use(params);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [data, setData] = useState<CatNameProps>({ catName: '' });
     const [isLoading, setIsLoading] = useState<boolean>(true);
     
@@ -40,6 +41,7 @@ const DelCategory: React.FC<DelCatParams> = ({ params }): JSX.Element => {
     }, [CatId]);
     
     const handleDelCat = async (): Promise<void> => {
+        setIsSaving(true);
         try {
             const res = await fetch(`${BASE_API_URL}/api/categories/${CatId}/delete-category`, {
                 method: 'DELETE',
@@ -54,6 +56,8 @@ const DelCategory: React.FC<DelCatParams> = ({ params }): JSX.Element => {
             }
         } catch (error) {
             toast.error("Category deletion failed.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -79,8 +83,10 @@ const DelCategory: React.FC<DelCatParams> = ({ params }): JSX.Element => {
                         </p>
                     </div>
                     <div className="flex gap-1">
-                        <button type="button" onClick={handleDelCat} className="btnLeft w-full">CONFIRM</button>
-                        <button type="button" onClick={() => router.push('/account/category-list')} className="btnRight w-full">CANCEL</button>
+                        <button type="button" onClick={handleDelCat} className="btnLeft w-full" disabled={isSaving}>
+                            {isSaving ? "Confirming..." : "Confirm"}
+                        </button>
+                        <button type="button" onClick={() => router.push('/account/category-list')} className="btnRight w-full">Cancel</button>
                     </div>
                 </div>
             </div>

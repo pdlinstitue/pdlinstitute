@@ -108,6 +108,9 @@ const usrSchema = new mongoose.Schema({
     sdkPinCode:{
         type:Number
     },
+    sdkComPinCode:{
+        type:Number
+    },
     sdkComAdds: { 
         type: String, 
         required: [true, "Communication address is must."]
@@ -137,6 +140,10 @@ const usrSchema = new mongoose.Schema({
         default: "Sadhak"
     },
     isVolunteer:{
+        type:String,
+        default: "No"
+    },
+    isAdmin:{
         type:String,
         default: "No"
     },

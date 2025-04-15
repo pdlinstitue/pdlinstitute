@@ -6,7 +6,7 @@
 .btnLeft{
   padding: 9px 16px;
   background-color: #ea580c;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: white;
   cursor: pointer;
   text-align: center;
@@ -23,7 +23,7 @@
   padding: 9px 16px;
   border: 1.5px solid #ea580c; 
   background-color: #FFFFFF;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: #F97316;
   cursor: pointer;
   text-align: center;

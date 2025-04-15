@@ -51,10 +51,18 @@ interface cityListProps {
   city_name: string;
 }
 
+interface RoleListProps {
+  _id: string;
+  roleType: string;
+}
+
 const AddNewSadhak: React.FC = () => {
 
   const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [image, setImage] = useState<File | string | null>(null);
   const [preview, setPreview] = useState<string>("");
@@ -97,6 +105,21 @@ const AddNewSadhak: React.FC = () => {
         usrRole: '',
       },
     });
+
+  useEffect(() => {
+    async function fetchRoleList() {
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/role-list`);
+        const roleData = await res.json();
+        setRoleList(roleData?.rolList);
+      } catch (error) {
+        console.error("Error fetching role data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+   }
+  fetchRoleList();
+  },[])
 
   useEffect(() => {
     try {
@@ -188,11 +211,13 @@ const AddNewSadhak: React.FC = () => {
   };
 
   const handleUpload = async () => {
+
     if (!image) {
       toast.error("Please select an image!");
       return;
     }
 
+    setIsUploading(true);
     const formData = new FormData();
     formData.append("profileImage", image);
 
@@ -211,199 +236,206 @@ const AddNewSadhak: React.FC = () => {
       }
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+
     e.preventDefault();
-    if (
-      !sdkData ||
-      !("sdkFstName" in sdkData) ||
-      sdkData.sdkFstName === null ||
-      sdkData.sdkFstName.trim() === ""
-    ) {
-      setErrorMessage("First name is required.");
-    } else if (
-      !sdkData ||
-      !("sdkLstName" in sdkData) ||
-      sdkData.sdkLstName === null ||
-      sdkData.sdkLstName.trim() === ""
-    ) {
-      setErrorMessage("Last name is required.");
-    } else if (
-      !sdkData ||
-      !("sdkBthDate" in sdkData) ||
-      sdkData.sdkBthDate === null ||
-      sdkData.sdkBthDate.trim() === ""
-    ) {
-      setErrorMessage("DOB is required.");
-    } else if (
-      !sdkData ||
-      !("sdkPhone" in sdkData) ||
-      sdkData.sdkPhone === null ||
-      sdkData.sdkPhone.trim() === ""
-    ) {
-      setErrorMessage("Phone number is required.");
-    } else if (
-      !sdkData ||
-      !("sdkWhtNbr" in sdkData) ||
-      sdkData.sdkWhtNbr === null ||
-      sdkData.sdkWhtNbr.trim() === ""
-    ) {
-      setErrorMessage("Whatsapp number is required.");
-    } else if (
-      !sdkData ||
-      !("sdkGender" in sdkData) ||
-      sdkData.sdkGender === null ||
-      sdkData.sdkGender.trim() === ""
-    ) {
-      setErrorMessage("Gender is required.");
-    } else if (
-      !sdkData ||
-      !("sdkEmail" in sdkData) ||
-      sdkData.sdkEmail === null ||
-      sdkData.sdkEmail.trim() === ""
-    ) {
-      setErrorMessage("Email is required.");
-    } else if (
-      !sdkData ||
-      !("sdkMarStts" in sdkData) ||
-      sdkData.sdkMarStts === null ||
-      sdkData.sdkMarStts.trim() === ""
-    ) {
-      setErrorMessage("Marital status is required.");
-    } else if (
-      sdkData &&
-      "sdkMarStts" in sdkData &&
-      sdkData.sdkMarStts === "Married" &&
-      (!sdkData ||
-        !("sdkSpouce" in sdkData) ||
-        sdkData.sdkSpouce === null ||
-        sdkData.sdkSpouce?.trim() === "")
-    ) {
-      setErrorMessage("Spouce name is required.");
-    } else if (
-      !sdkData ||
-      !("sdkCountry" in sdkData) ||
-      sdkData.sdkCountry === null ||
-      sdkData.sdkCountry.trim() === ""
-    ) {
-      setErrorMessage("Country is required.");
-    } else if (
-      !sdkData ||
-      !("sdkState" in sdkData) ||
-      sdkData.sdkState === null ||
-      sdkData.sdkState.trim() === ""
-    ) {
-      setErrorMessage("State is required.");
-    } else if (
-      !sdkData ||
-      !("sdkCity" in sdkData) ||
-      sdkData.sdkCity === null ||
-      sdkData.sdkCity.trim() === ""
-    ) {
-      setErrorMessage("City is required.");
-    } else if (
-      !sdkData ||
-      !("sdkRole" in sdkData) ||
-      sdkData.sdkRole === null ||
-      sdkData.sdkRole.trim() === ""
-    ) {
-      setErrorMessage("User role is required.");
-    } else if (
-      !sdkData ||
-      !("isMedIssue" in sdkData) ||
-      sdkData.isMedIssue === null ||
-      sdkData.isMedIssue.trim() === ""
-    ) {
-      setErrorMessage("Please tick medical issue.");
-    } else if (
-      sdkData &&
-      "isMedIssue" in sdkData &&
-      sdkData.isMedIssue === "Yes" &&
-      (!sdkData ||
-        !("sdkMedIssue" in sdkData) ||
-        sdkData.sdkMedIssue === null ||
-        sdkData.sdkMedIssue?.trim() === "")
-    ) {
-      setErrorMessage("Please describe meedical issue.");
-    } else if (
-      !sdkData ||
-      !("sdkParAdds" in sdkData) ||
-      sdkData.sdkParAdds === null ||
-      sdkData.sdkParAdds.trim() === ""
-    ) {
-      setErrorMessage("Permanent address is must.");
-    } else if (
-      !sdkData ||
-      !("sdkComAdds" in sdkData) ||
-      sdkData.sdkComAdds === null ||
-      sdkData.sdkComAdds.trim() === ""
-    ) {
-      setErrorMessage("Communication address is must.");
-    } else if (
-      !sdkData ||
-      !("sdkPwd" in sdkData) ||
-      sdkData.sdkPwd === null ||
-      sdkData.sdkPwd.trim() === ""
-    ) {
-      setErrorMessage("Password is required.");
-    } else if (
-      !sdkData ||
-      !("sdkConfPwd" in sdkData) ||
-      sdkData.sdkConfPwd === null ||
-      sdkData.sdkConfPwd.trim() === ""
-    ) {
-      setErrorMessage("Confirm password is required.");
-    } else {
-      try {
+    setIsSaving(true);
+
+    try {
+      if (
+        !sdkData ||
+        !("sdkFstName" in sdkData) ||
+        sdkData.sdkFstName === null ||
+        sdkData.sdkFstName.trim() === ""
+      ) {
+        setErrorMessage("First name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkLstName" in sdkData) ||
+        sdkData.sdkLstName === null ||
+        sdkData.sdkLstName.trim() === ""
+      ) {
+        setErrorMessage("Last name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkBthDate" in sdkData) ||
+        sdkData.sdkBthDate === null ||
+        sdkData.sdkBthDate.trim() === ""
+      ) {
+        setErrorMessage("DOB is required.");
+      } else if (
+        !sdkData ||
+        !("sdkPhone" in sdkData) ||
+        sdkData.sdkPhone === null ||
+        sdkData.sdkPhone.trim() === ""
+      ) {
+        setErrorMessage("Phone number is required.");
+      } else if (
+        !sdkData ||
+        !("sdkWhtNbr" in sdkData) ||
+        sdkData.sdkWhtNbr === null ||
+        sdkData.sdkWhtNbr.trim() === ""
+      ) {
+        setErrorMessage("Whatsapp number is required.");
+      } else if (
+        !sdkData ||
+        !("sdkGender" in sdkData) ||
+        sdkData.sdkGender === null ||
+        sdkData.sdkGender.trim() === ""
+      ) {
+        setErrorMessage("Gender is required.");
+      } else if (
+        !sdkData ||
+        !("sdkEmail" in sdkData) ||
+        sdkData.sdkEmail === null ||
+        sdkData.sdkEmail.trim() === ""
+      ) {
+        setErrorMessage("Email is required.");
+      } else if (
+        !sdkData ||
+        !("sdkMarStts" in sdkData) ||
+        sdkData.sdkMarStts === null ||
+        sdkData.sdkMarStts.trim() === ""
+      ) {
+        setErrorMessage("Marital status is required.");
+      } else if (
+        sdkData &&
+        "sdkMarStts" in sdkData &&
+        sdkData.sdkMarStts === "Married" &&
+        (!sdkData ||
+          !("sdkSpouce" in sdkData) ||
+          sdkData.sdkSpouce === null ||
+          sdkData.sdkSpouce?.trim() === "")
+      ) {
+        setErrorMessage("Spouce name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkCountry" in sdkData) ||
+        sdkData.sdkCountry === null ||
+        sdkData.sdkCountry.trim() === ""
+      ) {
+        setErrorMessage("Country is required.");
+      } else if (
+        !sdkData ||
+        !("sdkState" in sdkData) ||
+        sdkData.sdkState === null ||
+        sdkData.sdkState.trim() === ""
+      ) {
+        setErrorMessage("State is required.");
+      } else if (
+        !sdkData ||
+        !("sdkCity" in sdkData) ||
+        sdkData.sdkCity === null ||
+        sdkData.sdkCity.trim() === ""
+      ) {
+        setErrorMessage("City is required.");
+      } else if (
+        !sdkData ||
+        !("sdkRole" in sdkData) ||
+        sdkData.sdkRole === null ||
+        sdkData.sdkRole.trim() === ""
+      ) {
+        setErrorMessage("User role is required.");
+      } else if (
+        !sdkData ||
+        !("isMedIssue" in sdkData) ||
+        sdkData.isMedIssue === null ||
+        sdkData.isMedIssue.trim() === ""
+      ) {
+        setErrorMessage("Please tick medical issue.");
+      } else if (
+        sdkData &&
+        "isMedIssue" in sdkData &&
+        sdkData.isMedIssue === "Yes" &&
+        (!sdkData ||
+          !("sdkMedIssue" in sdkData) ||
+          sdkData.sdkMedIssue === null ||
+          sdkData.sdkMedIssue?.trim() === "")
+      ) {
+        setErrorMessage("Please describe meedical issue.");
+      } else if (
+        !sdkData ||
+        !("sdkParAdds" in sdkData) ||
+        sdkData.sdkParAdds === null ||
+        sdkData.sdkParAdds.trim() === ""
+      ) {
+        setErrorMessage("Permanent address is must.");
+      } else if (
+        !sdkData ||
+        !("sdkComAdds" in sdkData) ||
+        sdkData.sdkComAdds === null ||
+        sdkData.sdkComAdds.trim() === ""
+      ) {
+        setErrorMessage("Communication address is must.");
+      } else if (
+        !sdkData ||
+        !("sdkPwd" in sdkData) ||
+        sdkData.sdkPwd === null ||
+        sdkData.sdkPwd.trim() === ""
+      ) {
+        setErrorMessage("Password is required.");
+      } else if (
+        !sdkData ||
+        !("sdkConfPwd" in sdkData) ||
+        sdkData.sdkConfPwd === null ||
+        sdkData.sdkConfPwd.trim() === ""
+      ) {
+        setErrorMessage("Confirm password is required.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/users/add-new-sadhak`,{
-            method: "POST",
-            body: JSON.stringify({
-              sdkFstName: sdkData.sdkFstName,
-              sdkMdlName: sdkData.sdkMdlName,
-              sdkLstName: sdkData.sdkLstName,
-              sdkFthName: sdkData.sdkFthName,
-              sdkMthName: sdkData.sdkMthName,
-              sdkAbout: sdkData.sdkAbout,
-              isMedIssue: sdkData.isMedIssue,
-              sdkMedIssue: sdkData.sdkMedIssue,
-              sdkBthDate: sdkData.sdkBthDate,
-              sdkGender: sdkData.sdkGender,
-              sdkMarStts: sdkData.sdkMarStts,
-              sdkSpouce: sdkData.sdkSpouce,
-              sdkCountry: sdkData.sdkCountry,
-              sdkState: sdkData.sdkState,
-              sdkCity: sdkData.sdkCity,
-              sdkPhone: sdkData.sdkPhone,
-              sdkWhtNbr: sdkData.sdkWhtNbr,
-              sdkEmail: sdkData.sdkEmail,
-              sdkComAdds: sdkData.sdkComAdds,
-              sdkParAdds: sdkData.sdkParAdds,
-              sdkImg: image,
-              sdkRole: sdkData.sdkRole,
-              isVolunteer: sdkData.isVolunteer,
-              sdkPwd: sdkData.sdkPwd,
-              sdkConfPwd: sdkData.sdkConfPwd,
-              createdBy: loggedInUser.result?._id
-            }),
-          }
-        );
-
-        const post = await response.json();
-        console.log(post);
-
-        if (post.success === false) {
-          toast.error(post.msg);
-        } else {
-          toast.success(post.msg);
-          router.push("/account/sadhak-list/active-sadhak");
+          method: "POST",
+          body: JSON.stringify({
+            sdkFstName: sdkData.sdkFstName,
+            sdkMdlName: sdkData.sdkMdlName,
+            sdkLstName: sdkData.sdkLstName,
+            sdkFthName: sdkData.sdkFthName,
+            sdkMthName: sdkData.sdkMthName,
+            sdkAbout: sdkData.sdkAbout,
+            isMedIssue: sdkData.isMedIssue,
+            sdkMedIssue: sdkData.sdkMedIssue,
+            sdkBthDate: sdkData.sdkBthDate,
+            sdkGender: sdkData.sdkGender,
+            sdkMarStts: sdkData.sdkMarStts,
+            sdkSpouce: sdkData.sdkSpouce,
+            sdkCountry: sdkData.sdkCountry,
+            sdkState: sdkData.sdkState,
+            sdkCity: sdkData.sdkCity,
+            sdkPhone: sdkData.sdkPhone,
+            sdkWhtNbr: sdkData.sdkWhtNbr,
+            sdkEmail: sdkData.sdkEmail,
+            sdkComAdds: sdkData.sdkComAdds,
+            sdkParAdds: sdkData.sdkParAdds,
+            sdkImg: image,
+            sdkRole: sdkData.sdkRole,
+            isVolunteer: sdkData.isVolunteer,
+            sdkPwd: sdkData.sdkPwd,
+            sdkConfPwd: sdkData.sdkConfPwd,
+            createdBy: loggedInUser.result?._id
+          }),
         }
-      } catch (error) {
-        toast.error("Error creating sadhak profile.");
+      );
+
+      const post = await response.json();
+      console.log(post);
+
+      if (post.success === false) {
+        toast.error(post.msg);
+      } else {
+        toast.success(post.msg);
+        router.push("/account/sadhak-list/active-sadhak");
       }
-    }
-  };
+      }
+    } catch (error) {
+        toast.error("Error creating sadhak profile.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -419,7 +451,7 @@ const AddNewSadhak: React.FC = () => {
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-1">
             <div className="w-full h-auto border-[1.5px] bg-gray-100">
-              <Image src={preview} alt="sadhak" width={600} height={350} />
+              <Image src={preview ? preview : "/images/uploadImage.jpg"} alt="sadhak" width={600} height={350} />
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -428,8 +460,8 @@ const AddNewSadhak: React.FC = () => {
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
               ></input>
-              <button type="button" className="btnLeft" onClick={handleUpload}>
-                UPLOAD
+              <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+                {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>
           </div>
@@ -655,10 +687,16 @@ const AddNewSadhak: React.FC = () => {
               value={sdkData.sdkRole}
               onChange={handleChange}
             >
-              <option className="text-center"> --- Select --- </option>
-              <option value="Admin">Admin</option>
-              <option value="Sadhak">Sadhak</option>
-              <option value="View-Admin">View-Admin</option>
+              <option className="text-center"> --- Choose Role --- </option>
+              {
+                roleList?.map((role: any) => {
+                  return (
+                    <option key={role._id} value={role.roleType}>
+                      {role.roleType}
+                    </option>
+                  );
+                })
+              }             
             </select>
           </div>
         </div>
@@ -684,11 +722,7 @@ const AddNewSadhak: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Profile Image:</label>
-            <input type="file" className="inputBox" />
-          </div>
+        <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Do you have any medical issues?</label>
             <div className="flex gap-4 mt-3">
@@ -744,7 +778,7 @@ const AddNewSadhak: React.FC = () => {
             </div>
           </div>
         </div>
-        {sdkData.isMedIssue === "Yes" && (
+        {sdkData?.isMedIssue === "Yes" && (
           <div className="flex flex-col gap-2">
             <label className="text-lg">Medical Issues:</label>
             <textarea
@@ -756,34 +790,12 @@ const AddNewSadhak: React.FC = () => {
             />
           </div>
         )}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Create Password:</label>
-            <input
-              type="password"
-              className="inputBox"
-              name="sdkPwd"
-              value={sdkData.sdkPwd}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Confirm Password:</label>
-            <input
-              type="password"
-              className="inputBox"
-              name="sdkConfPwd"
-              value={sdkData.sdkConfPwd}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
         {errorMessage && (
           <p className="text-sm italic text-red-600">{errorMessage}</p>
         )}
         <div className="grid grid-cols-2 gap-1">
-          <button type="submit" className="btnLeft">
-            Save
+          <button type="submit" className="btnLeft" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

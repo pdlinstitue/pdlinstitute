@@ -39,6 +39,7 @@ const RegeneratePassword : React.FC<IRegenPwdParams>= ({params}) => {
 
   const router = useRouter();
   const {SdkId} = use(params);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [regPwd, setRegPwd] = useState<ChangePwdProps>({sdkRegPwd:'', updatedBy:'', sdkRegPwdExpiry:new Date});
 
@@ -70,33 +71,36 @@ const RegeneratePassword : React.FC<IRegenPwdParams>= ({params}) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setErrorMessage(''); // Clear the previous error
+    setIsSaving(true);
 
-    if (!regPwd.sdkRegPwd.trim()) {
+    try {
+      if (!regPwd.sdkRegPwd.trim()) {
         setErrorMessage('Please generate password.');
     } else {
-      try {
-        // Calculate sdkRegPwdExpiry as 15 minutes from the current time
-        const sdkRegPwdExpiry = new Date();
-        sdkRegPwdExpiry.setMinutes(sdkRegPwdExpiry.getMinutes() + 15);
-        const response = await fetch(`${BASE_API_URL}/api/users/${SdkId}/re-generate-pwd`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            sdkRegPwd: regPwd.sdkRegPwd,
-            sdkRegPwdExpiry,
-            updatedBy: loggedInUser.result._id
-          }),
-        });
+      // Calculate sdkRegPwdExpiry as 15 minutes from the current time
+      const sdkRegPwdExpiry = new Date();
+      sdkRegPwdExpiry.setMinutes(sdkRegPwdExpiry.getMinutes() + 1440);
+      const response = await fetch(`${BASE_API_URL}/api/users/${SdkId}/re-generate-pwd`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          sdkRegPwd: regPwd.sdkRegPwd,
+          sdkRegPwdExpiry,
+          updatedBy: loggedInUser.result._id
+        }),
+      });
 
-        const post = await response.json();
-        if (post.success === false) {
-            toast.error(post.msg);
-        } else {
-            toast.success(post.msg);
-            router.push('/account/sadhak-list/active-sadhak');
-        }
-        } catch (error) {
-            toast.error('Error re-generating password.');
-        }
+      const post = await response.json();
+      if (post.success === false) {
+          toast.error(post.msg);
+      } else {
+          toast.success(post.msg);
+          router.push('/account/sadhak-list/active-sadhak');
+      }
+    }
+  } catch (error) {
+          toast.error('Error re-generating password.');
+      } finally {
+        setIsSaving(false);
       }
     };
   
@@ -113,7 +117,9 @@ const RegeneratePassword : React.FC<IRegenPwdParams>= ({params}) => {
             </div>
             {errorMessage && <p className="text-sm italic text-red-600">{errorMessage}</p>}
             <div className="grid grid-cols-2 gap-1">
-              <button type='submit' className='btnLeft'>SAVE</button>
+              <button type='submit' className='btnLeft' disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save"}
+              </button>
               <button type='button' className='btnRight' onClick={()=> router.push('/account/sadhak-list/active-sadhak')}>BACK</button>
             </div>
         </form>

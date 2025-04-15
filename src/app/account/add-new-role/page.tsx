@@ -1,10 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "../Loading";
+import toast from "react-hot-toast";
 
 interface AddNewRoleProps {
   roleType: string;
@@ -15,6 +15,7 @@ const AddNewRole: React.FC = () => {
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [data, setData] = useState<AddNewRoleProps>({
     roleType: "",
@@ -54,12 +55,13 @@ const AddNewRole: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
 
-    if (!data.roleType.trim()) {
-      setErrorMessage("Role is required.");
-    } else {
-      try {
+    try {
+      if (!data.roleType.trim()) {
+        setErrorMessage("Role is required.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/role-list`, {
           method: "POST",
           body: JSON.stringify({
@@ -76,11 +78,13 @@ const AddNewRole: React.FC = () => {
           toast.success(post.msg);
           router.push("/account/role-list");
         }
-      } catch (error) {
-        toast.error("Error creating role.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error creating role.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -105,8 +109,8 @@ const AddNewRole: React.FC = () => {
         </div>
         {errorMessage && (<p className="text-red-600 italic text-sm">{errorMessage}</p>)}
         <div className="flex gap-1 w-full">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

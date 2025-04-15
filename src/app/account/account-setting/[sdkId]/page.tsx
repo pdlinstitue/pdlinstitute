@@ -21,9 +21,11 @@ interface IAccountParams {
 }
 
 const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
+
   const router = useRouter();
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [contactDetails, setContactDetails] = useState<AccountSettingProps>({
     sdkPhone: "",
@@ -63,17 +65,19 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    setErrorMessage(""); // Clear the previous error
 
-    if (!contactDetails.sdkPhone.trim()) {
-      setErrorMessage("Phone is required.");
-    } else if (!contactDetails.sdkWhtNbr.trim()) {
-      setErrorMessage("Whatsapp number is required.");
-    } else if (!contactDetails.sdkEmail.trim()) {
-      setErrorMessage("Email is required.");
-    } else {
-      try {
+    e.preventDefault();
+    setIsSaving(true);
+    setErrorMessage(""); // Clear the previous error
+    
+    try {
+      if (!contactDetails.sdkPhone.trim()) {
+        setErrorMessage("Phone is required.");
+      } else if (!contactDetails.sdkWhtNbr.trim()) {
+        setErrorMessage("Whatsapp number is required.");
+      } else if (!contactDetails.sdkEmail.trim()) {
+        setErrorMessage("Email is required.");
+      } else {
         const response = await fetch(
           `${BASE_API_URL}/api/users/${SdkId}/update-contact`,
           {
@@ -86,19 +90,24 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
             }),
           }
         );
-
         const post = await response.json();
         if (post.success === false) {
           toast.error(post.msg);
         } else {
           toast.success(post.msg);
-          router.push("/account/dashboard");
+          if(loggedInUser.result.usrRole === "Admin" || loggedInUser.result.usrRole === "View-Admin"){
+            router.push("/account/admin-dashboard");
+          } else {
+            router.push("/account/sadhak-dashboard");
+          }
         }
-      } catch (error) {
-        toast.error("Error updating contact details.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error updating contact details.");
+    } finally {
+        setIsSaving(true);
+      }
+    };
 
   useEffect(() => {
     async function fetchContactDetails() {
@@ -128,10 +137,7 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
 
   return (
     <div className="flex justify-center items-center my-24">
-      <form
-        className="flex w-[400px] flex-col border border-orange-500 p-9 gap-2 rounded-md shadow-xl"
-        onSubmit={handleSubmit}
-      >
+      <form className="formStyle w-[400px]" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-2">
           <label>Phone:</label>
           <input
@@ -166,15 +172,21 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
           <p className="text-sm italic text-red-600">{errorMessage}</p>
         )}
         <div className="grid grid-cols-2 gap-1">
-          <button type="submit" className="btnLeft">
-            SUBMIT
+          <button type="submit" className="btnLeft" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
             className="btnRight"
-            onClick={() => router.push("/account/dashboard")}
+            onClick={() => {
+              if (loggedInUser.result.usrRole === "Sadhak") {
+                router.push("/account/sadhak-dashboard");
+              } else {
+                router.push("/account/admin-dashboard");
+              }
+            }}
           >
-            BACK
+            Back
           </button>
         </div>
       </form>

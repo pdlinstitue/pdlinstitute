@@ -4,7 +4,8 @@ import Users from './Users';
 const roleSchema = new mongoose.Schema({
     roleType: { 
         type: String, 
-        required:[true, "Sadhak role is required."]
+        unique: true,
+        required: [true, "Role type is required."],
     },
     isActive: {
         type: Boolean,

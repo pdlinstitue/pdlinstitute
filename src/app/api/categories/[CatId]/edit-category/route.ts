@@ -8,7 +8,7 @@ type CatType = {
   updatedBy?:string;
 }
 
-export async function PUT(req: Request,{ params }: { params: Promise<{ CatId: string }>}) {
+export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CatId: string }>}) {
 
   try 
   {

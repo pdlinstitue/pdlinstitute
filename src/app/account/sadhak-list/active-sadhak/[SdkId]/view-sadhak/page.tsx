@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, use, useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/account/Loading";

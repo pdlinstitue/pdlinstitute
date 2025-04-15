@@ -15,7 +15,7 @@ export async function GET(req: NextRequest){
       }
   
       // Populate 'bthId' with all fields from BatchType
-      const enrListBySdkId = await Enrollments.find({ sdkId:sdkId, isApproved:"Approved" , isCompleted:"Pending" })
+      const enrListBySdkId = await Enrollments.find({ sdkId:sdkId, isApproved:"Approved", isCompleted:"Pending" })
       .populate("corId","coNick")
       .populate("bthId", "bthName bthShift bthStart bthEnd corId bthVtr bthWhatGrp bthTeleGrp bthLang bthMode bthLink bthLoc")
       .sort({createdAt: -1});

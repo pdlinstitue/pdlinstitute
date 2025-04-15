@@ -3,13 +3,29 @@ import dbConnect from "../../../../dbConnect";
 import Classes from "../../../../modals/Classes";
 import Enrollments from "../../../../modals/Enrollments";
 import Attendance from "../../../../modals/Attendance";
+import mongoose from "mongoose";
 
 export async function GET(req: NextRequest) {
     try {
         await dbConnect();
+        
+        const corId = req.nextUrl.searchParams.get("corId");
+        const bthId = req.nextUrl.searchParams.get("bthId");
+        const durInMonth = Number(req.nextUrl.searchParams.get("dur"));
+
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - durInMonth);
+
+        const filter: Record<string, any> = { createdAt: { $gte: startDate } };
+        if (corId && mongoose.Types.ObjectId.isValid(corId)) {
+            filter.corId = new mongoose.Types.ObjectId(corId);
+        }
+        if (bthId && mongoose.Types.ObjectId.isValid(bthId)) {
+            filter.bthId = new mongoose.Types.ObjectId(bthId);
+        }
 
         // Fetch all classes
-        const clsList = await Classes.find()
+        const clsList = await Classes.find(filter)
             .populate('corId', 'coName coNick')
             .populate('bthId', 'bthName')
             .populate('clsName.createdBy', 'sdkFstName')
@@ -52,7 +68,6 @@ export async function GET(req: NextRequest) {
 
         // Attach joinersCount and attendance data to each class in clsList
         const clsListWithCounts = clsList?.map(cls => {
-
             const joinersKey = `${cls.corId?._id}_${cls.bthId?._id}`;
             const joinersCount = countMap.get(joinersKey) || 0;        
             // Ensure cls.clsName is an array before filtering and mapping

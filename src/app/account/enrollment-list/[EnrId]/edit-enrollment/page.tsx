@@ -23,6 +23,7 @@ const EditEnrollment : React.FC<IEnrParams> = ({params}) => {
 
     const router = useRouter();
     const {EnrId} = use(params);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [enrData, setEnrData] = useState<EditEnrollmentProps>({isCompleted:'', enrIncompRemarks:'', updatedBy:''});
     const [status, setStatus] = useState('');
@@ -80,6 +81,7 @@ const EditEnrollment : React.FC<IEnrParams> = ({params}) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault(); 
+    setIsSaving(true);
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/enrollments/${EnrId}/edit-enrollment`, {
@@ -101,6 +103,8 @@ const EditEnrollment : React.FC<IEnrParams> = ({params}) => {
             }
         } catch (error) {
             toast.error('Error updating completion status.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -118,8 +122,12 @@ const EditEnrollment : React.FC<IEnrParams> = ({params}) => {
             <textarea rows={4} className='inputBox' name='enrIncompRemarks' value={enrData.enrIncompRemarks} onChange={handleChange}></textarea>
          </div>
          <div className='grid grid-cols-2 gap-1 items-center'>
-            <button type='submit' className='btnRight' onClick={() => setStatus('Complete')}>Complete</button>
-            <button type='submit' className='btnRight' onClick={() => setStatus('Incomplete')}>Incomplete</button>
+            <button type='submit' className='btnRight' onClick={() => setStatus('Complete')} disabled={isSaving}>
+                {isSaving ? "Completing..." : "Complete" }
+            </button>
+            <button type='submit' className='btnRight' onClick={() => setStatus('Incomplete')} disabled={isSaving}>
+                {isSaving ? "Incompleting..." : "Incomplete"}
+            </button>
          </div>
          <button type='button' className='btnLeft' onClick={()=>router.push('/account/complete-course')}>BACK</button>
       </form>

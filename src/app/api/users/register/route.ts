@@ -20,6 +20,8 @@ type SdkType = {
   sdkCountry: string;
   sdkState: string;
   sdkCity: string;
+  sdkPinCode:number;
+  sdkComPinCode:number
   sdkComAdds: string;
   sdkParAdds: string;
   sdkPwd: string;
@@ -59,6 +61,8 @@ export async function POST(req: NextRequest) {
       sdkPhone,
       sdkWhtNbr,
       sdkEmail,
+      sdkPinCode,
+      sdkComPinCode,
       sdkCountry,
       sdkState,
       sdkCity,
@@ -126,6 +130,8 @@ export async function POST(req: NextRequest) {
       sdkCountry,
       sdkState,
       sdkCity,
+      sdkPinCode,
+      sdkComPinCode,
       sdkComAdds,
       sdkParAdds,
       sdkPwd: hashedPwd,

@@ -1,6 +1,6 @@
 "use client";
 import Loading from "@/app/account/Loading";
-import React, { FormEvent, use, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import toast from "react-hot-toast";
@@ -24,7 +24,9 @@ interface AddNewCouponProps {
 }
 
 const AddNewCoupon: React.FC = () => {
+
   const router = useRouter();
+  const [isSaving, setIsSaving] = useState(false);
   const [coData, setCoData] = useState<CourseDataProps[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -138,25 +140,27 @@ const AddNewCoupon: React.FC = () => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+
     e.preventDefault();
+    setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
 
-    if (!randomCpn.trim()) {
-      setErrorMessage("Please generate coupon.");
-    } else if (!data.cpnUse) {
-      setErrorMessage("Please enter number of uses.");
-    } else if (!data.cpnVal) {
-      setErrorMessage("Please enter validity.");
-    } else if (!data.cpnDisType.trim()) {
-      setErrorMessage("Please select discount type.");
-    } else if (!data.cpnDisc) {
-      setErrorMessage("Please enter discount.");
-    } else if (!data.cpnCourse.trim()) {
-      setErrorMessage("Please select course.");
-    } else if (!couponFor.trim()) {
-      setErrorMessage("Please select coupon is for whom.");
-    } else {
-      try {
+    try {
+      if (!randomCpn.trim()) {
+        setErrorMessage("Please generate coupon.");
+      } else if (!data.cpnUse) {
+        setErrorMessage("Please enter number of uses.");
+      } else if (!data.cpnVal) {
+        setErrorMessage("Please enter validity.");
+      } else if (!data.cpnDisType.trim()) {
+        setErrorMessage("Please select discount type.");
+      } else if (!data.cpnDisc) {
+        setErrorMessage("Please enter discount.");
+      } else if (!data.cpnCourse.trim()) {
+        setErrorMessage("Please select course.");
+      } else if (!couponFor.trim()) {
+        setErrorMessage("Please select coupon is for whom.");
+      } else {
         const response = await fetch(`${BASE_API_URL}/api/coupons`, {
           method: "POST",
           body: JSON.stringify({
@@ -181,11 +185,13 @@ const AddNewCoupon: React.FC = () => {
           toast.success(post.msg);
           router.push("/account/coupon-list");
         }
-      } catch (error) {
-        toast.error("Error creating coupon.");
       }
-    }
-  };
+    } catch (error) {
+        toast.error("Error creating coupon.");
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
   if (isLoading) {
     return (
@@ -333,8 +339,8 @@ const AddNewCoupon: React.FC = () => {
         )}
         {errorMessage && <p className="text-sm italic text-red-600">{errorMessage}</p>}
         <div className="flex gap-1 w-full">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Creating..." : "Create"}
           </button>
           <button
             type="button"

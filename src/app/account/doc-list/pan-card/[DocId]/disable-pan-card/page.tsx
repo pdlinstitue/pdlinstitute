@@ -23,6 +23,7 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
     const router = useRouter();
     const { DocId } = use(params);
     const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [panNumber, setPanNumber] = useState<PanNumberProps>({sdkPanNbr:'', disabledBy:''});
   
     const loggedInUser = {
@@ -50,6 +51,7 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/documents/${DocId}/disable-doc`, {
@@ -68,6 +70,8 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
             }
         } catch (error) {
             toast.error('Error disabling pan.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -88,8 +92,10 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
                     <p className="font-bold text-xl text-green-600">{panNumber.sdkPanNbr}</p>
                 </div>
                 <div className="flex gap-1">
-                    <button type="submit"  className="btnLeft w-full">CONFIRM</button>
-                    <button type="button" onClick={() => router.push('/account/doc-list/pan-card')} className="btnRight w-full">CANCEL</button>
+                    <button type="submit"  className="btnLeft w-full" disabled={isSaving}>
+                        {isSaving ? "Confirming..." : "Confirm"}
+                    </button>
+                    <button type="button" onClick={() => router.push('/account/doc-list/pan-card')} className="btnRight w-full">Cancel</button>
                 </div>
             </form>
        </div>

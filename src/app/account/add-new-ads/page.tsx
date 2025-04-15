@@ -17,8 +17,13 @@ interface AddNewAdsProps {
 }
 
 const AddNewAds: React.FC = () => {
+
   const router = useRouter();
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [image , setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [data, setData] = useState<AddNewAdsProps>({
     sdkDocType: "",
     sdkDocOwnr: "",
@@ -66,8 +71,55 @@ const AddNewAds: React.FC = () => {
     });
   };
 
+  const handleFileChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+
+    if (!image) {
+      toast.error("Please select an image!");
+      return;
+    }
+
+    setIsUploading(true);
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("addsImage", image);
+    try {
+      const res = await fetch("/api/adds-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success === true) {
+        toast.success(data.msg);
+        setImage(data.imageUrl);
+      } else {
+        toast.error(data.msg);
+      }
+    } catch (error:any) {
+        toast.error(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     try {
       const response = await fetch(`${BASE_API_URL}/api/documents`, {
         method: "POST",
@@ -77,7 +129,7 @@ const AddNewAds: React.FC = () => {
           sdkUpldDate: new Date(),
           sdkAdsNbr: data.sdkAdsNbr,
           sdkDocRel: data.sdkDocRel,
-          sdkAdsProof: data.sdkAdsProof,
+          sdkAdsProof: image,
           createdBy: loggedInUser.result._id,
         }),
       });
@@ -93,6 +145,8 @@ const AddNewAds: React.FC = () => {
       }
     } catch (error) {
       toast.error("Error uploading document.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -138,6 +192,17 @@ const AddNewAds: React.FC = () => {
               onChange={handleChange}
             />
           </div>
+          {preview ?
+            (
+              <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            ): null
+          }
           <div className="flex flex-col gap-2">
             <label className="text-lg">Upload Image:</label>
             <div className="flex gap-1">
@@ -145,18 +210,17 @@ const AddNewAds: React.FC = () => {
                 type="file"
                 className="inputBox w-full"
                 name="sdkAdsProof"
-                value={data.sdkAdsProof}
-                onChange={handleChange}
+                onChange={handleFileChange}
               />
-              <button type="button" className="btnRight">
-                Upload
+              <button type="button" className="btnRight" onClick={handleUpload} disabled={isUploading}>
+                {isUploading ? "Uploading..." : "upload"}
               </button>
             </div>
           </div>
         </div>
         <div className="flex gap-2 w-full mt-3">
-          <button type="submit" className="btnLeft w-full">
-            Save
+          <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

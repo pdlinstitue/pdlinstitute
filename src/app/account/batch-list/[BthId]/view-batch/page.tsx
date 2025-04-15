@@ -125,7 +125,7 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
           cache: "no-store",
         });
         const coData = await res.json();
-        setCoList(coData.coList);
+        setCoList(coData?.coList);
       } catch (error) {
         console.error("Error fetching course data:", error);
       } finally {
@@ -142,7 +142,7 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
           cache: "no-store",
         });
         const volUserData = await res.json();
-        setVolunteer(volUserData.volList);
+        setVolunteer(volUserData?.volList);
       } catch (error) {
         console.error("Error fetching course data:", error);
       } finally {
@@ -240,8 +240,8 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
                 </option>
                 {volunteer?.map((vol) => {
                   return (
-                    <option key={vol._id} value={vol._id}>
-                      {vol.sdkFstName}
+                    <option key={vol?._id} value={vol?._id}>
+                      {vol?.sdkFstName}
                     </option>
                   );
                 })}

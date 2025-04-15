@@ -21,6 +21,7 @@ const DisableCategory : React.FC <ICatParams>= ({params}) => {
 
     const router = useRouter();
     const { CatId } = use(params);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(true);
     const [catName, setCatName] = useState<CatNameProps>({catName:''});
     const [loggedInUser, setLoggedInUser] = useState({
@@ -67,6 +68,7 @@ const DisableCategory : React.FC <ICatParams>= ({params}) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
         try 
         {
             const response = await fetch(`${BASE_API_URL}/api/categories/${CatId}/disable-category`, {
@@ -86,6 +88,8 @@ const DisableCategory : React.FC <ICatParams>= ({params}) => {
             }
         } catch (error) {
             toast.error('Error updating category.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -105,8 +109,10 @@ const DisableCategory : React.FC <ICatParams>= ({params}) => {
                     <p className="font-bold text-xl text-green-600">{catName.catName}</p>
                 </div>
                 <div className="flex gap-1">
-                    <button type="submit"  className="btnLeft w-full">CONFIRM</button>
-                    <button type="button" onClick={() => router.push('/account/category-list')} className="btnRight w-full">CANCEL</button>
+                    <button type="submit"  className="btnLeft w-full" disabled={isSaving}>
+                        {isSaving ? "Confirming..." : "Confirm"}
+                    </button>
+                    <button type="button" onClick={() => router.push('/account/category-list')} className="btnRight w-full">Cancel</button>
                 </div>
             </form>
        </div>

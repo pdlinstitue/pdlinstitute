@@ -16,13 +16,13 @@ export async function GET(req: NextRequest) {
     try {
 
         await dbConnect(); 
-        const country_id = req.nextUrl.searchParams.get("country_id");
+        const country_name = req.nextUrl.searchParams.get("country_name");
 
-        if (!country_id) {
+        if (!country_name) {
             return NextResponse.json({ success: false, msg: "country is required" }, { status: 400 });
         }
 
-        const stateList: SttType[] = await States.find({ country_id });
+        const stateList: SttType[] = await States.find({ country_name });
 
         if (stateList.length > 0) {
             return NextResponse.json({ sttList: stateList, success: true }, { status: 200 });

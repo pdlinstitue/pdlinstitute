@@ -66,9 +66,10 @@ const LoginPage : NextPage = () => {
                 }),
             });
 
-            const post = await result.json();
-            
-            if (post.success === false) {
+             const post = await result.json();
+            if (post.redirect && post.location) {
+                window.location.href = post.location;
+              } else if (post.success === false) {
                 toast.error(post.msg);
             } else {
                 Cookies.set("loggedInUserId", post.result.id);
@@ -78,7 +79,7 @@ const LoginPage : NextPage = () => {
                 toast.success("Logged in successfully.");
                 
                 // Redirect conditionally based on user role
-                if (post.result.usrRole === "Admin") {
+                if (post.result.usrRole === "Admin" || post.result.usrRole === "View-Admin") {
                     router.push("/account/admin-dashboard");
                 } else {
                     router.push("/account/sadhak-dashboard");

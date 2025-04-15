@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Loading from '@/app/account/Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
+import Cookies from 'js-cookie';
 
 interface IPrcParams {
     params: Promise<{
@@ -21,17 +22,21 @@ interface EditPracticeClassProps {
   prcEndsAt:string,
   prcLink:string,
   prcWhatLink: string,
-  usrId?:string
+  updatedBy?:string
  }
 
 const EditPracticeClass : React.FC<IPrcParams> = ({params}) => {
 
   const router = useRouter();
   const {PrcId} = use(params);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [image, setImage] = useState<File | string | null>(null);
+  const [preview, setPreview] = useState<string>('');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [pracDays, setPracDays] = useState<string[] | null>([])
-  const [data, setData] = useState<EditPracticeClassProps>({prcName:'', prcLang:'', prcDays:[''], prcStartsAt:'', prcEndsAt:'', prcLink:'', prcWhatLink:'',  prcImg:'', usrId:''});
+  const [data, setData] = useState<EditPracticeClassProps>({prcName:'', prcLang:'', prcDays:[''], prcStartsAt:'', prcEndsAt:'', prcLink:'', prcWhatLink:'',  prcImg:'', updatedBy:''});
   const practiceDays : string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
 
 
@@ -64,6 +69,56 @@ const EditPracticeClass : React.FC<IPrcParams> = ({params}) => {
     }); 
   }
 
+  const handleFileChange = (e:any) => {
+    const file = e.target.files[0];
+    if (file) {
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+
+    if (!image) {
+      toast.error("Please select an image!");
+      return;
+    }
+
+    setIsUploading(true);
+  
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("prcImage", image);
+    formData.append("prcImageFileName", data.prcImg);
+  
+      try {
+        const res = await fetch("/api/prc-upload", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Image uploaded successfully!");            
+          setImage(data.imageUrl);
+        } else {
+          throw new Error(data.error || "Upload failed");
+        }
+      } catch (error:any) {
+        toast.error(error.message);
+      } finally {
+        setIsUploading(false);
+      }
+  };
+
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, day: string) => {
     const { checked } = event.target;
     let updatedDays = [...(pracDays || [])];  
@@ -74,68 +129,84 @@ const EditPracticeClass : React.FC<IPrcParams> = ({params}) => {
     }
     setPracDays(updatedDays);
   };
+
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
   
 
     const handleSubmit = async (e:FormEvent<HTMLFormElement>):Promise<void> => {
-    e.preventDefault();
-    setErrorMessage(''); // Clear the previous error
-    let errMsg: string[] = [];
-        
-    if (!data.prcName.trim()) {
-        errMsg.push('Class name is must.');    
-    }
-    
-    if (!data.prcStartsAt.trim()) {
-        errMsg.push('Please fix start time.');    
-    }
 
-    if (!data.prcEndsAt.trim()) {
-        errMsg.push('Please fix end time.');    
-    }
-
-    if (!data.prcLang.trim()) {
-      errMsg.push('Please Choose language.');    
-    }
-
-    if (!data.prcLink.trim()) {
-      errMsg.push('Please provide meeting link.');    
-    }
-
-    if(errMsg.length>0){
-        setErrorMessage(errMsg.join(' || '));
-        return;
-    }
-  
-    try 
-      {
-        const response = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/edit-practice-class`, {
-        method: 'PUT',
-        body: JSON.stringify({ 
-          prcName:data.prcName,
-          prcImg:data.prcImg,
-          prcLang:data.prcLang,
-          prcDays:pracDays,
-          prcStartsAt:data.prcStartsAt,
-          prcEndsAt:data.prcEndsAt,
-          prcLink:data.prcLink,
-          prcWhatLink: data.prcWhatLink,
-            // usrId: loggedInUser.result._id
-        }),
-      });
-  
-      const post = await response.json();
-      console.log(post);
-  
-      if (post.success === false) {
-          toast.error(post.msg);
-      } else {
-          toast.success(post.msg);
-          router.push('/account/course-practice');
+      e.preventDefault();
+      setIsSaving(true);
+      setErrorMessage(''); // Clear the previous error
+       
+      try {
+        if (!data.prcName.trim()) {
+          setErrorMessage('Class name is must.');    
+        } else if (!data.prcStartsAt.trim()) {
+            setErrorMessage('Please fix start time.');    
+        } else if (!data.prcEndsAt.trim()) {
+            setErrorMessage('Please fix end time.');    
+        } else if (!data.prcLang.trim()) {
+          setErrorMessage('Please Choose language.');    
+        } else if (!data.prcLink.trim()) {
+          setErrorMessage('Please provide meeting link.');    
+        } else {
+          const response = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/edit-practice-class`, {
+            method: 'PUT',
+            body: JSON.stringify({ 
+              prcName:data.prcName,
+              prcImg:image,
+              prcLang:data.prcLang,
+              prcDays:pracDays,
+              prcStartsAt:data.prcStartsAt,
+              prcEndsAt:data.prcEndsAt,
+              prcLink:data.prcLink,
+              prcWhatLink: data.prcWhatLink,
+              updatedBy: loggedInUser.result._id
+            }),
+          });
+      
+          const post = await response.json();
+          console.log(post);
+      
+          if (post.success === false) {
+              toast.error(post.msg);
+          } else {
+              toast.success(post.msg);
+              router.push('/account/course-practice');
+          }
+        }
+      } catch (error) {
+        toast.error('Error updating practice class.');
+      } finally {
+        setIsSaving(false);
       }
-    } catch (error) {
-      toast.error('Error updating practice class.');
-    } 
-  };
+    };
 
   if(isLoading){
     return<div>
@@ -146,8 +217,25 @@ const EditPracticeClass : React.FC<IPrcParams> = ({params}) => {
   return (
     <div className='flex justify-center items-center my-4 '>
       <form onSubmit={handleSubmit} className='formStyle w-[500px]'>
-        <div className=' w-full h-auto'>
-            <Image src="/images/sadhak.jpg" alt='practice' width={450} height={275}/>
+      <div className="flex flex-col gap-1">
+        <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+          <img
+            src={data.prcImg || preview || "/images/uploadImage.jpg"}
+            alt="course"
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <div className="flex items-center gap-1">
+          <input
+            type="file"
+            accept="image/*"
+            className="inputBox w-full h-[45px]"
+            onChange={handleFileChange}
+          ></input>
+          <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+            {isUploading ? "Uploading..." : "Upload"}
+          </button>
+        </div>
         </div>
         <div className='flex flex-col gap-2 w-full'>
           <label>Class Name:</label>
@@ -195,9 +283,11 @@ const EditPracticeClass : React.FC<IPrcParams> = ({params}) => {
             <label>Meeting Link:</label>
             <input type='text' className='inputBox' name='prcLink' value={data.prcLink} onChange={handleChange}/>
         </div>
-        {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
+        {errorMessage && <p className="text-sm italic text-red-600">{errorMessage}</p>}
         <div className="flex gap-1 w-full mt-4">
-            <button type="submit" className="btnLeft w-full">Update</button>
+            <button type="submit" className="btnLeft w-full" disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save"}
+            </button>
             <button type="button" className="btnRight w-full" onClick={() => router.push("/account/course-practice")}>Back</button>
         </div>
       </form>

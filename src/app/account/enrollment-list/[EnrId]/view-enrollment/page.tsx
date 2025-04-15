@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { BASE_API_URL } from '@/app/utils/constant';
 import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 interface IEnrParams{
     params: Promise<{
@@ -17,25 +18,51 @@ interface ViewEnrollmentProps {
     enrSrnShot: string;
     enrRemarks: string;
     enrTnsNo:string;
-    usrId?: string;
+    updatedBy?: string;
 }
 
 const ViewEnrollment : React.FC<IEnrParams> = ({params}) => {
 
     const router = useRouter();
     const {EnrId} = use(params);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [enrData, setEnrData] = useState<ViewEnrollmentProps>({_id:"", enrSrnShot:"", enrRemarks:"", enrTnsNo:"", usrId:""});
+    const [enrData, setEnrData] = useState<ViewEnrollmentProps>({_id:"", enrSrnShot:"", enrRemarks:"", enrTnsNo:"", updatedBy:""});
     const [status, setStatus] = useState('');
+    const [loggedInUser, setLoggedInUser] = useState({
+        result: {
+          _id: "",
+          usrName: "",
+          usrRole: "",
+        },
+      });
+    
+      useEffect(() => {
+        try {
+          const userId = Cookies.get("loggedInUserId") || "";
+          const userName = Cookies.get("loggedInUserName") || "";
+          const userRole = Cookies.get("loggedInUserRole") || "";
+          setLoggedInUser({
+            result: {
+              _id: userId,
+              usrName: userName,
+              usrRole: userRole,
+            },
+          });
+        } catch (error) {
+          console.error("Error fetching loggedInUserData.");
+        } finally {
+          setIsLoading(false);
+        }
+      }, []);
 
     useEffect(() => {
         const fetchEnrollmentData = async () => {
             try {
                 const res = await fetch(`${BASE_API_URL}/api/enrollments/${EnrId}/view-enrollment`);    
                 const data = await res.json();
-                setEnrData(data.enrById);
-                console.log(data.enrById);
-            } catch (error) {
+                setEnrData(data?.enrById);
+             } catch (error) {
                 console.error("Error fetching enrData: ", error);
             } finally {
                 setIsLoading(false);
@@ -56,15 +83,18 @@ const ViewEnrollment : React.FC<IEnrParams> = ({params}) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault(); 
+    setIsSaving(true);
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/enrollments/${EnrId}/view-enrollment`, {
                 method: 'PATCH',
                 body: JSON.stringify({ 
                     isApproved:status, 
-                    enrRemarks: enrData.enrRemarks
+                    enrRemarks: enrData.enrRemarks,
+                    updatedBy:loggedInUser.result._id
                 }),
             });
+
             const post = await response.json();
             console.log(post);
             
@@ -76,6 +106,8 @@ const ViewEnrollment : React.FC<IEnrParams> = ({params}) => {
             }
         } catch (error) {
             toast.error('Error updating enrData.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -89,19 +121,23 @@ const ViewEnrollment : React.FC<IEnrParams> = ({params}) => {
     <div className='flex items-center justify-center'>
       <form className='formStyle  w-[450px] my-3' onSubmit={handleSubmit}>
          <div className=' bg-gray-200 w-auto h-auto rounded-md'>
-            <Image alt='paymentImg' src="/#" width={420} height={250}/>
+            <Image alt='paymentImg' src={enrData?.enrSrnShot} width={420} height={250}/>
          </div>
          <div className='flex flex-col gap-2'>
             <label>Trans No:</label>
-            <input className='inputBox' name='enrTnsNo' value={enrData.enrTnsNo} onChange={handleChange}></input>
+            <input className='inputBox' name='enrTnsNo' value={enrData?.enrTnsNo} onChange={handleChange}></input>
          </div>
          <div className='flex flex-col gap-2'>
             <label>Remarks:</label>
-            <textarea className='inputBox' name='enrRemarks' value={enrData.enrRemarks} onChange={handleChange} placeholder='Remarks'></textarea>
+            <textarea className='inputBox' name='enrRemarks' value={enrData?.enrRemarks} onChange={handleChange} placeholder='Remarks'></textarea>
          </div>
          <div className='grid grid-cols-3 gap-1 items-center mt-3'>
-            <button type='submit' className='btnLeft' onClick={() => setStatus('Approved')}>Approve</button>
-            <button type='submit' className='btnRight' onClick={() => setStatus('Rejected')}>Reject</button>
+            <button type='submit' className='btnLeft' onClick={() => setStatus('Approved')} disabled={isSaving}>
+                {isSaving ? "Approving..." : "Approve"}
+            </button>
+            <button type='submit' className='btnRight' onClick={() => setStatus('Rejected')} disabled={isSaving}>
+                {isSaving ? "Rejecting..." : "Reject"}
+            </button>
             <button type='button' className='btnLeft' onClick={()=>router.push('/account/enrollment-list')}>BACK</button>
          </div>
       </form>

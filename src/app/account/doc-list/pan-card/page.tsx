@@ -2,7 +2,6 @@
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Loading from '../../Loading';
 import { useRouter } from 'next/navigation';
 import { BASE_API_URL } from '@/app/utils/constant';
@@ -32,14 +31,32 @@ const PanCard : React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [panData, setPanData] = useState<DocTypeProps[] | null>([]);
   const data = React.useMemo(() => panData ?? [], [panData]);
-
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
 
   //changing the status color as per the status
   const StatusCell = ({ row }: { row: any }) => {
@@ -62,15 +79,15 @@ const PanCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'Sadhak', accessorKey: 'createdBy.sdkFstName'},
-    {header: 'Sdk Id', accessorKey: 'createdBy._id'},
-    {header: 'Phone', accessorKey: 'createdBy.sdkPhone'},
+    {header: 'Sadhak', accessorKey: 'sdkFstName'},
+    {header: 'Sdk Id', accessorKey: 'sdkRegNo'},
+    {header: 'Phone', accessorKey: 'sdkPhone'},
     {header: 'PAN', accessorKey: 'sdkPanNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
     {header: 'Relation', accessorKey: 'sdkDocRel'},
     {header: 'Date: A/R', accessorKey: 'sdkAprDate', cell: DateCell},
     {header: 'Status', accessorKey: 'sdkDocStatus', cell: StatusCell},
-    {header: 'Action', accessorKey: 'docAction', 
+    {header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
           <button type='button' title='View' onClick={()=> router.push(`/account/doc-list/pan-card/${row.original._id}/view-pan-card`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
@@ -86,7 +103,6 @@ const PanCard : React.FC = () => {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
@@ -103,7 +119,7 @@ const PanCard : React.FC = () => {
         state: {
           sorting: sorting,
           globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+          pagination: { pageIndex: pageInput - 1, pageSize: 100 }
         },
         onSortingChange: setSorting,
         getFilteredRowModel: getFilteredRowModel(),
@@ -123,7 +139,14 @@ const PanCard : React.FC = () => {
       {
         const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.result._id}`, { cache: "no-store" });
         const docData = await res.json();
-        setPanData(docData.panList);
+        const updatedDocList = docData?.panList?.map((item:any) => { 
+          return { ...item, 
+            sdkFstName: item.createdBy.sdkFstName ? item.createdBy.sdkFstName : 'N/A',
+            sdkPhone: item.createdBy.sdkPhone ? item.createdBy.sdkPhone : 'N/A',
+            sdkRegNo: item.updatedBy.sdkRegNo ? item.updatedBy.sdkRegNo : 'N/A' 
+          };
+        });
+        setPanData(updatedDocList);
       } catch (error) {
           console.error("Error fetching doc data:", error);
       } finally {

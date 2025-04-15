@@ -41,7 +41,7 @@ type DocType = {
 
         // Fetch active documents with necessary population
         const docList: DocType[] = await Documents.find({ isActive: true })
-            .populate("createdBy", "sdkFstName sdkPhone")
+            .populate("createdBy", "sdkFstName sdkPhone sdkRegNo")
             .populate("updatedBy", "sdkFstName");
 
         // Filter documents based on user role
@@ -76,9 +76,9 @@ export async function POST(req: NextRequest) {
     const savedDocs = await newDocs.save();
 
     if(savedDocs){
-      return NextResponse.json({ savedDocs, success: true, msg:"Document created successfully." }, {status:200});
+      return NextResponse.json({ savedDocs, success: true, msg:"Document uploaded successfully." }, {status:200});
     }else{
-      return NextResponse.json({ savedDocs, success: false, msg:"Document creation failed." }, {status:400});
+      return NextResponse.json({ savedDocs, success: false, msg:"Document uploading failed." }, {status:400});
     }
 
   } catch (error:any) {

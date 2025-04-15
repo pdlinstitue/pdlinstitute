@@ -21,6 +21,7 @@ const DeleteCourse : React.FC <ICorParams>= ({params}) => {
   const router = useRouter();
   const { CorId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [courseName, setCourseName] = useState<CorNameProps>({coNick:''});
   
     useEffect(() => { 
@@ -40,6 +41,7 @@ const DeleteCourse : React.FC <ICorParams>= ({params}) => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setIsSaving(true);
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/courses/${CorId}/delete-course`, {
@@ -56,6 +58,8 @@ const DeleteCourse : React.FC <ICorParams>= ({params}) => {
             }
         } catch (error) {
             toast.error('Error deleting course.');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -75,8 +79,10 @@ const DeleteCourse : React.FC <ICorParams>= ({params}) => {
                     <p className="font-bold text-xl text-green-600">{courseName.coNick}</p>
                 </div>
                 <div className="flex gap-1">
-                    <button type="submit"  className="btnLeft w-full">CONFIRM</button>
-                    <button type="button" onClick={() => router.push('/account/course-list')} className="btnRight w-full">CANCEL</button>
+                    <button type="submit"  className="btnLeft w-full" disabled={isSaving}>
+                        {isSaving ? "Confirming..." : "Confirm"}
+                    </button>
+                    <button type="button" onClick={() => router.push('/account/course-list')} className="btnRight w-full">Cancel</button>
                 </div>
             </form>
        </div>

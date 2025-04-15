@@ -22,6 +22,7 @@ const DelPracticeClass: React.FC<DelPrcParams> = ({ params }): JSX.Element => {
     const router = useRouter();
     const { PrcId } = use(params);
     const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [practiceName, setPracticeName] = useState<PracticeNameProps>({_id:'', prcName:''});
     
     useEffect(() => { 
@@ -41,6 +42,7 @@ const DelPracticeClass: React.FC<DelPrcParams> = ({ params }): JSX.Element => {
     }, []);
     
     const handleDelPracticeClass = async (): Promise<void> => {
+    setIsSaving(true);
     try 
         {
             const res = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/delete-practice-class`, {
@@ -56,6 +58,8 @@ const DelPracticeClass: React.FC<DelPrcParams> = ({ params }): JSX.Element => {
             }
         } catch (error) {
             toast.error("Practice class deletion failed.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -79,7 +83,9 @@ const DelPracticeClass: React.FC<DelPrcParams> = ({ params }): JSX.Element => {
                         </p>
                     </div>
                     <div className="flex gap-1">
-                        <button type="button" onClick={handleDelPracticeClass} className="btnLeft w-full">CONFIRM</button>
+                        <button type="button" onClick={handleDelPracticeClass} className="btnLeft w-full" disabled={isSaving}>
+                            {isSaving ? "Confirming" : "Confirm"}
+                        </button>
                         <button type="button" onClick={() => router.push('/account/course-practice')} className="btnRight w-full">CANCEL</button>
                     </div>
                 </div>

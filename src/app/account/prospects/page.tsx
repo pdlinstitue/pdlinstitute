@@ -1,12 +1,11 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
-import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
+import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import Loading from '../Loading';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BASE_API_URL } from '@/app/utils/constant';
-import { format } from 'date-fns';
-import { parse } from 'date-fns';
+
 
 interface ProspectsListProps {
   prosMonth:string,
@@ -23,9 +22,9 @@ const ProspectsList : React.FC = () => {
   const data = React.useMemo(() => prosData ?? [], [prosData]);
   const columns = React.useMemo(() => [
     { header: 'Name', accessorKey: 'sdkFstName'},
-    { header: 'SDK Id', accessorKey: 'usrId'},
+    { header: 'SDK Id', accessorKey: 'sdkRegNo'},
     { header: 'Phone',  accessorKey: 'sdkPhone'},
-    { header: 'Course', accessorKey: 'corId'},
+    { header: 'Course', accessorKey: 'coNick'},
     { header: 'Month',   accessorKey: 'prosMonth'},
     { header: 'Shift',  accessorKey: 'prosShift'},
     { header: 'DOR', accessorKey: 'createdAt'}
@@ -41,7 +40,6 @@ const ProspectsList : React.FC = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [filtered, setFiltered] = React.useState('');
   const [pageInput, setPageInput] = React.useState(1);
-  const [pageSize, setPageSize] = React.useState(25);
 
   const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
     return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
@@ -53,7 +51,13 @@ const ProspectsList : React.FC = () => {
         const res = await fetch(`${BASE_API_URL}/api/prospects`, { cache: "no-store" });
         const prosDataList = await res.json();
         const updatedProsDataList = prosDataList.prosList.map((item:any) => { 
-          return { ...item, corId: item.corId.coName};
+          return { 
+            ...item, 
+            coNick: item.corId.coNick,
+            sdkFstName:item.sdkId.sdkFstName,
+            sdkRegNo: item.sdkId.sdkRegNo,
+            sdkPhone:item.sdkId.sdkPhone
+          };
         });
         setProsData(updatedProsDataList);
       } catch (error) {
@@ -76,7 +80,7 @@ const ProspectsList : React.FC = () => {
       state: {
         sorting: sorting,
         globalFilter: filtered,
-        pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+        pagination: { pageIndex: pageInput - 1, pageSize: 100 }
       },
       onSortingChange: setSorting,
       getFilteredRowModel: getFilteredRowModel(),
