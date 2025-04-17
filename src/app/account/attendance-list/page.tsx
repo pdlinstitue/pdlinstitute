@@ -105,7 +105,7 @@ useEffect(() => {
     { header: 'Action', accessorKey: 'action', 
         cell: ({ row }: { row: any }) => ( 
           <div className='flex items-center justify-center gap-3'> 
-            <button type='button' title='Mark' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attendees`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+            <button type='button' title='Attendees' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attendees`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
             <button type='button' title='Upload Screenshots' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attd-images`)} className='text-blue-600 border-[1.5px] border-blue-800 p-1 rounded-full hover:border-black'><RiUpload2Fill size={12}/></button>
           </div> 
         ), 
@@ -123,6 +123,7 @@ useEffect(() => {
     useEffect(() => {
     async function fetchBatchData() {
       try {
+        
         const res = await fetch(`${BASE_API_URL}/api/classes?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
         const classData = await res.json();
         
@@ -148,8 +149,7 @@ useEffect(() => {
         });
     
         setClsData(updatedClassList);
-        console.log(updatedClassList);
-      } catch (error) {
+       } catch (error) {
           console.error("Error fetching class data:", error);
       } finally {
           setIsLoading(false);

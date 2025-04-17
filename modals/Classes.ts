@@ -4,6 +4,7 @@ import Courses from "./Courses";
 import Users from "./Users";
  
 const classSchema = new mongoose.Schema({
+    
 clsName: [{
     clsDay: {
         type: String,

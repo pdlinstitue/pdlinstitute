@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
     startDate.setMonth(startDate.getMonth() - durInMonth);
 
     const filter: Record<string, any> = { createdAt: { $gte: startDate } };
+    
     if (corId && mongoose.Types.ObjectId.isValid(corId)) {
       filter.corId = new mongoose.Types.ObjectId(corId);
     }
@@ -69,24 +70,22 @@ export async function GET(req: NextRequest) {
       enrList.map(async (enr) => {
         // Count total joiners
         const ttlJoiners = await Enrollments.countDocuments({
-          corId: enr.corId,
-          bthId: enr.bthId,
+          corId: enr?.corId,
+          bthId: enr?.bthId,
         });
 
         // Compute batch-wise attendance
-        const totalClasses = batchClassCounts[enr.bthId._id] || 0;
-        const classIds = batchClassIds[enr.bthId._id] || [];
+        const totalClasses = batchClassCounts[enr?.bthId?._id] || 0;
+        const classIds = batchClassIds[enr?.bthId?._id] || [];
 
         const attendedClasses = await Attendance.countDocuments({
-          bthId: enr.bthId,
+          bthId: enr?.bthId,
           clsId: { $in: classIds },
-          sdkId: enr.createdBy._id,
+          sdkId: enr?.createdBy?._id,
           status: "Present",
         });
 
-        const batchAttendance =
-          totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0;
-
+        const batchAttendance = totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0;
         return { ...enr, ttlJoiners, batchAttendance };
       })
     );

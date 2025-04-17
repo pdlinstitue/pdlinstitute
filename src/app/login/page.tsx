@@ -67,11 +67,11 @@ const LoginPage : NextPage = () => {
             });
 
              const post = await result.json();
-            if (post.redirect && post.location) {
-                window.location.href = post.location;
-              } else if (post.success === false) {
-                toast.error(post.msg);
-            } else {
+            // if (post.redirect && post.location) {
+            //     window.location.href = post.location;
+            //   } else if (post.success === false) {
+            //     toast.error(post.msg);
+            // } else {
                 Cookies.set("loggedInUserId", post.result.id);
                 Cookies.set("loggedInUserName", post.result.usrName);
                 Cookies.set("loggedInUserRole", post.result.usrRole);
@@ -84,7 +84,7 @@ const LoginPage : NextPage = () => {
                 } else {
                     router.push("/account/sadhak-dashboard");
                 }
-              }
+            //   }
           } catch (error) {
               toast.error('Error while logging in.');
           }

@@ -33,6 +33,7 @@ const AddNewPan: React.FC = () => {
     sdkPanNbr: "",
     createdBy: "",
   });
+  
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
       _id: "",

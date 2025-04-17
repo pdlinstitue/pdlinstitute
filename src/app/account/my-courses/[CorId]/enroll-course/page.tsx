@@ -46,7 +46,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
   const [image, setImage] = useState<File | string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const[isCoupanApplied, setIsCoupanApplied]=useState<boolean>(false);
+  const [isCoupanApplied, setIsCoupanApplied]=useState<boolean>(false);
   const [amtAfterCoupon, setAmtAfterCoupon] = useState<number>(0);
   const [isScreeshotSelected, setIsScreeshotSelected] = useState<boolean>(false);
   const [isUploaded, setIsUploaded] = useState<boolean>(false);
@@ -202,7 +202,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
     async function fetchBatchesByCoId() {
       try {
         const response = await fetch(
-          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch?sdkId=${loggedInUser.result?._id}&excl=true`
+          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch?sdkId=${loggedInUser.result?._id}`
         );
         const data = await response.json();
         setBatchList(data.bthListByCourseId);
@@ -356,10 +356,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
         {!batchList ? (
           <NoBatch CourseId={CorId} />
         ) : (          
-          <form
-            className="formStyle w-[600px] mx-auto my-24"
-            onSubmit={handleSubmit}
-          >
+          <form className="formStyle w-[600px] mx-auto my-24" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <h1 className="text-2xl font-bold text-center text-orange-600 italic">
                 Enroll Batch
@@ -370,10 +367,10 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
                 value={enrData.bthId}
                 onChange={handleChange}
               >
-                <option value="" className="text-center">
+                <option  className="text-center">
                   --- Select Batch ---
                 </option>
-                {batchList.map((bth: any) => (
+                {batchList?.map((bth: any) => (
                   <option key={bth._id} value={bth._id}>
                     {bth.bthName}
                   </option>

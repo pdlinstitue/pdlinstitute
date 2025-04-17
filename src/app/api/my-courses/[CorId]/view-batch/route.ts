@@ -20,44 +20,68 @@ type BatchType = {
   bthBank:string, 
   bthQr:string,
 }
-
-export async function GET(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }){
-
-    try {
   
-      const sdkIdParam = req.nextUrl.searchParams.get("sdkId");
-const exclParam = req.nextUrl.searchParams.get("excl");
+export async function GET(req: NextRequest, { params }: { params: Promise<{ CorId: string }> }) {
 
-const sdkId: string = sdkIdParam ?? ""; // Or handle null appropriately
-const excl: boolean = exclParam === "true"; // Converts "true" to true
+  try {
 
+    await dbConnect();
+    const sdkId = req.nextUrl.searchParams.get("sdkId");
+    const { CorId } = await params;
 
-      await dbConnect();
-      const { CorId } = await params;
-
-      let bthIds: any[] = [];
-      if (excl && sdkId) {
-        const enr = await Enrollments.find({
-          corId: CorId,
-          sdkId: new mongoose.Types.ObjectId(sdkId),
-        });
-      
-        bthIds = enr
-          .filter((a: any) => a.isApproved === "Pending" || a.isApproved === "Approved")
-          .map((a: any) => a.bthId);
-      }      
-
-      const bthList: BatchType[] = await Batches.find({ _id: { $nin: bthIds } });
-      const bthListByCourseId = bthList.filter((bth:any) =>  bth.corId.toString() === CorId?.toString());
-
-      if(bthListByCourseId.length === 0){
-        return NextResponse.json({success:false, msg:"No Batches found"}, {status:404});
-      } else{
-        return NextResponse.json({ bthListByCourseId, success: true }, {status:200});
-      }
-
-    } catch (error) {
-      return new NextResponse("Error while fetching bthByCourseId: " + error, {status:500});
+    if (!sdkId || !CorId) {
+      return NextResponse.json(
+        { success: false, msg: "Missing sdkId or CorId" },
+        { status: 400 }
+      );
     }
-  }
 
+    const today = new Date();
+    const utcToday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+
+
+    // Step 1: Get all batches for the course with bthEnd >= today
+    const allValidBatches = await Batches.find({
+      corId: CorId,
+      bthEnd: { $gte: utcToday },
+    });
+
+    if (!allValidBatches.length) {
+      return NextResponse.json(
+        { success: false, msg: "No valid batches found" },
+        { status: 404 }
+      );
+    }
+
+    const validBatchIds = allValidBatches.map((batch) => batch._id);
+
+    // Step 2: Find which of these batches the sdkId is already enrolled in
+    const alreadyEnrolledBatchIds = await Enrollments.find({
+      sdkId: sdkId,
+      bthId: { $in: validBatchIds },
+    }).distinct("bthId");
+
+    // Step 3: Filter out batches the sdkId is already enrolled in
+    const finalBatches = validBatchIds.filter(
+      (batch) => !alreadyEnrolledBatchIds.includes(batch._id.toString())
+    );
+
+    if (!finalBatches.length) {
+      return NextResponse.json(
+        { success: false, msg: "No available batches (not already enrolled)" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { bthListByCourseId: finalBatches, success: true },
+      { status: 200 }
+    );
+  } catch (error) {
+    return new NextResponse(
+      "Error while fetching batches: " + error,
+      { status: 500 }
+    );
+  }
+}
+  

@@ -41,8 +41,33 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
   const { BthId, ClsId } = use(params);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enrollData, setEnrollData] = useState<ClassAttendeesProps[]>([]);
-  const [selectedRows, setSelectedRows] = useState<ClassAttendeesProps[]>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: "",
+      usrName: "",
+      usrRole: "",
+    },
+  });
+
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const StatusCell = ({ row }: { row: any }) => {
     const statusClass = (value: string) =>
@@ -152,15 +177,9 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
     fetchBatchData();
   }, [BthId, ClsId]); // ✅ Added dependencies
 
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
-    }
-  };
 
   const markAsPresent = async () => {
+    
     const selectedData = table.getSelectedRowModel().rows.map((row) => row.original);
   
     if (selectedData.length === 0) {
