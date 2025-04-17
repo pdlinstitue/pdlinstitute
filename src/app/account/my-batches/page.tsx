@@ -4,6 +4,8 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
+import { CiMoneyCheck1 } from "react-icons/ci";
+import { MdReceipt } from "react-icons/md";
 import React from 'react';
 import Link from 'next/link';
 import { FaWhatsapp, FaTelegram } from 'react-icons/fa';
@@ -79,6 +81,8 @@ const MyBatches : React.FC = () => {
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
           <button type='button' title='View Details' onClick={()=> router.push(`/account/my-batches/${row.original._id}/batch-details`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+          <button type='button' title='My Receipt' onClick={()=> router.push(`/account/my-batches/${row.original._id}/batch-details`)} className='text-blue-500 border-[1.5px] border-blue-700 p-1 rounded-full hover:border-black'><MdReceipt size={12}/></button>
+          <button type='button' title='My Payment' onClick={()=> router.push(`/account/my-batches/${row.original._id}/batch-details`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full hover:border-black'><CiMoneyCheck1 size={12}/></button>
           <button type='button' title='My Classes' onClick={()=> router.push(`/account/my-batches/${row.original._id}/view-classes`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><PiChalkboardTeacher size={12}/></button>      
         </div> 
       ), 

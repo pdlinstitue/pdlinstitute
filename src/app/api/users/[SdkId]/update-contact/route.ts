@@ -12,6 +12,7 @@ type SdkType = {
 export async function PUT(req: NextRequest,{ params }: { params: Promise<{ SdkId: string }> }) {
   
   try {
+    
     await dbConnect();
     const { SdkId } = await params;
     const { sdkPhone, sdkWhtNbr, sdkEmail, updatedBy }: SdkType = await req.json();

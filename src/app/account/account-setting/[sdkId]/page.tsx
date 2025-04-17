@@ -117,7 +117,7 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
           { cache: "no-store" }
         );
         const data = await response.json();
-        setContactDetails(data.sdkById);
+        setContactDetails(data?.sdkById);
       } catch (error) {
         console.error("Error fetching contact details:", error);
       } finally {

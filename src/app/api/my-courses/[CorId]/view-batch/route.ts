@@ -59,11 +59,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ CorI
     const alreadyEnrolledBatchIds = await Enrollments.find({
       sdkId: sdkId,
       bthId: { $in: validBatchIds },
+      isApproved:{ $ne: "Rejected" },
     }).distinct("bthId");
+
+    const enrolledBatchIds = alreadyEnrolledBatchIds.map((batch) => batch._id);
 
     // Step 3: Filter out batches the sdkId is already enrolled in
     const finalBatches = validBatchIds.filter(
-      (batch) => !alreadyEnrolledBatchIds.includes(batch._id.toString())
+      (batch) => !enrolledBatchIds.includes(batch)
     );
 
     if (!finalBatches.length) {
@@ -73,8 +76,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ CorI
       );
     }
 
+    const batchDetails = await Batches.find({
+      _id: { $in: finalBatches }});
+
     return NextResponse.json(
-      { bthListByCourseId: finalBatches, success: true },
+      { bthListByCourseId: batchDetails, success: true },
       { status: 200 }
     );
   } catch (error) {
