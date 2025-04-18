@@ -9,7 +9,7 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ SdkId
     {
       await dbConnect();
       const { SdkId } = await params;
-      let sdkById = await Users.findById(SdkId);
+      const sdkById = await Users.findById(SdkId);
 
       if(!sdkById){
         return NextResponse.json({success:false, msg: "No Sadhak found." }, { status: 404 });

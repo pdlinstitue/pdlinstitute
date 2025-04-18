@@ -232,7 +232,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       }
     }
     fetchBatchDataById();
-  }, [enrData.bthId]);
+  }, [enrData?.bthId]);
 
   useEffect(() => {
     async function fetchCourseById() {
@@ -364,7 +364,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
               <select
                 className="inputBox"
                 name="bthId"
-                value={enrData.bthId}
+                value={enrData?.bthId}
                 onChange={handleChange}
               >
                 <option  className="text-center" value={""}>
