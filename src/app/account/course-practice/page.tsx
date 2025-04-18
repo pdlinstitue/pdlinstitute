@@ -12,154 +12,136 @@ import { RxCross2 } from 'react-icons/rx';
 import { BASE_API_URL } from '@/app/utils/constant';
 
 interface PracticeProps {
-  _id: string;
-  prcName: string;
-  prcImg: string;
-  prcLang: string;
-  prcDays: string;
-  prcStartsAt: string;
-  prcEndsAt: string;
-  prcLink: string;
-  prcWhatLink: string;
+    _id: string;
+    prcName: string;
+    prcImg: string;
+    prcLang: string;
+    prcDays: [string];
+    prcStartsAt: string;
+    prcEndsAt: string;
+    prcLink: string;
+    prcWhatLink: string;
 }
 
 const Practice: React.FC = () => {
 
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [prcData, setPrcData] = useState<PracticeProps[]>([]);
-  const [currentTime, setCurrentTime] = useState(new Date());
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
+    const [prcData, setPrcData] = useState<PracticeProps[]>([]);
+    const [currentTime, setCurrentTime] = useState(new Date());
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+        return () => clearInterval(interval);
+    }, []);
 
-  useEffect(() => {
-    async function fetchPracticeData() {
-      try {
-        const res = await fetch(`${BASE_API_URL}/api/course-practice`, { cache: "no-store" });
-        const practiceData = await res.json();
-        const updatedPrcList = practiceData?.prcList?.map((item:any)=>{
-          return {
-            ...item,
-            prcName:item.prcName.coNick
-          }
-        })
-        setPrcData(updatedPrcList);
-      } catch (error) {
-        console.error("Error fetching course data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchPracticeData();
-  }, []);
+    useEffect(() => {
+        async function fetchPracticeData() {
+            try {
+                const res = await fetch(`${BASE_API_URL}/api/course-practice`, { cache: "no-store" });
+                const practiceData = await res.json();
+                const updatedPrcList = practiceData?.prcList?.map((item: any) => {
+                    return {
+                        ...item,
+                        prcName: item.prcName.coNick
+                    }
+                })
+                setPrcData(updatedPrcList);
+            } catch (error) {
+                console.error("Error fetching course data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchPracticeData();
+    }, []);
 
-  const data = React.useMemo(() => prcData, [prcData]);
+    const data = React.useMemo(() => prcData, [prcData]);
 
-  const convertDateTime = (dateStr: string, timeStr: string) => {
-    const date = new Date(dateStr); // Already a valid ISO date
-    const formattedTime = timeStr.replace('.', ':');
-    const [hours, minutes] = formattedTime.split(':').map(Number);
-  
-    // Set hours and minutes safely
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  };
+    const columns = React.useMemo(() => [
+        { header: 'Course', accessorKey: 'prcName' },
+        { header: 'Starts At', accessorKey: 'prcStartsAt' },
+        { header: 'Ends At', accessorKey: 'prcEndsAt' },
+        { header: 'Language', accessorKey: 'prcLang' },
+        {
+            header: 'Class',
+            accessorKey: 'prcLink',
+            cell: ({ row }: { row: any }) => {
+                const { prcStartsAt, prcEndsAt, prcDays, prcLink } = row.original;
+                const currentTimeOnly = currentTime.toLocaleTimeString('en-US', { hour12: false });
 
-  const columns = React.useMemo(() => [
-    { header: 'Course', accessorKey: 'prcName' },
-    { header: 'Starts At', accessorKey: 'prcStartsAt' },
-    { header: 'Ends At', accessorKey: 'prcEndsAt' },
-    { header: 'Language', accessorKey: 'prcLang' },
-    {
-      header: 'Class',
-      accessorKey: 'prcLink',
-      cell: ({ row }: { row: any }) => {
-        const { prcStartsAt, prcEndsAt, prcDate, prcLink } = row.original;
-        const startTime = convertDateTime(prcDate, prcStartsAt);
-        const endTime = convertDateTime(prcDate, prcEndsAt);
-      
-        const diffInMs = startTime.getTime() - currentTime.getTime();
-        const diffInMin = diffInMs / (1000 * 60);
-          
-          if ((diffInMin <= 15 && currentTime < endTime) || (currentTime >= startTime && currentTime <= endTime)) {
-            return (
-              <div className='flex items-center gap-3'>
-                <button
-                  type='button'
-                  title='Join'
-                  onClick={() => window.open(prcLink, '_blank')}
-                  className='bg-orange-600 py-1 px-2 font-semibold rounded-sm text-white text-sm'
-                >
-                  JOIN
-                </button>
-              </div>
-            );
-          }else if (diffInMin > 15) {
-            return <span className='text-blue-500 font-medium italic'>Upcoming</span>;        
-          } else if (currentTime > endTime) {
-            return <span className='text-gray-500 italic'>Ended</span>;
-          }      
-    
-        return <span className='text-gray-400'>N/A</span>;
-      },
-    },
-    {
-      header: 'Action',
-      accessorKey: 'prcAction',
-      cell: ({ row }: { row: any }) => (
-        <div className='flex items-center gap-3'>
-          <button type='button' title='View' onClick={() => router.push(`/account/course-practice/${row.original._id}/view-practice-class`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12} /></button>
-          <button type='button' title='Edit' onClick={() => router.push(`/account/course-practice/${row.original._id}/edit-practice-class`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full hover:border-black'><BiEditAlt size={12} /></button>
-          <button type='button' title='Disable' onClick={() => router.push(`/account/course-practice/${row.original._id}/disable-practice-class`)} className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full hover:border-black'><HiMinus size={12} /></button>
-          <button type='button' title='Delete' onClick={() => router.push(`/account/course-practice/${row.original._id}/delete-practice-class`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full hover:border-black'><RxCross2 size={12} /></button>
+                if (prcLink && prcDays.includes(currentTime.toLocaleDateString('en-US', { weekday: 'short' })) && currentTimeOnly >= prcStartsAt && currentTimeOnly <= prcEndsAt) {
+                    return (
+                        <div className='flex items-center gap-3'>
+                            <button
+                                type='button'
+                                title='Join'
+                                onClick={() => window.open(prcLink, '_blank')}
+                                className='bg-orange-600 py-1 px-2 font-semibold rounded-sm text-white text-sm'
+                            >
+                                JOIN
+                            </button>
+                        </div>
+                    );
+                } else {
+                    return <div className='flex items-center gap-3'>N/A</div>;
+                }
+            },
+        },
+        {
+            header: 'Action',
+            accessorKey: 'prcAction',
+            cell: ({ row }: { row: any }) => (
+                <div className='flex items-center gap-3'>
+                    <button type='button' title='View' onClick={() => router.push(`/account/course-practice/${row.original._id}/view-practice-class`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12} /></button>
+                    <button type='button' title='Edit' onClick={() => router.push(`/account/course-practice/${row.original._id}/edit-practice-class`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full hover:border-black'><BiEditAlt size={12} /></button>
+                    <button type='button' title='Disable' onClick={() => router.push(`/account/course-practice/${row.original._id}/disable-practice-class`)} className='text-pink-500 border-[1.5px] border-pink-700 p-1 rounded-full hover:border-black'><HiMinus size={12} /></button>
+                    <button type='button' title='Delete' onClick={() => router.push(`/account/course-practice/${row.original._id}/delete-practice-class`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full hover:border-black'><RxCross2 size={12} /></button>
+                </div>
+            ),
+        },
+    ], [currentTime, router]);
+
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [pageInput, setPageInput] = React.useState(1);
+    const [filtered, setFiltered] = useState('');
+
+    const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) =>
+        String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase());
+
+    const table = useReactTable({
+        data,
+        columns,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        globalFilterFn,
+        state: {
+            sorting,
+            globalFilter: filtered,
+            pagination: { pageIndex: pageInput - 1, pageSize: 100 }
+        },
+        onSortingChange: setSorting,
+        onGlobalFilterChange: setFiltered,
+    });
+
+    if (isLoading) return <Loading />;
+
+    return (
+        <div>
+            <div className='flex items-center justify-between mb-4'>
+                <Link href="/account/add-new-practice" className='btnLeft'><HiMiniUserGroup size={24} /></Link>
+                <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)} />
+            </div>
+            <div className='overflow-auto max-h-[412px]'>
+                <DataTable table={table} />
+            </div>
         </div>
-      ),
-    },
-  ], [currentTime, router]);
-
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [pageInput, setPageInput] = React.useState(1);
-  const [filtered, setFiltered] = useState('');
- 
-  const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => 
-    String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase());
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    globalFilterFn,
-    state: { 
-      sorting, 
-      globalFilter: filtered,
-      pagination:{ pageIndex: pageInput - 1, pageSize: 100 } 
-     },
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setFiltered,
-  });
-
-  if (isLoading) return <Loading />;
-
-  return (
-    <div>
-      <div className='flex items-center justify-between mb-4'>
-        <Link href="/account/add-new-practice" className='btnLeft'><HiMiniUserGroup size={24} /></Link>
-        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)} />
-      </div>
-      <div className='overflow-auto max-h-[412px]'>
-        <DataTable table={table} />
-      </div>
-    </div>
-  );
-} 
+    );
+}
 
 export default Practice;
