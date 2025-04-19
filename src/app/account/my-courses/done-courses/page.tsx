@@ -1,18 +1,11 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Loading from '../../Loading';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Cookies from 'js-cookie';
 import { TfiFaceSad } from "react-icons/tfi";
-
-
-interface IMyCourseParams {
-params:Promise<{
-  SdkId:string;
-}>
-}
 
 interface DoneCoursesProps {
   coName: string, 
@@ -33,21 +26,39 @@ interface DoneCoursesProps {
 const DoneCourses : React.FC = () => {
 
   const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [myCoData, setMyCoData] = React.useState<DoneCoursesProps[] | null>([]);
-
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [myCoData, setMyCoData] = useState<DoneCoursesProps[] | null>([]);
+  const [loggedInUser, setLoggedInUser] = useState({
+      result: {
+        _id: '',
+        usrName: '',
+        usrRole: '',
+      },
+    });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
     }
-  }; 
+  }, []);
 
   useEffect(()=>{
     async function fetchMyCourseData() {
       try {
-        const response = await fetch(`${BASE_API_URL}/api/done-courses?sdkid=${loggedInUser.result._id}`);
+        const response = await fetch(`${BASE_API_URL}/api/done-courses?sdkid=${Cookies.get("loggedInUserId")}`,);
         const data = await response.json();
         const updatedCoList = data.coList.map((item:any) => { 
             return { ...item, coCat: item.coCat.catName };
@@ -72,7 +83,7 @@ const DoneCourses : React.FC = () => {
     <div>
       {myCoData && myCoData.length > 0 ? (
         <div className="grid grid-cols-3 gap-9 my-9">
-          {myCoData.map((cor: any) => (
+          {myCoData?.map((cor: any) => (
             <div
               key={cor._id}
               className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-3 border-[1.5px] border-orange-600"
@@ -107,7 +118,25 @@ const DoneCourses : React.FC = () => {
                 <span className="font-bold">Elegibility:</span>{" "}
                 {cor.eligibilityName}
               </p>
-              <div className="grid grid-cols-2 gap-1">
+              <div className="grid grid-cols-1 gap-1">
+              <button
+                type="button"
+                className="btnRight"
+                disabled={cor.reqStatus === "Pending"}
+                onClick={() => {
+                  if (cor.reqStatus === "Approved") {
+                    router.push(`/account/my-courses/${cor._id}/enroll-course`);
+                  } else if (!cor.reqStatus || cor.reqStatus === "Rejected") {
+                    router.push(`/account/my-courses/${cor._id}/request-to-re-enroll`);
+                  }
+                }}
+              >
+                {cor.reqStatus === "Pending"
+                  ? "Requested"
+                  : cor.reqStatus === "Approved"
+                  ? "Re-enroll"
+                  : "Request to Re-enroll"}
+                </button>
                 <button
                   type="button"
                   className="btnLeft"
@@ -116,15 +145,6 @@ const DoneCourses : React.FC = () => {
                   }
                 >
                   Read More
-                </button>
-                <button
-                  type="button"
-                  className="btnRight"
-                  onClick={() =>
-                    router.push(`/account/my-courses/${cor._id}/enroll-course`)
-                  }
-                >
-                  Re-Enroll
                 </button>
               </div>
             </div>

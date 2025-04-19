@@ -55,6 +55,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
     coDisc: 0,
     coType: "",
   });
+  
   const [enrData, setEnrData] = useState<BatchDataProps>({
     enrSrnShot: "",
     cpnName: "",

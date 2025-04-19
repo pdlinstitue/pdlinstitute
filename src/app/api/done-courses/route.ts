@@ -4,13 +4,14 @@ import Enrollments from "../../../../modals/Enrollments";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Categories from "../../../../modals/Categories";
+import Reenrollments from "../../../../modals/Reenrollments";
 
 export async function GET(req: NextRequest) {
     try {
         await dbConnect();
 
         const sdkId = req.nextUrl.searchParams.get("sdkid");
-        
+
         if (!sdkId) {
             return NextResponse.json({ error: "Missing sdkid parameter" }, { status: 400 });
         }
@@ -23,30 +24,39 @@ export async function GET(req: NextRequest) {
         // Step 2: Filter courses based on completion status
         const completedCourses = [];
 
-        let eligibilityName = "";
-
         for (const course of allCourses) {
             // Check if the user is enrolled and has completed the course
             const enrollment = await Enrollments.findOne({
                 createdBy: sdkObjectId,
                 corId: course._id,
+                isApproved: "Approved",
                 isCompleted: "Complete",
             });
 
-            if (course.coElgType === "Course" && course.coElg!=="None"){
-                const eligibleCourse = await Courses.findById(course.coElgId, "coNick");
-                eligibilityName = eligibleCourse ? eligibleCourse.coNick : "Unknown Course";
-            }
-            else if (course.coElgType === "Category" && course.coElg!=="None"){
-                const eligibleCategory = await Categories.findById(course.coElg, "catName");
-                eligibilityName = eligibleCategory ? eligibleCategory.catName : "Unknown Category";
-            }
-            else{
-                eligibilityName=course.coElg;
-            }
-
             if (enrollment) {
-                completedCourses.push({ ...course, eligibilityName });
+                // Fetch eligibility name
+                let eligibilityName = "None";
+                if (course.coElgType === "Course" && course.coElg !== "None") {
+                    const eligibleCourse = await Courses.findById(course.coElgId, "coNick");
+                    eligibilityName = eligibleCourse ? eligibleCourse.coNick : "Unknown Course";
+                } else if (course.coElgType === "Category" && course.coElg !== "None") {
+                    const eligibleCategory = await Categories.findById(course.coElg, "catName");
+                    eligibilityName = eligibleCategory ? eligibleCategory.catName : "Unknown Category";
+                } else {
+                    eligibilityName = course.coElg;
+                }
+
+                // Fetch reqStatus from reenrollments
+                const reenrollment = await Reenrollments.findOne({
+                    sdkId: sdkObjectId,
+                    corId: course._id,
+                });
+
+                completedCourses.push({
+                    ...course,
+                    eligibilityName,
+                    reqStatus: reenrollment ? reenrollment.reqStatus : null,
+                });
             }
         }
 

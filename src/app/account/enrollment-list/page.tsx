@@ -42,7 +42,6 @@ const EnrollmentList : React.FC = () => {
   const [selectedBatch, setSelectedBatch] = useState<string>('')
   const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
   const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
-  const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
   const [filtered, setFiltered] = React.useState('');
   const [pageInput, setPageInput] = React.useState(1);
   const [selectedDuration, setSelectedDuration]=useState<number>(1);

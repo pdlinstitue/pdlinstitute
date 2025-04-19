@@ -182,7 +182,7 @@ const CommDetails : React.FC = () => {
           <div className='flex flex-col gap-2'>
             <label>Comm Address:
               <span className='text-red-500 px-3'>*</span>
-              <input type='checkbox' checked={isSameComm} onChange={handleSameCommToggle} className='ml-2' />Check if same
+              <input type='checkbox' checked={isSameComm} onChange={handleSameCommToggle} /> {"" }Check if same
             </label>
             <textarea rows={4} name='sdkComAdds' value={userData.sdkComAdds} placeholder='Communication Address' onChange={handleChange} className='inputBox' disabled={isSameComm} />
           </div>

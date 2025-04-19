@@ -50,12 +50,13 @@ const ContactDetails: React.FC = () => {
             />
           </div>
           <div className='flex flex-col gap-2'>
-            <label>Phone Number:*
+            <label className='flex items-center gap-3'>Phone Number:*
               <input
                 type='checkbox'
                 checked={isSameAsWhatsapp}
                 onChange={handleSameAsWhatsappToggle}
-              />Check if same
+              />
+              <span>Check if same</span>
             </label>
             <input
               type='text'
@@ -68,7 +69,6 @@ const ContactDetails: React.FC = () => {
             />
           </div>
         </div>
-
         <div className='grid grid-cols-1 mt-2'>
           <div className='flex flex-col gap-2'>
             <label>Email:*</label>
@@ -105,6 +105,10 @@ const ContactDetails: React.FC = () => {
               placeholder='Enter email OTP'
             />
           </div>
+        </div>
+        <div className='grid grid-cols-2 gap-2 mt-4'>
+          <button type='button' className='btnLeft'>Send OTP</button>
+          <button type='button' className='btnRight'>Verify</button>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import Loading from '../account/Loading';
 import SadhakSideMenu from './SadhakSideMenu';
 import AdminSideMenu from './AdminSideMenu';
+import VolunteerSideMenu from './VolunteerSideMenu';
 
 
 
@@ -54,8 +55,11 @@ const SideBar: React.FC = () => {
           <p className='text-white font-bold'>PDL INSTITUTE</p>
         </div>
         <div className='flex flex-col gap-2'>
-          {(loggedInUser.result.usrRole === 'Sadhak' || loggedInUser.result.usrRole === 'Volunteer') && (
+          {(loggedInUser.result.usrRole === 'Sadhak') && (
             <SadhakSideMenu />
+          )}
+          {(loggedInUser.result.usrRole === 'Volunteer') && (
+            <VolunteerSideMenu />
           )}
           {(loggedInUser.result.usrRole === 'Admin' || loggedInUser.result.usrRole === 'View-Admin') && (
             <AdminSideMenu />
