@@ -1,7 +1,11 @@
 "use client";
 import { StepperContext } from '@/app/context/StepperContext';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
+
+interface countryListProps {
+  country_phonecode: string;
+}
 const ContactDetails: React.FC = () => {
 
   const stepperContext = useContext(StepperContext);
@@ -11,6 +15,9 @@ const ContactDetails: React.FC = () => {
   }
 
   const { userData, setUserData } = stepperContext;
+  const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSameAsWhatsapp, setIsSameAsWhatsapp] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,39 +41,78 @@ const ContactDetails: React.FC = () => {
     }
   };
 
+  useEffect(()=>{
+    async function fetchCountryList() {
+      try {
+        const response = await fetch('/api/countries');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setCountryList(data?.ctrList);
+      } catch (error) {
+        console.error('Error fetching country list:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  fetchCountryList();
+  },[]);
+
   return (
     <div>
       <div className='flex flex-col'>
-        <div className='grid grid-cols-2 gap-2'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
           <div className='flex flex-col gap-2'>
             <label>Whatsapp Number:*</label>
-            <input
-              type='text'
-              name='sdkWhtNbr'
-              value={userData.sdkWhtNbr}
-              placeholder='with country code e.g. +91 if india'
-              onChange={handleChange}
-              className='inputBox'
-            />
+            <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-1'>
+              <select className='w-full sm:w-24 inputBox'>
+                {countryList?.map((item, index) => (
+                  <option key={index} value={item.country_phonecode}>
+                    {item.country_phonecode}
+                  </option>
+                ))}
+              </select>
+              <input
+                type='text'
+                name='sdkWhtNbr'
+                value={userData.sdkWhtNbr}
+                placeholder='Enter whatsapp number'
+                onChange={handleChange}
+                className='inputBox w-full'
+              />
+            </div>
           </div>
           <div className='flex flex-col gap-2'>
-            <label className='flex items-center gap-3'>Phone Number:*
-              <input
-                type='checkbox'
-                checked={isSameAsWhatsapp}
-                onChange={handleSameAsWhatsappToggle}
-              />
-              <span>Check if same</span>
+            <label className='flex flex-col sm:flex-row sm:items-center gap-2'>
+              Phone Number:*
+              <div className="flex items-center gap-2">
+                <input
+                  type='checkbox'
+                  checked={isSameAsWhatsapp}
+                  onChange={handleSameAsWhatsappToggle}
+                />
+                <span>Check if same</span>
+              </div>
             </label>
-            <input
-              type='text'
-              name='sdkPhone'
-              value={userData.sdkPhone}
-              placeholder='with country code e.g. +91 if india'
-              onChange={handleChange}
-              className='inputBox'
-              disabled={isSameAsWhatsapp}
-            />
+            <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-1'>
+              <select className='w-full sm:w-24 inputBox'>
+                {countryList?.map((item, index) => (
+                  <option key={index} value={item.country_phonecode}>
+                    {item.country_phonecode}
+                  </option>
+                ))}
+              </select>
+              <input
+                type='text'
+                name='sdkPhone'
+                value={userData.sdkPhone}
+                placeholder='Enter phone number'
+                onChange={handleChange}
+                className='inputBox w-full'
+                disabled={isSameAsWhatsapp}
+              />
+            </div>
           </div>
         </div>
         <div className='grid grid-cols-1 mt-2'>
@@ -82,7 +128,7 @@ const ContactDetails: React.FC = () => {
             />
           </div>
         </div>
-        <div className='grid grid-cols-2 gap-2 mt-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-1 mt-4'>
           <div className='flex flex-col gap-2'>
             <label>Phone OTP:</label>
             <input
@@ -106,13 +152,15 @@ const ContactDetails: React.FC = () => {
             />
           </div>
         </div>
-        <div className='grid grid-cols-2 gap-2 mt-4'>
-          <button type='button' className='btnLeft'>Send OTP</button>
-          <button type='button' className='btnRight'>Verify</button>
+  
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-1 mt-4'>
+          <button type='button' className='btnLeft w-full'>Send OTP</button>
+          <button type='button' className='btnRight w-full'>Verify</button>
         </div>
       </div>
     </div>
   );
+  
 };
 
 export default ContactDetails;
