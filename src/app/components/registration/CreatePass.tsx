@@ -19,7 +19,7 @@ const CreatePass : React.FC = () => {
 
   return (
     <div>
-      <div className='flex flex-col'>
+      <div className=' max-w-[600px]'>
         <div className='grid grid-rows-2 gap-2'>
           <div className='flex flex-col gap-2'>
             <label>Create Password:*</label>
