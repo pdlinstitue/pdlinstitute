@@ -43,13 +43,15 @@ const Practice: React.FC = () => {
             try {
                 const res = await fetch(`${BASE_API_URL}/api/course-practice`, { cache: "no-store" });
                 const practiceData = await res.json();
-                const updatedPrcList = practiceData?.prcList?.map((item: any) => {
-                    return {
-                        ...item,
-                        prcName: item.prcName.coNick
-                    }
-                })
-                setPrcData(updatedPrcList);
+                if (practiceData.success) {
+                    const updatedPrcList = practiceData?.prcList?.map((item: any) => {
+                        return {
+                            ...item,
+                            prcName: item.prcName.coNick
+                        }
+                    })
+                    setPrcData(updatedPrcList);
+                }
             } catch (error) {
                 console.error("Error fetching course data:", error);
             } finally {
