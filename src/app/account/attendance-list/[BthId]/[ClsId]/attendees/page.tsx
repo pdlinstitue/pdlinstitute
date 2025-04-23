@@ -34,6 +34,7 @@ interface ClassAttendeesProps {
     status: string;
     absRemarks: string;
     clsStartAt: Date;
+    clsEndAt: Date;
 }
 
 const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
@@ -131,11 +132,12 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
                 accessorKey: "action",
                 cell: ({ row }: { row: any }) => {
                     const clsStartAt = row.original.clsStartAt;
+                    const clsEndAt = row.original.clsEndAt;                        ;
                     const isVolunteer = Cookies.get("loggedInUserRole") === "Volunteer";
                     
                     return (
                         <div className="flex items-center gap-4">
-                            {isVolunteer && localDateTime >= clsStartAt && (
+                            {isVolunteer && localDateTime >= clsStartAt && localDateTime <= clsEndAt && (
                                 <button
                                     type="button"
                                     title="Mark"
@@ -195,7 +197,8 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
                     sdkId: item.createdBy._id,
                     status: item.attendanceStatus,
                     absRemarks: item.attendanceRemark,
-                    clsStartAt: item.clsStartAt
+                    clsStartAt: item.clsStartAt,
+                    clsEndAt: item.clsEndAt,
                 }));
 
                 setEnrollData(enrollList);
