@@ -19,7 +19,8 @@ const PersonalDetails : React.FC = () => {
     
     return (
     <div className='max-w-[600px] '>
-      <div className='grid md:grid-cols-3 gap-2'>
+      <div className='flex flex-col gap-2'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-1'>
           <div className='flex flex-col gap-2'>
             <label>First Name:<span className='text-red-500'>*</span></label>
             <input type='text' name='sdkFstName' value={userData.sdkFstName} placeholder='As per Gvt. ID' onChange={handleChange} className='inputBox' />
@@ -33,7 +34,7 @@ const PersonalDetails : React.FC = () => {
             <input type='text' name='sdkLstName' value={userData.sdkLstName} placeholder='As per Gvt. ID' onChange={handleChange} className='inputBox' />
           </div>
         </div>
-        <div className='grid md:grid-cols-2 gap-2 mt-2'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
           <div className='flex flex-col gap-2'>
             <label>Birth Date:<span className='text-red-500'>*</span></label>
             <input type='date' name='sdkBthDate' value={userData.sdkBthDate} onChange={handleChange} className='inputBox' />
@@ -48,17 +49,16 @@ const PersonalDetails : React.FC = () => {
             </select>
           </div>
         </div>
-        <div className='grid grid-cols-1 gap-2 mt-2'>
-          <div className='flex flex-col gap-2'>
-            <label>Marital Status:<span className='text-red-500'>*</span></label>
-            <select name='sdkMarStts' value={userData.sdkMarStts} onChange={handleChange} className='inputBox h-[45px] '>
-              <option className='text-center' value=''>--- Select ---</option>
-              <option value='Married'>Married</option>
-              <option value='Unmarried'>Unmarried</option>
-              <option value='Other'>Other</option>
-            </select>
-          </div>
+        <div className='flex flex-col gap-2'>
+          <label>Marital Status:<span className='text-red-500'>*</span></label>
+          <select name='sdkMarStts' value={userData.sdkMarStts} onChange={handleChange} className='inputBox h-[45px] '>
+            <option className='text-center' value=''>--- Select ---</option>
+            <option value='Married'>Married</option>
+            <option value='Unmarried'>Unmarried</option>
+            <option value='Other'>Other</option>
+          </select>
         </div>
+      </div>
     </div>
   )
 }
