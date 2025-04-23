@@ -1,5 +1,6 @@
 "use client";
 import { StepperContext } from '@/app/context/StepperContext';
+import { SMS_KEY } from '@/app/utils/constant';
 import React, { useContext, useEffect, useState } from 'react';
 
 
@@ -14,13 +15,12 @@ const ContactDetails: React.FC = () => {
     return null; // or handle the null case appropriately
   }
 
-  const { userData, setUserData } = stepperContext;
+  const { userData, setUserData, setErrorMessage } = stepperContext;
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSameAsWhatsapp, setIsSameAsWhatsapp] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       const {name, value} = e.target;
       setUserData({...userData, [name]: value});
   }
@@ -59,6 +59,59 @@ const ContactDetails: React.FC = () => {
   fetchCountryList();
   },[]);
 
+  const handleSendOtp = () => {
+    fetch(`https://2factor.in/API/V1/${SMS_KEY}/SMS/${userData.sdkPhoneCntCode}${userData.sdkPhone}/AUTOGEN2/OTP1`, {
+      method: "GET"
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setUserData(prev => ({
+          ...prev,
+          sdkOtpVerified: false,
+          sdkPhoneSentOtp:data.OTP
+        }));
+        setErrorMessage("Otp sent.");
+      })
+      .catch(error => {
+        setErrorMessage("Error sending OTP: "+ error);
+      });
+  };    
+
+const handleVerifyOtp=()=>{
+  if(!userData.sdkPhoneSentOtp){
+    setErrorMessage("Please send OTP.");
+    return;
+  }
+
+  if(!userData.sdkPhoneOtp){
+    setErrorMessage("Please enter OTP.");
+    return;
+  }
+
+  if(userData.sdkPhoneSentOtp===userData.sdkPhoneOtp){
+    setUserData(prev => ({
+      ...prev,
+      sdkOtpVerified: true
+    }));
+    setErrorMessage("OTP verified.");
+  }
+  else{
+    setErrorMessage("OTP is invalid.");
+  }
+}
+
+const resetOtpData = () =>{
+  setUserData(prev => ({
+    ...prev,
+    sdkOtpVerified: false,
+    sdkPhoneOtp: "",
+    sdkPhoneSentOtp: "",
+    sdkEmailOtp: "",
+    sdkEmailSentOtp: ""
+  }));
+}
+
   return (
     <div>
       <div className='flex flex-col'>
@@ -66,7 +119,7 @@ const ContactDetails: React.FC = () => {
           <div className='flex flex-col gap-2'>
             <label>Whatsapp Number:*</label>
             <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-1'>
-              <select className='w-full sm:w-24 inputBox'>
+              <select className='w-full sm:w-24 inputBox' name='sdkWhtNbrCntCode' value={userData.sdkWhtNbrCntCode} onChange={handleChange}>              
                 {countryList?.map((item, index) => (
                   <option key={index} value={item.country_phonecode}>
                     {item.country_phonecode}
@@ -96,7 +149,15 @@ const ContactDetails: React.FC = () => {
               </div>
             </label>
             <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-1'>
-              <select className='w-full sm:w-24 inputBox'>
+            <select
+                className='w-full sm:w-24 inputBox'
+                name='sdkPhoneCntCode'
+                value={userData.sdkPhoneCntCode}
+                onChange={(e) => {
+                  handleChange(e);
+                  resetOtpData();
+                }}
+              >
                 {countryList?.map((item, index) => (
                   <option key={index} value={item.country_phonecode}>
                     {item.country_phonecode}
@@ -108,7 +169,10 @@ const ContactDetails: React.FC = () => {
                 name='sdkPhone'
                 value={userData.sdkPhone}
                 placeholder='Enter phone number'
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  resetOtpData();
+                }}
                 className='inputBox w-full'
                 disabled={isSameAsWhatsapp}
               />
@@ -154,8 +218,8 @@ const ContactDetails: React.FC = () => {
         </div>
   
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-1 mt-4'>
-          <button type='button' className='btnLeft w-full'>Send OTP</button>
-          <button type='button' className='btnRight w-full'>Verify</button>
+          <button type='button' className='btnLeft w-full' onClick={handleSendOtp}>Send OTP</button>
+          <button type='button' className='btnRight w-full' onClick={handleVerifyOtp}>Verify</button>
         </div>
       </div>
     </div>

@@ -22,7 +22,9 @@ interface UserDataProps {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string | undefined;
+  sdkWhtNbrCntCode: string;
   sdkWhtNbr: string;
+  sdkPhoneCntCode: string;
   sdkPhone: string;
   sdkEmail: string;
   sdkCountry: string;
@@ -36,6 +38,9 @@ interface UserDataProps {
   sdkConfPwd: string;
   sdkPhoneOtp:string; 
   sdkEmailOtp:string;
+  sdkPhoneSentOtp:string; 
+  sdkEmailSentOtp:string;
+  sdkOtpVerified:boolean;
 }
 
 const Register = () => {
@@ -50,7 +55,9 @@ const Register = () => {
     sdkGender: "",
     sdkMarStts: "",
     sdkSpouce: "",
+    sdkWhtNbrCntCode: "+91",
     sdkWhtNbr: "",
+    sdkPhoneCntCode: "+91",
     sdkPhone: "",
     sdkEmail: "",
     sdkPinCode: 0,
@@ -63,7 +70,10 @@ const Register = () => {
     sdkPwd: "",
     sdkConfPwd: "",
     sdkPhoneOtp:"", 
-  sdkEmailOtp:"",
+    sdkEmailOtp:"",
+    sdkPhoneSentOtp:"", 
+    sdkEmailSentOtp:"",
+    sdkOtpVerified:false,
   });
   const [finalData, setFinalData] = useState<any[]>([]);
   const [errorMessage,setErrorMessage] = useState<string>("");
@@ -138,10 +148,20 @@ const Register = () => {
         return false;
       }
     } else if(step === 3){   
+      if(!userData || !("sdkWhtNbrCntCode" in userData) || userData.sdkWhtNbrCntCode === null || userData.sdkWhtNbrCntCode.trim() === ""){
+        setErrorMessage("Whatsapp number country code is required.");
+        return false;
+      }
       if(!userData || !("sdkWhtNbr" in userData) || userData.sdkWhtNbr === null || userData.sdkWhtNbr.trim() === ""){
         setErrorMessage("Whatsapp number is required.");
         return false;
       }
+
+      if(!userData || !("sdkPhoneCntCode" in userData) || userData.sdkPhoneCntCode === null || userData.sdkPhoneCntCode.trim() === ""){
+        setErrorMessage("Phone number country code is required.");
+        return false;
+      }
+
       if(!userData || !("sdkPhone" in userData) || userData.sdkPhone === null || userData.sdkPhone.trim() === ""){
         setErrorMessage("Phone number is required.");
         return false;
@@ -150,6 +170,21 @@ const Register = () => {
         setErrorMessage("Email is required.");
         return false;
       }
+      if(!userData || !("sdkPhoneOtp" in userData) || userData.sdkPhoneOtp === null || userData.sdkPhoneOtp.trim() === ""){
+        setErrorMessage("Phone Otp is required.");
+        return false;
+      }
+
+      if(!userData || !("sdkEmailOtp" in userData) || userData.sdkEmailOtp === null || userData.sdkEmailOtp.trim() === ""){
+        setErrorMessage("Email Otp is required.");
+        return false;
+      }
+
+      if(!userData || !("sdkOtpVerified" in userData) || userData.sdkOtpVerified === null || userData.sdkOtpVerified === false){
+        setErrorMessage("Otp is not verified.");
+        return false;
+      }
+
     } else if(step === 4){   
       if(!userData || !("sdkPwd" in userData) || userData.sdkPwd === null || userData.sdkPwd.trim() === ""){
         setErrorMessage("Password is required.");
@@ -192,8 +227,8 @@ const Register = () => {
               sdkGender: userData.sdkGender,
               sdkMarStts: userData.sdkMarStts,
               sdkSpouce: userData.sdkSpouce,
-              sdkPhone: userData.sdkPhone,
-              sdkWhtNbr: userData.sdkWhtNbr,
+              sdkPhone: userData.sdkPhoneCntCode+userData.sdkPhone,
+              sdkWhtNbr: userData.sdkWhtNbrCntCode+userData.sdkWhtNbr,
               sdkEmail: userData.sdkEmail,
               sdkCountry:userData.sdkCountry,
               sdkState:userData.sdkState,
@@ -234,7 +269,7 @@ const Register = () => {
                 currentStep={currentStep}
             />
             <div className='mb-6 mt-10'>
-              <StepperContext.Provider value={{userData, setUserData, finalData, setFinalData}}>
+              <StepperContext.Provider value={{userData, setUserData, finalData, setFinalData, setErrorMessage}}>
                 {displayStep(currentStep)}
               </StepperContext.Provider>
             </div>               

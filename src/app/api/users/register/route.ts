@@ -111,8 +111,8 @@ export async function POST(req: NextRequest) {
     }
     
     const hashedPwd = await bcrypt.hash(sdkPwd, 12);
-    const country = await Countries.findOne({country_id:sdkCountry});
-    const state = await States.findOne({state_id:sdkState});
+    const country = await Countries.findOne({country_name:sdkCountry});
+    const state = await States.findOne({state_name:sdkState});
     const customId = await generateCustomId(country, state);
 
     const newUser = new Users({
