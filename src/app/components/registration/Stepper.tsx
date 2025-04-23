@@ -51,7 +51,7 @@ const Stepper: React.FC<StepperProps> = ({steps, currentStep}) => {
                     <div className={`flex items-center justify-center py-3 ${step.selected ? "bg-orange-500 text-white font-bold border border-orange-500" : ""} rounded-full transition duration-500 ease-in-out border-2 border-gray-300 h-12 w-12`}>
                         {step.completed ?( <span className='text-white font-bold text-xl'>&#10003;</span>) :( index + 1)}
                     </div>
-                    <div className={`absolute ${step.highlighted ? "text-black" : "text-gray-400"} top-0 text-center mt-16 w-32 text-xs font-medium uppercase`}>
+                    <div className={`hidden lg:block absolute ${step.highlighted ? "text-black" : "text-gray-400"} top-0 text-center mt-16 w-32 text-xs font-medium uppercase`}>
                         {step.description}
                     </div>
                 </div>

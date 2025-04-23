@@ -114,7 +114,7 @@ const resetOtpData = () =>{
 
   return (
     <div>
-      <div className='flex flex-col'>
+      <div className='flex flex-col max-w-[600px]'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
           <div className='flex flex-col gap-2'>
             <label>Whatsapp Number:*</label>
@@ -137,17 +137,15 @@ const resetOtpData = () =>{
             </div>
           </div>
           <div className='flex flex-col gap-2'>
-            <label className='flex flex-col sm:flex-row sm:items-center gap-2'>
-              Phone Number:*
-              <div className="flex items-center gap-2">
-                <input
-                  type='checkbox'
-                  checked={isSameAsWhatsapp}
-                  onChange={handleSameAsWhatsappToggle}
-                />
-                <span>Check if same</span>
-              </div>
-            </label>
+            <div className='flex items-center gap-2'>
+              <label>Phone Number:*</label>
+              <input
+                type='checkbox'
+                checked={isSameAsWhatsapp}
+                onChange={handleSameAsWhatsappToggle}
+              />
+              <span>Check if same</span>
+            </div>
             <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-1'>
             <select
                 className='w-full sm:w-24 inputBox'

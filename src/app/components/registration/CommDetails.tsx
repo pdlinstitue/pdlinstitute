@@ -131,12 +131,11 @@ const CommDetails : React.FC = () => {
     </div>
   }
   return (
-    <div>
-      <div className='flex flex-col gap-6'>
-        <div className='grid grid-cols-3 gap-2'>
+    <div className='max-w-[600px] '>
+        <div className='grid lg:grid-cols-3 gap-2'>
           <div className='flex flex-col gap-2'>
             <label>Country:<span className='text-red-500'>*</span></label>
-            <select className='inputBox' name='sdkCountry' value={userData.sdkCountry} onChange={handleChange}>
+            <select className='inputBox w-auto' name='sdkCountry' value={userData.sdkCountry} onChange={handleChange}>
               <option className='text-center'> --- Select --- </option>
               {
                 countryList?.map((ctr:any)=>{
@@ -149,7 +148,7 @@ const CommDetails : React.FC = () => {
           </div>
           <div className='flex flex-col gap-2'>
             <label>State:<span className='text-red-500'>*</span></label>
-            <select className='inputBox' name='sdkState' value={userData.sdkState} onChange={handleChange}>
+            <select className='inputBox w-auto' name='sdkState' value={userData.sdkState} onChange={handleChange}>
               <option className='text-center'> --- Select --- </option>
               {
                 stateList?.map((stt:any)=>{
@@ -162,7 +161,7 @@ const CommDetails : React.FC = () => {
           </div>
           <div className='flex flex-col gap-2'>
             <label>City:<span className='text-red-500'>*</span></label>
-            <select className='inputBox' name='sdkCity' value={userData.sdkCity} onChange={handleChange}>
+            <select className='inputBox w-auto' name='sdkCity' value={userData.sdkCity} onChange={handleChange}>
               <option className='text-center'> --- Select --- </option>
               {
                 cityList?.map((cty:any)=>{
@@ -174,7 +173,7 @@ const CommDetails : React.FC = () => {
             </select>
           </div>
         </div>
-        <div className='grid grid-cols-2 gap-2'>
+        <div className='grid md:grid-cols-2 gap-2'>
           <div className='flex flex-col gap-2'>
             <label>Perm Address:<span className='text-red-500'>*</span></label>
             <textarea rows={4} name='sdkParAdds' value={userData.sdkParAdds} placeholder='Permanent Address' onChange={handleChange} className='inputBox' />
@@ -187,20 +186,21 @@ const CommDetails : React.FC = () => {
             <textarea rows={4} name='sdkComAdds' value={userData.sdkComAdds} placeholder='Communication Address' onChange={handleChange} className='inputBox' disabled={isSameComm} />
           </div>
         </div>
-        <div className='grid grid-cols-2 gap-2'>
+        <div className='grid md:grid-cols-2 gap-2'>
           <div className='flex flex-col gap-2'>
-            <label>Pincode:<span className='text-red-500'>*</span></label>
+            <label className='md:hidden'>Pincode for permanent address:<span className='text-red-500'>*</span></label>
+            <label className='hidden md:flex'>Pincode:<span className='text-red-500'>*</span></label>
             <input type="number" name='sdkPinCode' value={userData.sdkPinCode} placeholder='For permanent address' onChange={handleChange} className='inputBox' />
           </div>
           <div className='flex flex-col gap-2'>
-            <label>Pincode:
-              <span className='text-red-500 px-3'>*</span>
-              <input type='checkbox' checked={isSamePin} onChange={handleSamePinToggle} className='ml-2' />Check if same
-            </label>
+            <label className='md:hidden'>Pincode for comm address:<span className='text-red-500 px-3'>*</span></label>
+            <div className='flex items-center gap-2'>
+              <label className='hidden md:flex'>Pincode:<span className='text-red-500 px-3'>*</span></label>
+              <input type='checkbox' checked={isSamePin} onChange={handleSamePinToggle} className='ml-2' />{""}Check if same
+            </div>
             <input type='number' name='sdkComPinCode' value={userData.sdkComPinCode} placeholder='For communication address' onChange={handleChange} className='inputBox' disabled={isSamePin} />
           </div>
         </div>
-      </div>
     </div>
   )
 }

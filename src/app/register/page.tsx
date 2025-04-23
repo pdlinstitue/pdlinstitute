@@ -75,6 +75,7 @@ const Register = () => {
     sdkEmailSentOtp:"",
     sdkOtpVerified:false,
   });
+
   const [finalData, setFinalData] = useState<any[]>([]);
   const [errorMessage,setErrorMessage] = useState<string>("");
 
@@ -262,26 +263,24 @@ const Register = () => {
     <div>
       <NavMenu/>
       <div className='flex justify-center items-center my-20'>
-        <div className='md:w-1/2 mx-auto shadow-xl rounded-md pb-2 border-[1px] border-orange-500'>
-          <div className='px-12 pt-12'>
-            <Stepper 
-                steps={steps}
-                currentStep={currentStep}
-            />
-            <div className='mb-6 mt-10'>
-              <StepperContext.Provider value={{userData, setUserData, finalData, setFinalData, setErrorMessage}}>
-                {displayStep(currentStep)}
-              </StepperContext.Provider>
-            </div>               
-            <p className='text-sm text-red-600 italic'>{errorMessage}</p>           
-              <StepperControl  
-                handleClick={handleClick}
-                currentStep={currentStep}
-                steps={steps}
-              /> 
-          </div>
+        <div className='formStyle w-auto'>
+          <Stepper 
+            steps={steps}
+            currentStep={currentStep}
+          />
+          <div className='mb-6 mt-10'>
+                      <StepperContext.Provider value={{ userData, setUserData, finalData, setFinalData, setErrorMessage }}>
+              {displayStep(currentStep)}
+            </StepperContext.Provider>
+          </div>               
+          <p className='text-sm text-red-600 italic'>{errorMessage}</p>           
+          <StepperControl  
+            handleClick={handleClick}
+            currentStep={currentStep}
+            steps={steps}
+          />
         </div>
-    </div>
+      </div>
     </div>
   )
 }
