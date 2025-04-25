@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 import Loading from '@/app/account/Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Image from 'next/image';
+import { FaIdCardClip } from "react-icons/fa6";
+
 
 
 interface UserProfileProps {
@@ -103,6 +105,10 @@ const ProfMenu = () => {
             <Link href={`/account/change-password/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
               <PiFolderLockFill size={24} />
               <span >Change Password</span>
+            </Link>
+            <Link href={`/account/my-id-card/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
+              <FaIdCardClip size={24} />
+              <span >My ID Card</span>
             </Link>
             <button type='button' 
               className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500"

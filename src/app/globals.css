@@ -73,6 +73,22 @@
   border-radius: 0.375rem; 
 }
 
+@media print {
+  
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-content, .print-content * {
+    visibility: visible;
+  }
+
+}
 
 body {
   background: white;
