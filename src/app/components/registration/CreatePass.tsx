@@ -19,8 +19,8 @@ const CreatePass : React.FC = () => {
 
   return (
     <div>
-      <div className=' max-w-[600px]'>
-        <div className='grid grid-rows-2 gap-2'>
+      <div className='max-w-[600px]'>
+        <div className='flex flex-col gap-2'>
           <div className='flex flex-col gap-2'>
             <label>Create Password:*</label>
             <input type='password' name='sdkPwd' placeholder='Min 8 characters' value={userData.sdkPwd} onChange={handleChange} className='inputBox' />

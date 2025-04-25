@@ -132,7 +132,7 @@ const CommDetails : React.FC = () => {
   }
   return (
     <div className='max-w-[600px] '>
-        <div className='grid lg:grid-cols-3 gap-2'>
+        <div className='grid lg:grid-cols-3 gap-1'>
           <div className='flex flex-col gap-2'>
             <label>Country:<span className='text-red-500'>*</span></label>
             <select className='inputBox w-auto' name='sdkCountry' value={userData.sdkCountry} onChange={handleChange}>
@@ -173,7 +173,7 @@ const CommDetails : React.FC = () => {
             </select>
           </div>
         </div>
-        <div className='grid md:grid-cols-2 gap-2'>
+        <div className='grid md:grid-cols-2 gap-2 mt-2'>
           <div className='flex flex-col gap-2'>
             <label>Perm Address:<span className='text-red-500'>*</span></label>
             <textarea rows={4} name='sdkParAdds' value={userData.sdkParAdds} placeholder='Permanent Address' onChange={handleChange} className='inputBox' />
@@ -186,7 +186,7 @@ const CommDetails : React.FC = () => {
             <textarea rows={4} name='sdkComAdds' value={userData.sdkComAdds} placeholder='Communication Address' onChange={handleChange} className='inputBox' disabled={isSameComm} />
           </div>
         </div>
-        <div className='grid md:grid-cols-2 gap-2'>
+        <div className='grid md:grid-cols-2 gap-2 mt-2'>
           <div className='flex flex-col gap-2'>
             <label className='md:hidden'>Pincode for permanent address:<span className='text-red-500'>*</span></label>
             <label className='hidden md:flex'>Pincode:<span className='text-red-500'>*</span></label>
