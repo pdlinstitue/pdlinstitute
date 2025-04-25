@@ -230,7 +230,7 @@ const ActiveSadhakList: React.FC = () => {
   return (
     <div>
       <div className='flex gap-2 items-center justify-between mb-4'>
-          <Link href="/account/add-new-sadhak" className='btnLeft'><FaUserPlus size={24}/></Link>
+          <Link href="/account/add-new-sadhak" title="Add New Sadhak" className='btnLeft'><FaUserPlus size={24}/></Link>
         <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className="overflow-auto max-h-[412px]">

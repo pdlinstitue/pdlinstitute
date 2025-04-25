@@ -2,6 +2,7 @@
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import Loading from '../Loading';
+import { PiChalkboardTeacherFill } from "react-icons/pi";
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -275,7 +276,7 @@ useEffect(() => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center w=[900px]'>
+          <div className='flex gap-1 items-center w=[900px]'>
           <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
               <option value="1">Last One Month</option>
               <option value="2">Last Two Month</option>
@@ -303,7 +304,7 @@ useEffect(() => {
             </select>
           </div>
           <div className='flex gap-2 items-center'>
-            <Link href="/account/add-new-class" className='btnLeft'>CREATE CLASS</Link>
+            <Link href="/account/add-new-class" title='Create Class' className='btnLeft'><PiChalkboardTeacherFill size={24}/></Link>
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
           </div>
         </div>

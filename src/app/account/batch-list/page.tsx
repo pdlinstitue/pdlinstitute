@@ -134,7 +134,7 @@ const BatchList : React.FC = () => {
   return (
     <div>
       <div className='flex items-center justify-between mb-4'>
-        <Link href="/account/add-new-batch" className='btnLeft'><BiLayerPlus size={24}/></Link>
+        <Link href="/account/add-new-batch" title='Create Batch' className='btnLeft'><BiLayerPlus size={24}/></Link>
         <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className='overflow-auto max-h-[412px]'>

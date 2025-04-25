@@ -112,7 +112,7 @@ const Couponlist : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <Link href="/account/add-new-coupon" className='btnLeft'><RiCoupon3Line size={24}/></Link>
+          <Link href="/account/add-new-coupon" title='Create Coupon' className='btnLeft'><RiCoupon3Line size={24}/></Link>
           <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
         </div>
       </div>

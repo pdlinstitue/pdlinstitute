@@ -107,7 +107,7 @@ const CategoryList : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <Link href="/account/add-new-category" className='btnLeft'><TbCategoryPlus size={24}/></Link>
+          <Link href="/account/add-new-category" title='Create Category' className='btnLeft'><TbCategoryPlus size={24}/></Link>
           <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
         </div>
       </div>

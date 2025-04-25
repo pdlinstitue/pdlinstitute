@@ -122,7 +122,7 @@ const CourseList : React.FC = () => {
   return (
     <div>
       <div className='flex items-center justify-between mb-4'>
-        <Link href="/account/add-new-course" className='btnLeft'><IoCreateOutline size={24}/></Link>
+        <Link href="/account/add-new-course" title='Create Course' className='btnLeft'><IoCreateOutline size={24}/></Link>
         <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className='overflow-auto max-h-[412px]'>

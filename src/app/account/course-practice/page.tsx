@@ -136,7 +136,7 @@ const Practice: React.FC = () => {
     return (
         <div>
             <div className='flex items-center justify-between mb-4'>
-                <Link href="/account/add-new-practice" className='btnLeft'><HiMiniUserGroup size={24} /></Link>
+                <Link href="/account/add-new-practice" title='Create Practice Class' className='btnLeft'><HiMiniUserGroup size={24} /></Link>
                 <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)} />
             </div>
             <div className='overflow-auto max-h-[412px]'>
