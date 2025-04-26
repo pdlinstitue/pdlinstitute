@@ -12,9 +12,9 @@ interface UserDataProps {
   sdkCity:string,
   sdkComAdds:string,
   sdkParAdds:string,
-  sdkWhtNbrCntCode: string;
+  sdkWhtNbrCntCode: string,
   sdkWhtNbr: string, 
-  sdkPhoneCntCode: string;
+  sdkPhoneCntCode: string,
   sdkPhone: string, 
   sdkEmail: string, 
   sdkPinCode: number,
@@ -23,9 +23,11 @@ interface UserDataProps {
   sdkConfPwd: string,
   sdkPhoneOtp:string, 
   sdkEmailOtp:string,
-  sdkPhoneSentOtp:string; 
-  sdkEmailSentOtp:string;
+  sdkPhoneSentOtp:string, 
+  sdkEmailSentOtp:string,
   sdkOtpVerified:boolean,
+  isPhoneValid:boolean,
+  isEmailValid:boolean
 }
 interface StepperContextProps {
   userData: UserDataProps;

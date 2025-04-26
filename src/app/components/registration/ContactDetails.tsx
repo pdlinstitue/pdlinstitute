@@ -31,12 +31,14 @@ const ContactDetails: React.FC = () => {
     if (newValue) {
       setUserData(prev => ({
         ...prev,
-        sdkPhone: prev.sdkWhtNbr
+        sdkPhone: prev.sdkWhtNbr,
+        sdkPhoneCntCode: prev.sdkWhtNbrCntCode
       }));
     } else {
       setUserData(prev => ({
         ...prev,
-        sdkPhone: ''
+        sdkPhone: '',
+        sdkPhoneCntCode:'+91'
       }));
     }
   };
@@ -59,8 +61,72 @@ const ContactDetails: React.FC = () => {
   fetchCountryList();
   },[]);
 
+  const handleValidPhone = () => {
+    const encodedPhone = encodeURIComponent(`${userData.sdkPhoneCntCode}${userData.sdkPhone}`);
+  
+    fetch(`/api/users/phoneexists?sdkPhone=${encodedPhone}`, {
+      method: "GET"
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setUserData(prev => ({
+          ...prev,
+          isPhoneValid: data.isPhoneValid
+        }));
+  
+        if (data.isPhoneValid) {
+          setErrorMessage("");
+        } else {
+          setErrorMessage(data.msg);
+        }
+      })
+      .catch(error => {
+        setErrorMessage("Error checking phone validity: " + error);
+      });
+  };  
+
+  useEffect(() => {
+    if (userData.sdkPhoneCntCode && userData.sdkPhone) {
+      handleValidPhone();
+    }
+  }, [userData.sdkPhoneCntCode, userData.sdkPhone]);
+
+  const handleValidEmail = () => {
+    fetch(`/api/users/emailexists?sdkEmail=${userData.sdkEmail}`, {
+      method: "GET"
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setUserData(prev => ({
+          ...prev,
+          isEmailValid:data.isEmailValid
+        }));
+
+        if(data.isEmailValid){
+          setErrorMessage("");
+        }
+        else{
+          setErrorMessage(data.msg);
+        }
+      })
+      .catch(error => {
+        setErrorMessage("Error checking email validity: "+ error);
+      });
+  };
+
+  useEffect(() => {
+    if (userData.sdkEmail) {
+      handleValidEmail();
+    }
+  }, [userData.sdkEmail]);
+
   const handleSendOtp = () => {
-    fetch(`https://2factor.in/API/V1/${SMS_KEY}/SMS/${userData.sdkPhoneCntCode}${userData.sdkPhone}/AUTOGEN2/OTP1`, {
+    const encodedPhoneCode = encodeURIComponent(userData.sdkPhoneCntCode);
+    const encodedPhone = encodeURIComponent(userData.sdkPhone);
+  
+    fetch(`https://2factor.in/API/V1/${SMS_KEY}/SMS/${encodedPhoneCode}${encodedPhone}/AUTOGEN2/OTP1`, {
       method: "GET"
     })
       .then(response => response.json())
@@ -69,14 +135,14 @@ const ContactDetails: React.FC = () => {
         setUserData(prev => ({
           ...prev,
           sdkOtpVerified: false,
-          sdkPhoneSentOtp:data.OTP
+          sdkPhoneSentOtp: data.OTP
         }));
         setErrorMessage("Otp sent.");
       })
       .catch(error => {
-        setErrorMessage("Error sending OTP: "+ error);
+        setErrorMessage("Error sending OTP: " + error);
       });
-  };    
+  };      
 
 const handleVerifyOtp=()=>{
   if(!userData.sdkPhoneSentOtp){
@@ -190,7 +256,7 @@ const resetOtpData = () =>{
             />
           </div>
         </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-1 mt-4'>
+        <div className='grid grid-cols-1 md:grid-cols-1 gap-1 mt-4'>
           <div className='flex flex-col gap-2'>
             <label>Phone OTP:</label>
             <input
@@ -202,7 +268,7 @@ const resetOtpData = () =>{
               placeholder='Enter phone OTP'
             />
           </div>
-          <div className='flex flex-col gap-2'>
+          {/* <div className='flex flex-col gap-2'>
             <label>Email OTP:</label>
             <input
               type='text'
@@ -212,7 +278,7 @@ const resetOtpData = () =>{
               className='inputBox'
               placeholder='Enter email OTP'
             />
-          </div>
+          </div> */}
         </div>
   
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-1 mt-4'>

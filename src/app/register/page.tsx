@@ -41,6 +41,8 @@ interface UserDataProps {
   sdkPhoneSentOtp:string; 
   sdkEmailSentOtp:string;
   sdkOtpVerified:boolean;
+  isPhoneValid:boolean;
+  isEmailValid:boolean;
 }
 
 const Register = () => {
@@ -74,6 +76,8 @@ const Register = () => {
     sdkPhoneSentOtp:"", 
     sdkEmailSentOtp:"",
     sdkOtpVerified:false,
+    isPhoneValid:false,
+    isEmailValid:false,
   });
 
   const [finalData, setFinalData] = useState<any[]>([]);
@@ -167,8 +171,16 @@ const Register = () => {
         setErrorMessage("Phone number is required.");
         return false;
       }
+      if(!userData || !("isPhoneValid" in userData) || userData.isPhoneValid === null || userData.isPhoneValid === false){
+        setErrorMessage("Phone already exists.");
+        return false;
+      }
       if(!userData || !("sdkEmail" in userData) || userData.sdkEmail === null || userData.sdkEmail.trim() === ""){
         setErrorMessage("Email is required.");
+        return false;
+      }
+      if(!userData || !("isEmailValid" in userData) || userData.isEmailValid === null || userData.isEmailValid === false){
+        setErrorMessage("Email already exists.");
         return false;
       }
       if(!userData || !("sdkPhoneOtp" in userData) || userData.sdkPhoneOtp === null || userData.sdkPhoneOtp.trim() === ""){
@@ -176,10 +188,10 @@ const Register = () => {
         return false;
       }
 
-      if(!userData || !("sdkEmailOtp" in userData) || userData.sdkEmailOtp === null || userData.sdkEmailOtp.trim() === ""){
-        setErrorMessage("Email Otp is required.");
-        return false;
-      }
+      // if(!userData || !("sdkEmailOtp" in userData) || userData.sdkEmailOtp === null || userData.sdkEmailOtp.trim() === ""){
+      //   setErrorMessage("Email Otp is required.");
+      //   return false;
+      // }
 
       if(!userData || !("sdkOtpVerified" in userData) || userData.sdkOtpVerified === null || userData.sdkOtpVerified === false){
         setErrorMessage("Otp is not verified.");
