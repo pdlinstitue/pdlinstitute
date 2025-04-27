@@ -54,7 +54,7 @@ const JoinGroups : React.FC<ICourseParams> = ({params}) => {
         </div>
         <div className='flex items-center gap-4 justify-center'>
           <a 
-            href={courseById.coWhatGrp} 
+            href={courseById?.coWhatGrp} 
             target="_blank" 
             rel="noopener noreferrer" 
             className='flex gap-2 italic'
@@ -62,7 +62,7 @@ const JoinGroups : React.FC<ICourseParams> = ({params}) => {
             <BsWhatsapp size={24} className='text-green-600'/> HINDI            
           </a>
           <a 
-            href={courseById.coTeleGrp} 
+            href={courseById?.coTeleGrp} 
             target="_blank" 
             rel="noopener noreferrer" 
             className='flex gap-2 italic'
