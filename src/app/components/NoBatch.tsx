@@ -94,7 +94,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
           toast.error(post.msg);
         } else {
           toast.success(post.msg);
-          router.push('/account/my-courses/join-groups');
+          router.push(`/account/my-courses/${CourseId}/join-groups`);
         }
       } catch (error) {
         toast.error('Error enrolling parking batch.');
