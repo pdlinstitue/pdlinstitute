@@ -171,18 +171,22 @@ const Register = () => {
         setErrorMessage("Phone number is required.");
         return false;
       }
+
       if(!userData || !("isPhoneValid" in userData) || userData.isPhoneValid === null || userData.isPhoneValid === false){
         setErrorMessage("Phone already exists.");
         return false;
       }
+
       if(!userData || !("sdkEmail" in userData) || userData.sdkEmail === null || userData.sdkEmail.trim() === ""){
         setErrorMessage("Email is required.");
         return false;
       }
+      
       if(!userData || !("isEmailValid" in userData) || userData.isEmailValid === null || userData.isEmailValid === false){
         setErrorMessage("Email already exists.");
         return false;
       }
+
       if(!userData || !("sdkPhoneOtp" in userData) || userData.sdkPhoneOtp === null || userData.sdkPhoneOtp.trim() === ""){
         setErrorMessage("Phone Otp is required.");
         return false;
