@@ -43,7 +43,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ BthI
         const classId = new mongoose.Types.ObjectId(ClsId);
 
         // Fetch enrollments
-        const enrByBatchId = await Enrollments.find({ bthId: batchId }).populate("createdBy", "sdkFstName sdkPhone");        
+        const enrByBatchId = await Enrollments.find({ bthId: batchId }).populate("sdkId", "sdkFstName sdkPhone");        
 
         if (!enrByBatchId || enrByBatchId.length === 0) {
             return NextResponse.json({ msg: "No enrollment found." }, { status: 404 });
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ BthI
                 const attendanceRecord = await Attendance.findOne({
                     bthId: batchId,
                     clsId: classId,
-                    sdkId: enrollment.createdBy._id, // Ensure this matches the field in Attendance
+                    sdkId: enrollment.sdkId._id,
                 });
 
                 return {

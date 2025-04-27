@@ -29,7 +29,8 @@ export async function GET(req: NextRequest) {
             .populate('corId', 'coName coNick')
             .populate('bthId', 'bthName')
             .populate('clsName.createdBy', 'sdkFstName')
-            .populate('clsName.updatedBy', 'sdkFstName');
+            .populate('clsName.updatedBy', 'sdkFstName')
+            .sort({ createdAt: -1 });
 
         // Aggregate enrollments to count joiners for each corId and bthId
         const enrollmentCounts = await Enrollments.aggregate([

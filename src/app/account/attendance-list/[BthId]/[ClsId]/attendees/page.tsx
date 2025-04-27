@@ -192,9 +192,9 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
                 const enrollList: ClassAttendeesProps[] = attendData.enrollments?.map((item: any) => ({
                     _id: item._id,
                     clsId: ClsId,
-                    sdkFstName: item.createdBy.sdkFstName,
-                    sdkPhone: item.createdBy.sdkPhone || "",
-                    sdkId: item.createdBy._id,
+                    sdkFstName: item.sdkId.sdkFstName,
+                    sdkPhone: item.sdkId.sdkPhone || "",
+                    sdkId: item.sdkId._id,
                     status: item.attendanceStatus,
                     absRemarks: item.attendanceRemark,
                     clsStartAt: item.clsStartAt,
