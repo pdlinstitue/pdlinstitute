@@ -434,7 +434,7 @@ const AddNewCourse: React.FC = () => {
               name="coTeleGrp"
               value={data.coTeleGrp}
               onChange={handleChange}
-              type="text"
+              type="url"
               className="inputBox"
             />
           </div>
@@ -444,7 +444,7 @@ const AddNewCourse: React.FC = () => {
               name="coWhatGrp"
               value={data.coWhatGrp}
               onChange={handleChange}
-              type="text"
+              type="url"
               className="inputBox"
             />
           </div>
