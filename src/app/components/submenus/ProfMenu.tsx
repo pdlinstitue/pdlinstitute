@@ -84,7 +84,7 @@ const ProfMenu = () => {
   }
 
   return (
-    <div className="flex p-4 items-center gap-3 w-auto">
+    <div className="flex p-4 items-center gap-2 w-auto">
       <div className="w-auto">
         <p>Hello, {loggedInUser.result?.usrName}</p>
       </div>
@@ -93,25 +93,25 @@ const ProfMenu = () => {
           userProfile.sdkImg ? (<Image src={userProfile.sdkImg} width={60} height={60} alt='sdkImg'/>)
           : <RxAvatar size={44} className="text-orange-500 cursor-pointer" />
         }
-        <div className="absolute z-50 group-hover:flex right-0 top-10 hidden w-[230px] flex-col transition-all py-3 px-3 bg-white rounded-md shadow-xl">
-            <Link href={`/account/profile-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
+        <div className="absolute border-[1.5px] border-orange-700 divide-y z-50 group-hover:flex right-0 top-14 hidden w-[230px] flex-col transition-all px-3 py-3  bg-white rounded-md shadow-xl">
+            <Link href={`/account/profile-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2  hover:bg-orange-500">
               <RiProfileLine size={24} />
               <span >Profile Setting</span>
             </Link>
-            <Link href={`/account/account-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
+            <Link href={`/account/account-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4  py-2 hover:bg-orange-500">
               <MdSettingsBrightness size={24} />
               <span >Account Setting</span>
             </Link>
             <Link href={`/account/change-password/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
-              <PiFolderLockFill size={24} />
+              <PiFolderLockFill size={26} />
               <span >Change Password</span>
             </Link>
-            <Link href={`/account/my-id-card/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
-              <FaIdCardClip size={24} />
+            <Link href={`/account/my-id-card/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-5 py-2  hover:bg-orange-500">
+              <FaIdCardClip size={22} />
               <span >My ID Card</span>
             </Link>
             <button type='button' 
-              className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500"
+              className="flex text-black hover:text-white gap-2 px-5 py-2 hover:bg-orange-500"
               onClick={handleLogOut}>
               <MdLogout size={24} />
               Logout
