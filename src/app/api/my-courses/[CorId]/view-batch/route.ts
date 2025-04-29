@@ -27,6 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ CorI
 
     await dbConnect();
     const sdkId = req.nextUrl.searchParams.get("sdkId");
+    const isReEnroll = req.nextUrl.searchParams.get("isReEnroll");
     const { CorId } = await params;
 
     if (!sdkId || !CorId) {
@@ -65,7 +66,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ CorI
     const alreadyEnrolledBatchIdObject= alreadyEnrolledBatchIds.map((item) => item.bthId._id.toString());
 
     const finalBatches = validBatchIds.filter(
-      (batch) => !alreadyEnrolledBatchIdObject.includes(batch._id.toString())
+      (batch) => isReEnroll || !alreadyEnrolledBatchIdObject.includes(batch._id.toString())
     );
 
     if (!finalBatches.length) {

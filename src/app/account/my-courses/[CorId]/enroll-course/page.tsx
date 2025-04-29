@@ -2,7 +2,7 @@
 import Loading from "@/app/account/Loading";
 import React, { FormEvent, use, useEffect, useState } from "react";
 import { BASE_API_URL } from "@/app/utils/constant";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import NoBatch from "@/app/components/NoBatch";
@@ -39,6 +39,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
 
   const { CorId } = use(params);
   const router = useRouter();
+  const searchParams=useSearchParams();
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -80,6 +81,8 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       usrRole: "",
     },
   });
+
+  const isReEnroll=searchParams.get("isReEnroll");
 
   const handleChange = (e: any) => {
     const name = e.target.name;
@@ -201,9 +204,9 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
 
   useEffect(() => {
     async function fetchBatchesByCoId() {
-      try {
+      try {                
         const response = await fetch(
-          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch?sdkId=${Cookies.get("loggedInUserId")}`
+          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch?sdkId=${Cookies.get("loggedInUserId")}&isReEnroll=${isReEnroll}`
         );
         const data = await response.json();
         setBatchList(data.bthListByCourseId);
@@ -281,7 +284,8 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
           bthId: enrData.bthId,
           corId: CorId,
           sdkId: loggedInUser.result._id,
-          createdBy: loggedInUser.result._id
+          createdBy: loggedInUser.result._id,
+          isReEnroll:isReEnroll
         }),
       });
 
@@ -472,7 +476,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
               <button
                 type="button"
                 className="btnRight"
-                onClick={() => router.push("/account/my-courses/elg-courses")}
+                onClick={() => router.push(isReEnroll?"/account/my-courses/done-courses": "/account/my-courses/elg-courses")}
               >
                 Back
               </button>

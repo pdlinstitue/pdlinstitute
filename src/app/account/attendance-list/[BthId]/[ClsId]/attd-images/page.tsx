@@ -44,7 +44,7 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
     setFiles((prev) => [...prev, ...newFiles]);
 
     const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-    setPreviews((prev) => [...prev, ...newPreviews]);
+    setPreviews((prev = []) => [...prev, ...newPreviews]);
   };
 
   // Handle file removal from preview and files array
@@ -156,7 +156,7 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
       <div className="formStyle w-full my-24">
         <h2 className="mb-4 text-xl font-bold">Upload Attendance Images</h2>
         <div className="flex gap-2 mt-2 flex-wrap">
-          {previews.map((src, index) => (
+          {previews?.map((src, index) => (
             <div key={index} className="relative w-24 h-24">
               <img
                 src={src}

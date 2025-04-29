@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Screenshots from "../../../../modals/Screenshots";
+import mongoose from "mongoose";
 
 
 type ScreenshotsType = {
@@ -12,24 +13,36 @@ type ScreenshotsType = {
 }
 
 export async function GET(request: NextRequest) {
-    try {
-        await dbConnect();
-        const bthId =  request.nextUrl.searchParams.get("bthId");
-        const clsId =  request.nextUrl.searchParams.get("clsId");
+  try {
+    await dbConnect();
 
-        const srnshots : ScreenshotsType[] = await Screenshots.find({bthId:bthId,clsId:clsId})
-        .populate("createdBy", "sdkFstName")
-        .populate("updatedBy", "sdkFstName")        
-        .sort({ createdAt: -1 });
+    const bthId = request.nextUrl.searchParams.get("bthId");
+    const clsId = request.nextUrl.searchParams.get("clsId");
 
-        if (!srnshots) {
-            return NextResponse.json({succes:false, msg: "No screenshots found" }, { status: 404 });
-        } else {
-            return NextResponse.json({sucess:true, srnshots}, { status: 200 });
-        }     
-    } catch (error) {
-        return NextResponse.json({ error: "Failed to fetch screenshots" }, { status: 500 });
+    if (!bthId || !mongoose.Types.ObjectId.isValid(bthId)) {
+      return NextResponse.json({ success: false, msg: "Invalid or missing bthId" }, { status: 400 });
     }
+
+    if (!clsId || !mongoose.Types.ObjectId.isValid(clsId)) {
+      return NextResponse.json({ success: false, msg: "Invalid or missing clsId" }, { status: 400 });
+    }
+
+    const srnshots: ScreenshotsType[] = await Screenshots.find({
+      bthId: new mongoose.Types.ObjectId(bthId),
+      clsId: new mongoose.Types.ObjectId(clsId),
+    })
+      .populate("uploadedBy", "sdkFstName");
+
+    if (srnshots.length === 0) {
+      return NextResponse.json({ success: false, msg: "No screenshots found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, srnshots }, { status: 200 });
+
+  } catch (error) {
+    console.error("Error in GET /screenshots:", error);
+    return NextResponse.json({ success: false, error: "Failed to fetch screenshots" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import mongoose from "mongoose";
 import Attendance from "../../../../modals/Attendance";
+import Reenrollments from "../../../../modals/Reenrollments";
 
 type EnrType = {
   sdkId: string;
@@ -16,6 +17,7 @@ type EnrType = {
   createdBy: mongoose.Types.ObjectId;
   ttlJoiners?: number;
   batchAttendance?: number;
+  isReEnroll:boolean
 };
 
 export async function GET(req: NextRequest) {
@@ -27,11 +29,14 @@ export async function GET(req: NextRequest) {
     const bthId = req.nextUrl.searchParams.get("bthId");
     const durInMonth = Number(req.nextUrl.searchParams.get("dur"));
 
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - durInMonth);
+    const filter: Record<string, any> = {};
 
-    const filter: Record<string, any> = { createdAt: { $gte: startDate } };
-    
+    if (durInMonth && !isNaN(durInMonth)) {
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - durInMonth);
+      filter.createdAt = { $gte: startDate };
+    }
+
     if (corId && mongoose.Types.ObjectId.isValid(corId)) {
       filter.corId = new mongoose.Types.ObjectId(corId);
     }
@@ -81,7 +86,7 @@ export async function GET(req: NextRequest) {
         const attendedClasses = await Attendance.countDocuments({
           bthId: enr?.bthId,
           clsId: { $in: classIds },
-          sdkId: enr?.createdBy?._id,
+          sdkId: enr?.sdkId?._id,
           status: "Present",
         });
 
@@ -98,27 +103,39 @@ export async function GET(req: NextRequest) {
 }
   
 export async function POST(req: NextRequest) {
-  
-    try {
-  
-      await dbConnect();
-      const { enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy }: EnrType = await req.json();
-  
-      const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy, isApproved:corId.toString()=="67d262857db737af7a47a679"?"Approved":"Pending"});
-      const savedEnr = await newEnr.save();
 
-      if(savedEnr){
-        return NextResponse.json({ savedEnr, success: true, msg:"Enrolled successfully." }, {status:200});
-      }else{
-        return NextResponse.json({ savedEnr, success: false, msg:"Enrollment failed." }, {status:200});
-      }
-  
-    } catch (error:any) {
-      if (error.name === 'ValidationError') {
-        const messages = Object.values(error.errors).map((val:any) => val.message);
-        return NextResponse.json({ success: false, msg: messages }, {status:400});
-      }else{
-        return new NextResponse ("Error while saving enrData: " + error, {status: 400});
-      }
+    try {
+
+        await dbConnect();
+        const { enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy, isReEnroll }: EnrType = await req.json();
+
+        const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy, isApproved: corId.toString() == "67d262857db737af7a47a679" ? "Approved" : "Pending" });
+        const savedEnr = await newEnr.save();
+
+        if (savedEnr) {
+            if (isReEnroll) {
+                const reenrollment = await Reenrollments.findOne({
+                    reqBy: sdkId,
+                    corId: corId,
+                }).sort({ createdAt: -1 });
+
+                if (reenrollment) {
+                    reenrollment.reqStatus = "ReEnrolled";
+                    await reenrollment.save();
+                }
+            }
+
+            return NextResponse.json({ savedEnr, success: true, msg: "Enrolled successfully." }, { status: 200 });
+        } else {
+            return NextResponse.json({ savedEnr, success: false, msg: "Enrollment failed." }, { status: 200 });
+        }
+
+    } catch (error: any) {
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map((val: any) => val.message);
+            return NextResponse.json({ success: false, msg: messages }, { status: 400 });
+        } else {
+            return new NextResponse("Error while saving enrData: " + error, { status: 400 });
+        }
     }
 }

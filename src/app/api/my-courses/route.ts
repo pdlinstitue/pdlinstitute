@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
         for (const course of allCourses) {
             // Check if the user is already enrolled in this course
             const enrollment = await Enrollments.findOne({
-                createdBy: sdkObjectId,
+                sdkId: sdkObjectId,
                 corId: course._id,
             });
 
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
             if (course.coElgType === "Course") {                
                 const isCompleted = await Enrollments.exists({
-                    createdBy: sdkObjectId,
+                    sdkId: sdkObjectId,
                     corId: course.coElg,
                     isCompleted: "Complete",
                 });
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
                 const categoryCourses = await Courses.find({ coCat: course.coElg }).lean();
                 const categoryCourseIds = categoryCourses.map((catCourse) => new mongoose.Types.ObjectId(catCourse._id as string));
                 const completedCount = await Enrollments.countDocuments({
-                    createdBy: sdkObjectId,
+                    sdkId: sdkObjectId,
                     corId: { $in: categoryCourseIds },
                     isCompleted: "Complete",
                 });

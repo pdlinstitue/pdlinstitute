@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
         for (const course of allCourses) {
             // Check if the user is enrolled and has completed the course
             const enrollment = await Enrollments.findOne({
-                createdBy: sdkObjectId,
+                sdkId: sdkObjectId,
                 corId: course._id,
                 isApproved: "Approved",
                 isCompleted: "Complete",
@@ -48,9 +48,9 @@ export async function GET(req: NextRequest) {
 
                 // Fetch reqStatus from reenrollments
                 const reenrollment = await Reenrollments.findOne({
-                    sdkId: sdkObjectId,
+                    reqBy: sdkObjectId,
                     corId: course._id,
-                });
+                }).sort({createdAt:-1});
 
                 completedCourses.push({
                     ...course,

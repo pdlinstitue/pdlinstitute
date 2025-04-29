@@ -85,7 +85,7 @@ const ViewReEnrollmentRequest : React.FC<IReEnrParams> = ({params}) => {
     try 
         {
             const response = await fetch(`${BASE_API_URL}/api/request-to-re-enroll/${ReqId}/approve-request`, {
-                method: 'PATCH',
+                method: 'PUT',
                 body: JSON.stringify({ 
                     reqStatus:status, 
                     updatedBy:loggedInUser.result._id

@@ -219,23 +219,23 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
     setErrorMessage(""); // Clear the previous error
   
     try {
-      if (!data.coName.trim()) {
+      if (!data.coName?.trim()) {
         setErrorMessage("Course title is must.");
-      } else if (!data.coNick.trim()) {
+      } else if (!data.coNick?.trim()) {
         setErrorMessage("Nick name is must.");
-      } else if (!data.coCat.trim()) {
+      } else if (!data.coCat?.trim()) {
         setErrorMessage("Please select category.");
-      } else if (!data.coType.trim()) {
+      } else if (!data.coType?.trim()) {
         setErrorMessage("Please select course type.");
-      } else if (!data.coElgType.trim()) {
+      } else if (!data.coElgType?.trim()) {
         setErrorMessage("Please select elegibility type.");
-      } else if (!data.coElg.trim()) {
+      } else if (!data.coElg?.trim()) {
         setErrorMessage("Please select elegibility.");
       } else if (data.durDays <= 1) {
         setErrorMessage("Please duration days.");
       } else if (data.durHrs <= 1) {
         setErrorMessage("Please duration hours.");
-      } else if (!data.coShort.trim()) {
+      } else if (!data.coShort?.trim()) {
         setErrorMessage("Please enter course introduction.");
       } else {
         const response = await fetch(

@@ -114,15 +114,14 @@ const CompleteCourse : React.FC = () => {
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
     };
     
-  useEffect(()=>{
     async function fetchEnrollmentData(){
       try {
         const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
         const enrDataList = await res.json();
         const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
-          return { 
+          return {
             ...item, 
-            sdkFstName: item.createdBy.sdkFstName,
+            sdkFstName: item.sdkId.sdkFstName,
             sdkPresent: item.batchAttendance,
             sdkRegNo:item.sdkId.sdkRegNo
           };
@@ -134,6 +133,8 @@ const CompleteCourse : React.FC = () => {
           setIsLoading(false);
       }
     }
+
+  useEffect(()=>{    
     fetchEnrollmentData();
   },[selectedCourse, selectedBatch])
 
@@ -240,7 +241,8 @@ const CompleteCourse : React.FC = () => {
       if (!response.ok) {
         throw new Error("Failed to mark enrollments as complete.");
       }
-
+      
+      fetchEnrollmentData();
       alert("Selected enrollments marked as complete.");      
     } catch (error) {
       console.error("Error marking enrollments as complete:", error);

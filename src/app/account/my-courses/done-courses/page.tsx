@@ -122,10 +122,10 @@ const DoneCourses : React.FC = () => {
               <button
                 type="button"
                 className="btnRight"
-                disabled={cor.reqStatus === "Pending"}
+                disabled={cor.reqStatus === "Pending" || cor.reqStatus === "Rejected" || cor.reqStatus === "ReEnrolled"}
                 onClick={() => {
                   if (cor.reqStatus === "Approved") {
-                    router.push(`/account/my-courses/${cor._id}/enroll-course`);
+                    router.push(`/account/my-courses/${cor._id}/enroll-course?isReEnroll=true`);
                   } else if (!cor.reqStatus || cor.reqStatus === "Rejected") {
                     router.push(`/account/my-courses/${cor._id}/request-to-re-enroll`);
                   }
@@ -135,6 +135,8 @@ const DoneCourses : React.FC = () => {
                   ? "Requested"
                   : cor.reqStatus === "Approved"
                   ? "Re-enroll"
+                  : cor.reqStatus === "ReEnrolled"
+                  ? "Re-enrolled"
                   : "Request to Re-enroll"}
                 </button>
                 <button
