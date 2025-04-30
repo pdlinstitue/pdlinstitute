@@ -86,7 +86,7 @@ const DoneCourses : React.FC = () => {
           {myCoData?.map((cor: any) => (
             <div
               key={cor._id}
-              className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-3 border-[1.5px] border-orange-600"
+              className="flex flex-col max-w-[400px] bg-white rounded-md shadow-xl p-9 gap-3 border-[1.5px] border-orange-600"
             >
               <Image
                 src="/images/sadhak.jpg"

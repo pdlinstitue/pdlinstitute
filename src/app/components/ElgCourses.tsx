@@ -11,7 +11,7 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
   return (
     <div className="flex flex-wrap justify-center gap-6">
       {myCoData?.map((cor: any) => (
-        <div className="w-[400px]" key={cor._id}>
+        <div className="max-w-[400px]" key={cor._id}>
           <div className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-3 border-[1.5px] border-orange-600">
             <div className="w-full border-[1.5px] bg-gray-100">
               <img
