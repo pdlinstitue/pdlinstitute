@@ -108,6 +108,7 @@ const CompleteCourse : React.FC = () => {
     const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
     const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
     const [pageInput, setPageInput] = React.useState(1);
+    const [selectedDuration, setSelectedDuration]=useState<number>(1);
     const data = React.useMemo(() => enrData ?? [], [enrData]);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
@@ -116,7 +117,7 @@ const CompleteCourse : React.FC = () => {
     
     async function fetchEnrollmentData(){
       try {
-        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
         const enrDataList = await res.json();
         const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
           return {
@@ -136,7 +137,7 @@ const CompleteCourse : React.FC = () => {
 
   useEffect(()=>{    
     fetchEnrollmentData();
-  },[selectedCourse, selectedBatch])
+  },[selectedCourse, selectedBatch, selectedDuration])
 
     const table = useReactTable(
       {
@@ -206,6 +207,10 @@ const CompleteCourse : React.FC = () => {
       const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedBatch(e.target.value);
       };
+
+        const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+          setSelectedDuration(Number(e.target.value));
+        };
         
       if(isLoading){
         return <div>
@@ -256,10 +261,15 @@ const CompleteCourse : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className="flex gap-2 items-center w-[800px]">
+          <div className="flex gap-2 items-center w-[900px]">
             <button type='button' className='btnLeft' onClick={handleComplete} disabled={isSaving}>
               {isSaving ? "Completing" : "Complete"}
             </button>
+            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+              <option value="1">Last One Month</option>
+              <option value="2">Last Two Month</option>
+              <option value="3">Last Three Month</option>
+            </select>
             <select className="inputBox w-full text-center" name="corId" value={selectedCourse} onChange={handleCourseChange}>
               <option value="" className='text-center'>--- Select Course ---</option>
               {courseList?.map((item: any) => {

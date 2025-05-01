@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
                 // Fetch eligibility name
                 let eligibilityName = "None";
                 if (course.coElgType === "Course" && course.coElg !== "None") {
-                    const eligibleCourse = await Courses.findById(course.coElgId, "coNick");
+                    const eligibleCourse = await Courses.findById(course.coElg, "coNick");
                     eligibilityName = eligibleCourse ? eligibleCourse.coNick : "Unknown Course";
                 } else if (course.coElgType === "Category" && course.coElg !== "None") {
                     const eligibleCategory = await Categories.findById(course.coElg, "catName");

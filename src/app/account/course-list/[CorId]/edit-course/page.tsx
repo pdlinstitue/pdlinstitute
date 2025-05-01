@@ -294,7 +294,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
           <div className="flex flex-col gap-1">
             <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
               <img
-                src={data.coImg || preview || "/images/uploadImage.jpg"}
+                src={preview || data.coImg || "/images/uploadImage.jpg"}
                 alt="course"
                 className="w-full h-full object-contain"
               />

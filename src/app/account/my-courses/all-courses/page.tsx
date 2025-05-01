@@ -69,7 +69,8 @@ const AllCourseList : React.FC = () => {
         const coData = await res.json();
         const updatedCoList = coData.coList.map((item:any) => { 
           return { ...item, 
-            coCat: item.coCat ? item.coCat.catName : 'N/A' 
+            coCat: item.coCat ? item.coCat.catName : 'N/A',
+            coElg: item.eligibilityName 
           };
         }); 
         setCoData(updatedCoList);
