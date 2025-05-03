@@ -24,6 +24,7 @@ interface AddNewCourseProps {
   coShort: string;
   prodType: string;
   coCat: string;
+  gglFmLink: string;
   coElgType: string;
   coElg: string;
   coImg: string;
@@ -52,6 +53,7 @@ const AddNewCourse: React.FC = () => {
     coName: "",
     coNick: "",
     coShort: "",
+    gglFmLink: "",
     coType: "",
     coDon: 0,
     coDesc: "",
@@ -217,6 +219,7 @@ const AddNewCourse: React.FC = () => {
             coName: data.coName,
             coNick: data.coNick,
             coShort: data.coShort,
+            gglFmLink: data.gglFmLink,
             prodType: "Courses",
             coCat: data.coCat,
             coElg: data.coElg,
@@ -262,13 +265,13 @@ const AddNewCourse: React.FC = () => {
       <form onSubmit={handleSubmit} className="formStyle w-full h-auto">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
-          <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-            <img
-              src={preview || "/images/uploadImage.jpg"}
-              alt="Preview"
-              className="w-full h-full object-contain"
-            />
-          </div>
+            <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+              <img
+                src={preview || "/images/uploadImage.jpg"}
+                alt="Preview"
+                className="w-full h-full object-contain"
+              />
+            </div>
             <div className="flex items-center gap-1">
               <input
                 type="file"
@@ -427,9 +430,9 @@ const AddNewCourse: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Telegram Group - Waiting:</label>
+            <label className="text-lg">WhatsApp Group - ENG:</label>
             <input
               name="coTeleGrp"
               value={data.coTeleGrp}
@@ -439,10 +442,20 @@ const AddNewCourse: React.FC = () => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-lg">WhatsApp group - Waiting:</label>
+            <label className="text-lg">WhatsApp group - HINDI:</label>
             <input
               name="coWhatGrp"
               value={data.coWhatGrp}
+              onChange={handleChange}
+              type="url"
+              className="inputBox"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Google Form:</label>
+            <input
+              name="gglFmLink"
+              value={data.gglFmLink}
               onChange={handleChange}
               type="url"
               className="inputBox"

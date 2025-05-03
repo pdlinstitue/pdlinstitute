@@ -58,6 +58,9 @@ const courseSchema = new mongoose.Schema({
     prodType: {
         type: String
     },
+    gglFmLink: {
+        type: String
+    },
     isActive: {
         type: Boolean,
         default:true

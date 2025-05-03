@@ -15,6 +15,7 @@ type CoType = {
     coType: string,
     coWhatGrp: string,
     coTeleGrp: string,
+    gglFmLink: string,
     coDesc:string, 
     coDon:number, 
     durDays:number, 
@@ -64,9 +65,9 @@ export async function POST(req: NextRequest) {
     try {
   
       await dbConnect();
-      const { coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, createdBy }: CoType = await req.json();
+      const { coName, coNick, gglFmLink, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, createdBy }: CoType = await req.json();
   
-      const newCourse = new Courses({ coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, createdBy});
+      const newCourse = new Courses({ coName, coNick, gglFmLink, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, createdBy});
       const savedCourse = await newCourse.save();
 
       if(savedCourse){

@@ -75,7 +75,7 @@ const SadhakDashLayout : React.FC = () => {
             
         </div>
       </div>
-      <div className='flex gap-9 w-full my-9'>
+      <div className='flex gap-9 w-full justify-between'>
         <MyElgCourses myCoData={myCoData} />
       </div>
     </div>

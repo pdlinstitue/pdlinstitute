@@ -476,7 +476,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
               <button
                 type="button"
                 className="btnRight"
-                onClick={() => router.push(isReEnroll?"/account/my-courses/done-courses": "/account/my-courses/elg-courses")}
+                onClick={() => router.back()}
               >
                 Back
               </button>

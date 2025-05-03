@@ -82,11 +82,11 @@ const DoneCourses : React.FC = () => {
    return (
     <div>
       {myCoData && myCoData.length > 0 ? (
-        <div className="flex gap-9 my-9 w-full">
+        <div className="flex gap-9 justify-between w-full">
           {myCoData?.map((cor: any) => (
             <div
               key={cor._id}
-              className="flex flex-col max-w-[400px] bg-white rounded-md shadow-xl p-9 gap-3 border-[1.5px] border-orange-600"
+              className="flex flex-col max-w-[400px] bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600"
             >
               <Image
                 src="/images/sadhak.jpg"
@@ -94,10 +94,9 @@ const DoneCourses : React.FC = () => {
                 width={320}
                 height={220}
               />
-              <h2 className="text-lg font-bold bg-gray-100 p-2 text-center">
+              <h2 className="text-lg font-bold bg-gray-200 p-2 text-center">
                 {cor.coName}
               </h2>
-              <p className="text-sm text-justify">{cor.coShort}</p>
               <div className="flex justify-between text-sm">
                 <p>
                   <span className="font-bold">Category:</span> {cor.coCat}
@@ -118,19 +117,26 @@ const DoneCourses : React.FC = () => {
                 <span className="font-bold">Elegibility:</span>{" "}
                 {cor.eligibilityName}
               </p>
-              <div className="grid grid-cols-1 gap-1">
-              <button
-                type="button"
-                className="btnRight"
-                disabled={cor.reqStatus === "Pending" || cor.reqStatus === "Rejected" || cor.reqStatus === "ReEnrolled"}
-                onClick={() => {
-                  if (cor.reqStatus === "Approved") {
-                    router.push(`/account/my-courses/${cor._id}/enroll-course?isReEnroll=true`);
-                  } else if (!cor.reqStatus || cor.reqStatus === "Rejected") {
-                    router.push(`/account/my-courses/${cor._id}/request-to-re-enroll`);
-                  }
-                }}
+              <button 
+                type='button' 
+                className='btnRight'
+                onClick={() => cor.gglFmLink && window.open(cor.gglFmLink, '_blank')}
               >
+                Google Form
+              </button>
+              <div className="grid grid-cols-2 gap-1">
+                <button
+                  type="button"
+                  className="btnRight"
+                  disabled={cor.reqStatus === "Pending" || cor.reqStatus === "Rejected" || cor.reqStatus === "ReEnrolled"}
+                  onClick={() => {
+                    if (cor.reqStatus === "Approved") {
+                      router.push(`/account/my-courses/${cor._id}/enroll-course?isReEnroll=true`);
+                    } else if (!cor.reqStatus || cor.reqStatus === "Rejected") {
+                      router.push(`/account/my-courses/${cor._id}/request-to-re-enroll`);
+                    }
+                  }}
+                >
                 {cor.reqStatus === "Pending"
                   ? "Requested"
                   : cor.reqStatus === "Approved"

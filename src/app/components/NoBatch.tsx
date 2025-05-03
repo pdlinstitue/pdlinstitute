@@ -168,7 +168,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
               <button
                 type="button"
                 className="btnRight"
-                onClick={() => router.push("/account/my-courses/elg-courses")}
+                onClick={() => router.back()}
               >
                 BACK
               </button>

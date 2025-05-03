@@ -22,6 +22,7 @@ interface EditCourseProps {
   coName: string;
   coNick: string;
   coShort: string;
+  gglFmLink: string;
   prodType: string;
   coCat: string;
   coElgType: string;
@@ -58,6 +59,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
     coName: "",
     coNick: "",
     coShort: "",
+    gglFmLink: "",
     coType: "",
     coElgType: "",
     coDon: 0,
@@ -246,6 +248,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
               coName: data.coName,
               coNick: data.coNick,
               coShort: data.coShort,
+              gglFmLink: data.gglFmLink,
               prodType: "Courses",
               coCat: data.coCat,
               coElg: data.coElg,
@@ -293,11 +296,13 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-              <img
-                src={preview || data.coImg || "/images/uploadImage.jpg"}
-                alt="course"
-                className="w-full h-full object-contain"
-              />
+              {preview || data.coImg ? (
+                <img
+                  src={preview || data.coImg}
+                  alt="course"
+                  className="w-full h-full object-contain"
+                />
+              ) : null}
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -457,24 +462,34 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Telegram Group - Waiting:</label>
+            <label className="text-lg">WhatsApp Group - ENG:</label>
             <input
               name="coTeleGrp"
               value={data.coTeleGrp}
               onChange={handleChange}
-              type="text"
+              type="url"
               className="inputBox"
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-lg">WhatsApp group - Waiting:</label>
+            <label className="text-lg">WhatsApp Group - HINDI:</label>
             <input
               name="coWhatGrp"
               value={data.coWhatGrp}
               onChange={handleChange}
-              type="text"
+              type="url"
+              className="inputBox"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Google Form:</label>
+            <input
+              name="gglFmLink"
+              value={data.gglFmLink}
+              onChange={handleChange}
+              type="url"
               className="inputBox"
             />
           </div>

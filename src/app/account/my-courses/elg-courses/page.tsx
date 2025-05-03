@@ -60,7 +60,7 @@ const MyCourses : React.FC = () => {
 
   return (
     <div>
-       <div className='flex gap-9 w-full my-9'>
+       <div className='flex gap-9 justify-between w-full'>
           <MyElgCourses myCoData={myCoData}/>
         </div>
     </div>

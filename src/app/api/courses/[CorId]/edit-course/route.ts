@@ -10,6 +10,7 @@ type CoType = {
     coShort:string, 
     prodType:string, 
     coElgType: string,
+    gglFmLink: string,
     coCat: string,
     coElg: string,
     coImg: string,
@@ -34,8 +35,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CorId
     if (!corById) {
       return NextResponse.json({ success: false, msg: "No course found." }, { status: 404 });
     } else {  
-      const { coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }: CoType = await req.json();
-      const corById = await Courses.findByIdAndUpdate(CorId, {coName, coNick, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }, {runValidators:true});
+      const { coName, coNick, coShort, gglFmLink, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }: CoType = await req.json();
+      const corById = await Courses.findByIdAndUpdate(CorId, {coName, coNick, coShort, gglFmLink, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }, {runValidators:true});
       return NextResponse.json({ success: true, corById, msg: "Course updated successfully." }, { status: 200 });
     }
   } catch (error:any) {
