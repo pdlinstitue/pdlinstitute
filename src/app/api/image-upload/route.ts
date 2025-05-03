@@ -34,8 +34,13 @@ export async function POST(req:NextRequest) {
             .toBuffer();
 
         // Generate unique filename
-        const uniqueName = (fileName ? fileName.split('/').pop() : `courseImage_${Date.now()}.jpeg`) || `courseImage_${Date.now()}.jpeg`;
-        const filePath = join(process.cwd(), "public/course-images", uniqueName === 'undefined'?`courseImage_${Date.now()}.jpeg`:uniqueName);
+        let uniqueName = (fileName ? fileName.split('/').pop() : `courseImage_${Date.now()}.jpeg`) || `courseImage_${Date.now()}.jpeg`;
+
+        if(uniqueName === 'undefined'){
+            uniqueName=`courseImage_${Date.now()}.jpeg`;
+        }
+
+        const filePath = join(process.cwd(), "public/course-images", uniqueName);
 
         // Save file to public folder
         await writeFile(filePath, resizedBuffer);
