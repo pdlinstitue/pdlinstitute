@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface MyCoursesProps {
   myCoData: any;
@@ -14,13 +15,14 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
       {myCoData?.map((cor: any) => (
         <div className="max-w-[400px]" key={cor._id}>
           <div className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600">
-            <div className="w-full border-[1.5px] bg-gray-100">
-              <img
-                src={cor.coImg || "/images/uploadImage.jpg"}
-                alt="Course"
-                className="w-full h-[200px] object-contain"
+            {cor.coImg && (
+              <Image
+                src={cor.coImg}
+                alt="courseImage"
+                width={320}
+                height={220}
               />
-            </div>
+            )}
             <h2 className="text-lg font-bold bg-gray-200 p-2 text-center">{cor.coName}</h2>
             <div className="flex justify-between text-sm">
               <p><span className="font-bold">Category:</span> {cor.coCat}</p>
