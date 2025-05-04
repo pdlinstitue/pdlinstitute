@@ -27,7 +27,8 @@ interface ViewCourseProps{
     coDon:number, 
     durDays:number, 
     durHrs:number, 
-    usrId: string
+    usrId: string,
+    eligibilityName:string
 }
 
 const ViewCourse : React.FC<ICourseParams> = ({params}) => {
@@ -35,7 +36,7 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
   const { CorId } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [data, setData] = useState<ViewCourseProps>({coName:'', coShort:'', coType:'', coAuth:'', coDon:0, coDesc:'', prodType:'Courses', coCat:'', coElg:'', coWhatGrp:'', coTeleGrp:'', durDays:0, durHrs:0, coImg:'', usrId:''});
+  const [data, setData] = useState<ViewCourseProps>({coName:'', coShort:'', coType:'', coAuth:'', coDon:0, coDesc:'', prodType:'Courses', coCat:'', coElg:'', coWhatGrp:'', coTeleGrp:'', durDays:0, durHrs:0, coImg:'', usrId:'', eligibilityName:''});
 
   useEffect(() =>{
   async function fetchCourseData() {
@@ -64,8 +65,8 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
     };
 
   return (
-    <div className='flex items-center justify-center'>
-      <div className='formStyle my-3 max-w-[400px]'>
+    <div className='flex items-center justify-center py-16'>
+      <div className='formStyle max-w-[400px]'>
         {data.coImg && (
             <Image
                 src={data.coImg}
@@ -75,21 +76,15 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
             />
         )}
         <h2 className='font-semibold text-lg text-center text-white p-2 bg-orange-500'>{data.coName}</h2>
-        <div className='grid grid-cols-2 gap-1 text-sm font-semibold'>
-            <div>
-                <p>{data.coCat}</p>
-            </div>
-            <div className='text-end'>
-                <p>{data.coType}</p>
-            </div>
+        <div className="flex justify-between text-sm gap-2">
+            <p>
+                <span className="font-bold">Category:</span> {data.coCat}
+            </p>
+            <p>
+                <span className="font-bold">Type:</span> {data.coType}
+            </p>
         </div>
-        <div className='text-sm'>
-            <p>{data.coShort}</p>
-        </div>
-        <div className='text-sm'>
-            <p><span className='font-semibold uppercase mr-3'>Fee:</span>{data.coDon}</p>
-        </div>
-        <div className='grid grid-cols-2 gap-1'>
+        <div className='flex justify-between text-sm gap-2'>
             <div className='text-sm'>
                 <p><span className='font-semibold uppercase mr-3'>Days:</span>{data.durDays}</p>
             </div>
@@ -97,8 +92,12 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
                 <p><span className='font-semibold uppercase mr-3'>Hrs:</span>{data.durHrs}</p>
             </div>
         </div>
+        <div className='flex justify-between text-sm gap-2'>
+            <p className="text-sm"><span className="font-bold">Eligibility:</span> {data.eligibilityName}</p>
+            <p className="text-sm"><span className="font-bold">Fee: &#8377;</span> {data.coDon.toLocaleString()}</p>
+        </div>
         <div className='grid grid-cols-2 gap-1'>
-            <button type='button' className='btnLeft'>
+            <button type='button' className='btnLeft' onClick={() => router.push(`/account/my-courses/${CorId}/read-more`)}>
                 Read More
             </button>
             <button type='button' className='btnRight' onClick={()=> router.push('/account/my-courses/all-courses')}>

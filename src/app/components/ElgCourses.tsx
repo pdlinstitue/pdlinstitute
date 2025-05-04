@@ -24,15 +24,18 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
               />
             )}
             <h2 className="text-lg font-bold bg-gray-200 p-2 text-center">{cor.coName}</h2>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm gap-2">
               <p><span className="font-bold">Category:</span> {cor.coCat}</p>
               <p><span className="font-bold">Type:</span> {cor.coType}</p>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm gap-2">
               <p><span className="font-bold">Duration:</span> {cor.durDays} DAYS</p>
               <p><span className="font-bold">Hrs:</span> {cor.durHrs}</p>
             </div>
-            <p className="text-sm"><span className="font-bold">Eligibility:</span> {cor.eligibilityName}</p>
+            <div className='flex justify-between text-sm gap-2'>
+              <p className="text-sm"><span className="font-bold">Eligibility:</span> {cor.eligibilityName}</p>
+              <p className="text-sm"><span className="font-bold">Fee: &#8377;</span> {cor.coDon.toLocaleString()}</p>
+            </div>
             <button 
               type='button' 
               className='btnRight'
