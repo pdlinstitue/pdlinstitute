@@ -397,13 +397,13 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
                     --- Select Elegibility ---
                   </option>
                   <option value="None">None</option>
-                  {data.coElg === "Course"
+                  {data.coElgType === "Course"
                     ? courseList.map((item) => (
                         <option key={item._id} value={item._id}>
                           {item.coNick}
                         </option>
                       ))
-                    : data.coElg === "Category"
+                    : data.coElgType === "Category"
                     ? cat.map((item) => (
                         <option key={item._id} value={item._id}>
                           {item.catName}

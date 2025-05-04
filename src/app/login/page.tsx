@@ -53,7 +53,7 @@ const LoginPage : NextPage = () => {
           setErrorMessage('Please enter email or phone.');
       } else if (!user.sdkPwd?.trim()) {
           setErrorMessage('Please enter password.');
-      } else {
+      } else {        
         try {
             const result = await fetch(`${BASE_API_URL}/api/login`, {
                 method: 'POST',
@@ -72,6 +72,9 @@ const LoginPage : NextPage = () => {
              //  } else if (post.success === false) {
              //    toast.error(post.msg);
              //} else {
+                if (post.success === false) {
+                       toast.error(post.msg);
+                    } else{
                 Cookies.set("loggedInUserId", post.result.id);
                 Cookies.set("loggedInUserName", post.result.usrName);
                 Cookies.set("loggedInUserRole", post.result.usrRole);
@@ -84,6 +87,7 @@ const LoginPage : NextPage = () => {
                 } else {
                     router.push("/account/sadhak-dashboard");
                 }
+            }
               //}
           } catch (error) {
               toast.error('Error while logging in.');

@@ -114,7 +114,7 @@ const DoneCourses : React.FC = () => {
               </div>
               <div className='flex justify-between text-sm gap-2'>
                 <p className="text-sm"><span className="font-bold">Eligibility:</span> {cor?.eligibilityName}</p>
-                <p className="text-sm"><span className="font-bold">Fee: &#8377;</span> {cor?.coDon.toLocaleString()}</p>
+                <p className="text-sm"><span className="font-bold">Fee: &#8377;</span> {cor?.coDon?.toLocaleString()}</p>
               </div>
               <button
                   type="button"
