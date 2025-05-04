@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import Menuaccess from "../../../../modals/Menuaccess";
 
 
-type SideMenuType = {
+type AccMenuType = {
     roleId:mongoose.Schema.Types.ObjectId;
     menuId:[mongoose.Schema.Types.ObjectId];
     createdBy?:string;
@@ -15,7 +15,9 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const accessList: SideMenuType[] = await Menuaccess.find({isActive: true})
+      const accessList: AccMenuType[] = await Menuaccess.find({isActive: true})
+      .populate('roleId', 'roleType')
+      .populate('menuId', 'menuName')
       .populate('createdBy', 'sdkFstName')
       .populate('updatedBy', 'sdkFstName')
       .sort({ createdAt: -1 });
@@ -35,7 +37,7 @@ export async function GET(req:NextRequest){
     try {
   
       await dbConnect();
-      const { roleId, menuId, createdBy }: SideMenuType = await req.json();
+      const { roleId, menuId, createdBy }: AccMenuType = await req.json();
   
       const newMenuAccess = new Menuaccess({ roleId, menuId, createdBy });
       const savedMenuAccess = await newMenuAccess.save();

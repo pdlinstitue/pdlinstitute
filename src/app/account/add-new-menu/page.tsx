@@ -1,0 +1,162 @@
+"use client";
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import Loading from '../Loading';
+import Cookies from 'js-cookie';
+import toast from 'react-hot-toast';
+
+
+interface SideMenuProps {
+  menuName: string;
+  menuIcon: string;
+  menuUrl: string;
+  isParent: boolean;
+  isChild: boolean;
+  parentId: string;
+}
+
+const CreateSideMenu : React.FC = () => {
+  
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [parent, setParent] = useState<boolean>(false);
+  const [child, setChild] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [data, setData] = useState<SideMenuProps>({
+    menuName: '',
+    menuIcon: '',
+    menuUrl: '',
+    isParent: false,
+    isChild: false,
+    parentId: '',
+  });
+
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: "",
+      usrName: "",
+      usrRole: "",
+    },
+  });
+  
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleChange = (e: any) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setData((prev) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+
+  const handleParent = () => {
+    setParent(!parent);
+  }
+
+  const handleChild = () => {
+    setChild(!child);
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/sidemenu-list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          menuName: data.menuName,
+          menuIcon: data.menuIcon,
+          menuUrl: data.menuUrl,
+          isParent: parent,
+          isChild: child,
+          parentId: data.parentId,
+          createdBy: loggedInUser.result._id,
+        }),
+      });
+
+      const post = await response.json();  
+      if (post.success === false) {
+        toast.error(post.msg);
+      } else {
+        toast.success(post.msg);
+        router.push("/account/sidemenu-list");
+      }
+    } catch (error) {
+      toast.error('An error occurred while saving the menu.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return <div>
+      <Loading />
+    </div>
+  };
+
+  return (
+    <div className='flex justify-center items-center py-10'>
+      <form onSubmit={handleSubmit} className="formStyle w-[600px]">
+          <div className='flex flex-col gap-2'>
+              <label>Menu Name:</label>
+              <input type="text" name="menuName" value={data.menuName} onChange={handleChange} required className="inputBox uppercase" />
+          </div>
+          <div className='flex flex-col gap-2'>
+              <label>Menu Icon:</label>
+              <input type="text" name="menuIcon" value={data.menuIcon} onChange={handleChange} required className="inputBox" />
+          </div>
+          <div className='flex flex-col gap-2'>
+              <label>Menu URL:</label>
+              <input type="text" name="menuUrl" value={data.menuUrl} onChange={handleChange} required className="inputBox" />
+          </div>
+          <div className='grid grid-cols-2 gap-1'>
+            <div className='flex gap-2'>    
+                <input type="checkbox" name="isParent"  onChange={handleParent} />
+                <label>Is Parent</label>
+            </div>
+            <div className='flex gap-2'> 
+              <input type="checkbox" name="isChild"  onChange={handleChild} />
+              <label>Is Child</label>
+            </div>
+          </div>
+          <div className='flex flex-col gap-2'>
+              <label>Parent ID:</label>
+              <input type="text" name="parentId" value={data.parentId} onChange={handleChange} className="inputBox" />
+          </div>
+          <div className='grid grid-cols-2 gap-1'>
+          <button type="submit" className="btnLeft" disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save'}
+          </button>
+          <button type="button" className="btnRight" onClick={()=> router.push('/account/sidemenu-list')}>
+              Back
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default CreateSideMenu;
