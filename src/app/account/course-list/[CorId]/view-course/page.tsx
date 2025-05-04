@@ -44,7 +44,8 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
             const courseById = await coData.json();
             const fullCourseData = { 
                 ...courseById.corById, 
-                coCat: courseById.catName 
+                coCat: courseById.catName, 
+                coElg:courseById.corEligibility
             }; 
             setData(fullCourseData);
         } catch (error) {

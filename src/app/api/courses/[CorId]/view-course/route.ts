@@ -21,7 +21,17 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ CorId
       const catNameByCourseId = catByCourseId?.catName;
 
       if (catNameByCourseId) {
-        return NextResponse.json({ corById, catName: catNameByCourseId, success: true }, { status: 200 });
+        let eligibilityName = "None";
+                if (corById.coElgType === "Course" && corById.coElg !== "None") {
+                    const eligibleCourse = await Courses.findById(corById.coElg, "coNick");
+                    eligibilityName = eligibleCourse ? eligibleCourse.coNick : "Unknown Course";
+                } else if (corById.coElgType === "Category" && corById.coElg !== "None") {
+                    const eligibleCategory = await Categories.findById(corById.coElg, "catName");
+                    eligibilityName = eligibleCategory ? eligibleCategory.catName : "Unknown Category";
+                } else {
+                    eligibilityName = corById.coElg;
+                }
+        return NextResponse.json({ corById, catName: catNameByCourseId, corEligibility:eligibilityName, success: true }, { status: 200 });
       } else {
         return NextResponse.json({ success: false, msg: "No category found." }, { status: 404 });
       }
