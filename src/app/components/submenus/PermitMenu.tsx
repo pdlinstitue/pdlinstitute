@@ -9,6 +9,8 @@ const PermitMenu : React.FC = () => {
         <Link href="/account/role-list" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- ROLES</Link>
         <Link href="/account/action-list" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- MODULES</Link> 
         <Link href="/account/permission-list" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- PERMISSIONS</Link> 
+        <Link href="/account/sidemenu-list" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- SIDE-MENUES</Link> 
+        <Link href="/account/menu-access-list" className='text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm'>- MENU-ACCESS</Link> 
       </div>
     </div>
   )
