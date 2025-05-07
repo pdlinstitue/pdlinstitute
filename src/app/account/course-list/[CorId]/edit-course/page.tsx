@@ -298,7 +298,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
               {preview || data.coImg ? (
                 <img
-                  src={preview || data.coImg}
+                  src={preview || `/api/image-upload?name=${data.coImg}`}
                   alt="course"
                   className="w-full h-full object-contain"
                 />

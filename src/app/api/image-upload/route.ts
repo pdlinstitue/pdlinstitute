@@ -1,9 +1,31 @@
-import { writeFile, mkdir,chmod } from "fs/promises";
+import fs, { writeFile, mkdir, chmod } from "fs/promises";
 import path, { dirname } from "path";
 import sharp from "sharp";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { UPLOAD_PATH } from "@/app/utils/constant";
+
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+    const name = searchParams.get("name");
+  
+    if (!name) {
+      return NextResponse.json({ error: "No image name provided" }, { status: 400 });
+    }
+  
+    const filePath = path.resolve(`${UPLOAD_PATH}/course-images`, name.replace("/course-images/", ""));
+  
+    try {
+      const file = await fs.readFile(filePath);
+      return new NextResponse(file, {
+        headers: {
+          "Content-Type": "image/jpeg", // or "image/png" depending on your case
+        },
+      });
+    } catch (err) {
+      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    }
+}  
 
 export async function POST(req: NextRequest) {
     try {
@@ -49,7 +71,7 @@ export async function POST(req: NextRequest) {
         await writeFile(filePath, resizedBuffer);
         await chmod(filePath, 0o644);
 
-        const imageUrl = `/uploads/course-images/${uniqueName}`;
+        const imageUrl = `/course-images/${uniqueName}`;
 
         revalidatePath("/");
         return NextResponse.json({ success: true, imageUrl });
