@@ -1,4 +1,4 @@
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, mkdir,chmod } from "fs/promises";
 import path, { dirname } from "path";
 import sharp from "sharp";
 import { revalidatePath } from "next/cache";
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
         await mkdir(dirname(filePath), { recursive: true });
 
         await writeFile(filePath, resizedBuffer);
+        await chmod(filePath, 0o644);
 
         const imageUrl = `/uploads/course-images/${uniqueName}`;
 
