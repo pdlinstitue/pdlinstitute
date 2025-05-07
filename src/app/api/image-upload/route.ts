@@ -1,11 +1,11 @@
-import { writeFile } from "fs/promises";
-import { join } from "path";
+import { writeFile, mkdir } from "fs/promises";
+import path, { dirname } from "path";
 import sharp from "sharp";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { UPLOAD_PATH } from "@/app/utils/constant";
 
-
-export async function POST(req:NextRequest) {
+export async function POST(req: NextRequest) {
     try {
         const formData = await req.formData();
         const file = formData.get("courseImage");
@@ -19,7 +19,6 @@ export async function POST(req:NextRequest) {
             return NextResponse.json({ success: false, msg: "Invalid file type" }, { status: 400 });
         }
 
-        // Validate file type
         const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
         if (!allowedTypes.includes(file.type)) {
             return NextResponse.json({ success: false, msg: "Only JPG, JPEG, or PNG files are allowed" }, { status: 400 });
@@ -27,33 +26,35 @@ export async function POST(req:NextRequest) {
 
         const buffer = Buffer.from(await file.arrayBuffer());
 
-        // Resize image
         const resizedBuffer = await sharp(buffer)
             .resize(600, 350)
             .toFormat("jpeg")
             .toBuffer();
 
-        // Generate unique filename
-        let uniqueName = (fileName ? fileName.split('/').pop() : `courseImage_${Date.now()}.jpeg`) || `courseImage_${Date.now()}.jpeg`;
-
-        if(uniqueName === 'undefined'){
-            uniqueName=`courseImage_${Date.now()}.jpeg`;
+        let uniqueName = fileName?.split("/").pop() || `courseImage_${Date.now()}.jpeg`;
+        if (!uniqueName || uniqueName === "undefined" || uniqueName === "null") {
+            uniqueName = `courseImage_${Date.now()}.jpeg`;
         }
 
-        const filePath = join(process.cwd(), "public/course-images", uniqueName);
+        if (!UPLOAD_PATH) {
+            console.error("UPLOAD_PATH is not defined.");
+            return NextResponse.json({ success: false, msg: "Server misconfiguration: upload path not set" }, { status: 500 });
+        }
 
-        // Save file to public folder
+        const filePath = path.resolve(`${UPLOAD_PATH}/course-images`, uniqueName);
+
+        // Ensure directory exists
+        await mkdir(dirname(filePath), { recursive: true });
+
         await writeFile(filePath, resizedBuffer);
 
-        const imageUrl = `/course-images/${uniqueName}`;
+        const imageUrl = `/uploads/course-images/${uniqueName}`;
 
-        // Revalidate cache
         revalidatePath("/");
         return NextResponse.json({ success: true, imageUrl });
 
     } catch (error) {
-        console.error("Upload error:", error);
+        console.error("Upload error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ success: false, msg: "Image upload failed" }, { status: 500 });
     }
 }
-

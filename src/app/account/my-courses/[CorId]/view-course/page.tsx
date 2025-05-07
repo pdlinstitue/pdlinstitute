@@ -93,8 +93,8 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
             </div>
         </div>
         <div className='flex justify-between text-sm gap-2'>
-            <p className="text-sm"><span className="font-bold">Eligibility:</span> {data.eligibilityName}</p>
-            <p className="text-sm"><span className="font-bold">Fee: &#8377;</span> {data.coDon.toLocaleString()}</p>
+            <p className="text-sm"><span className="font-bold">Eligibility:</span> {data?.eligibilityName}</p>
+            <p className="text-sm"><span className="font-bold">Fee: &#8377;</span> {data?.coDon?.toLocaleString()}</p>
         </div>
         <div className='grid grid-cols-2 gap-1'>
             <button type='button' className='btnLeft' onClick={() => router.push(`/account/my-courses/${CorId}/read-more`)}>
