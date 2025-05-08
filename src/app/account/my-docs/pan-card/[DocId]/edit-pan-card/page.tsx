@@ -188,12 +188,14 @@ const EditMyPanCard: React.FC <IDocParams> = ({params}) => {
             <input className='inputBox' name="sdkDocRel" value={data.sdkDocRel}  onChange={handleChange}/>
         </div> 
         <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-            <img
-                src={preview || "/images/uploadImage.jpg"}
-                alt="idCard"
-                className="w-full h-full object-contain"
-            />
-        </div> 
+          {preview || data.sdkPan ? (
+          <img
+              src={preview || `/api/pan-upload?name=${data.sdkPan}`}
+              alt="Pan_Card"
+              className="w-full h-full object-contain"
+          />
+          ) : null}
+        </div>
         <div className="flex flex-col gap-2">
           <label className='text-lg'>Upload Pan:</label>
           <div className="flex gap-1">

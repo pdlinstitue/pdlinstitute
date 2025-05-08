@@ -85,14 +85,14 @@ const DoneCourses : React.FC = () => {
         <div className="flex gap-9 justify-start w-full">
           {myCoData?.map((cor: any) => (
             <div key={cor._id} className="flex flex-col max-w-[400px] bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600">
-              {cor.coImg && (
+              {cor.coImg ? (
                 <Image
-                  src={cor.coImg}
+                  src={`/api/image-upload?name=${cor.coImg}`}
                   alt="courseImage"
                   width={320}
                   height={220}
-                />
-              )}
+                />):null
+              }
               <h2 className="text-lg font-bold bg-gray-200 p-2 text-center">
                 {cor.coName}
               </h2>

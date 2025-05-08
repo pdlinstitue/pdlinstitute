@@ -1,6 +1,5 @@
 "use client";
 import React, { FormEvent } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { use } from "react";
@@ -216,6 +215,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+
     e.preventDefault();
     setIsSaving(true);
     setErrorMessage(""); // Clear the previous error

@@ -462,7 +462,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
                   {payThrough === "QR" && bthData.bthQr && (
                     <div className="flex flex-col gap-2">
                       <label className="font-bold">QR CODE:</label>
-                      <Image src={bthData.bthQr} alt="paymentQR" width={400} height={400} />
+                      <Image src={`/api/qr-upload?name=${bthData.bthQr}`} alt="paymentQR" width={400} height={400} />
                     </div>
                   )}
                 </div>

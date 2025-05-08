@@ -101,7 +101,10 @@ const ViewPanCard : React.FC<IDocParams> = ({params}) => {
     <div className='flex items-center justify-center'>
       <form className='formStyle  w-[450px] my-3' onSubmit={handleSubmit}>
          <div className=' bg-gray-200 w-auto h-auto rounded-md'>
-            <Image alt='panImg' src="/#" width={420} height={250}/>
+            {
+                panData.sdkPan ? (<Image src={`/api/pan-upload?name=${panData.sdkPan}`} alt='PanCard' width={400} height={300} className='rounded-md' priority/> )
+                : null
+            }
          </div>
          <div className='flex flex-col gap-2'>
             <label>Pan Number:</label>

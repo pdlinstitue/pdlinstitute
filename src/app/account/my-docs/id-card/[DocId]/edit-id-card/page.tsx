@@ -187,11 +187,13 @@ const EditMyIdCard: React.FC <IDocParams> = ({params}) => {
             <input className='inputBox' name="sdkDocRel" value={data.sdkDocRel}  onChange={handleChange}/>
         </div> 
         <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-            <img
-                src={data.sdkIdProof || preview || "/images/uploadImage.jpg"}
-                alt="idCard"
-                className="w-full h-full object-contain"
-            />
+          {preview || data.sdkIdProof ? (
+          <img
+              src={preview || `/api/id-upload?name=${data.sdkIdProof}`}
+              alt="ID_Card"
+              className="w-full h-full object-contain"
+          />
+          ) : null}
         </div>    
         <div className="flex flex-col gap-2">
           <label className='text-lg'>Upload ID:</label>

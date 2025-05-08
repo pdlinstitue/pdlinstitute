@@ -67,14 +67,14 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
   return (
     <div className='flex items-center justify-center py-16'>
       <div className='formStyle max-w-[400px]'>
-        {data.coImg && (
+        {data.coImg ? (
             <Image
-                src={data.coImg}
+                src={`/api/image-upload?name=${data.coImg}`}
                 alt="courseImage"
                 width={320}
                 height={220}
-            />
-        )}
+            />):null
+        }
         <h2 className='font-semibold text-lg text-center text-white p-2 bg-orange-500'>{data.coName}</h2>
         <div className="flex justify-between text-sm gap-2">
             <p>

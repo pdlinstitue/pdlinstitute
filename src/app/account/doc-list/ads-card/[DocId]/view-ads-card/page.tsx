@@ -3,6 +3,7 @@ import React, { FormEvent, use, useEffect, useState } from 'react';
 import Loading from '@/app/account/Loading';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
 import { BASE_API_URL } from '@/app/utils/constant';
 import toast from 'react-hot-toast';
 
@@ -17,6 +18,7 @@ interface ViewIDCardProps {
     sdkAdsProof: string;
     sdkAdsNbr: string;
     sdkRemarks: string;
+    updatedBy: string;
 }
 
 const ViewAdsCard : React.FC<IDocParams> = ({params}) => {
@@ -24,8 +26,34 @@ const ViewAdsCard : React.FC<IDocParams> = ({params}) => {
     const router = useRouter();
     const {DocId} = use(params);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [adsData, setAdsData] = useState<ViewIDCardProps>({sdkAdsProof:"", sdkAdsNbr:"", sdkRemarks:""});
+    const [adsData, setAdsData] = useState<ViewIDCardProps>({sdkAdsProof:"", sdkAdsNbr:"", sdkRemarks:"", updatedBy:""});
     const [status, setStatus] = useState('');
+    const [loggedInUser, setLoggedInUser] = useState({
+        result: {
+          _id: '',
+          usrName: '',
+          usrRole: '',
+        },
+      });
+       
+      useEffect(() => {
+        try {
+          const userId = Cookies.get("loggedInUserId") || '';
+          const userName = Cookies.get("loggedInUserName") || '';
+          const userRole = Cookies.get("loggedInUserRole") || '';
+          setLoggedInUser({
+            result: {
+              _id: userId,
+              usrName: userName,
+              usrRole: userRole,
+            },
+          });
+        } catch (error) {
+            console.error("Error fetching loggedInUserData.");
+        } finally {
+          setIsLoading(false);
+        }
+      }, []);
 
     useEffect(() => {
         const fetchAdsData = async () => {
@@ -62,6 +90,7 @@ const ViewAdsCard : React.FC<IDocParams> = ({params}) => {
                     sdkDocStatus:status, 
                     sdkRemarks: adsData.sdkRemarks,
                     sdkAdsNbr: adsData.sdkAdsNbr,
+                    updatedBy: loggedInUser.result._id,
                     sdkAprDate: new Date(),
                 }),
             });
@@ -89,7 +118,13 @@ const ViewAdsCard : React.FC<IDocParams> = ({params}) => {
     <div className='flex items-center justify-center'>
       <form className='formStyle  w-[450px] my-3' onSubmit={handleSubmit}>
          <div className=' bg-gray-200 w-auto h-auto rounded-md'>
-            <Image alt='adsCardImg' src="/#" width={420} height={250}/>
+            {adsData.sdkAdsProof ? (
+                <Image src={`/api/adds-upload?name=${adsData.sdkAdsProof}`} alt='ads card' width={400} height={300} className='w-full h-full object-contain rounded-md'/>
+                ) : (
+                <div className='flex items-center justify-center w-full h-full'>
+                    <p>No Image Available</p>
+                </div>
+            )}
          </div>
          <div className='flex flex-col gap-2'>
             <label>ID Number:</label>

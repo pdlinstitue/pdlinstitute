@@ -1,11 +1,11 @@
 "use client";
 import React, { FormEvent, use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "@/app/account/Loading";
 import toast from "react-hot-toast";
-import { format } from "date-fns";
-
+ 
 
 interface IDocParams {
   params:Promise <{
@@ -13,22 +13,51 @@ interface IDocParams {
   }>
 }
 
-interface EditPanCardProps  {
+interface EditIdCardProps  {
     _id?: string;
     sdkDocOwnr: string;
     sdkUpldDate: Date;
     sdkDocRel: string;
     sdkIdProof: string;
     sdkIdNbr: string;
-    usrId?: string;
+    updatedBy?: string;
   };
 
 const EditIDCard: React.FC <IDocParams> = ({params}) => {
 
   const router = useRouter();
   const {DocId} = use(params);
-  const [data, setData] = useState<EditPanCardProps>({sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkIdNbr:'', sdkIdProof:'', usrId:''});
+  const [preview, setPreview] = useState<string>('');
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [image, setImage] = useState<File | string | null>(null);
+  const [data, setData] = useState<EditIdCardProps>({sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkIdNbr:'', sdkIdProof:'', updatedBy:''});
   const [isLoading, setIsLoading] = useState(true);
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
   
 
   useEffect(() => {
@@ -56,6 +85,56 @@ const EditIDCard: React.FC <IDocParams> = ({params}) => {
     });     
   };
 
+  const handleFileChange = (e:any) => {
+    const file = e.target.files[0];
+    if (file) {
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    }
+  };
+  
+  const handleUpload = async () => {
+
+    if (!image) {
+      toast.error("Please select an image!");
+      return;
+    }
+
+    setIsUploading(true);
+  
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("idImage", image);
+    formData.append("idImageFileName", data.sdkIdProof);
+  
+      try {
+        const res = await fetch("/api/id-upload", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Id uploaded successfully!");            
+          setImage(data.imageUrl);
+        } else {
+          throw new Error(data.error || "Upload failed");
+        }
+      } catch (error:any) {
+        toast.error(error.message);
+      } finally {
+        setIsUploading(false);
+      }
+  };
+
   const handleSubmit = async (e:FormEvent<HTMLFormElement>):Promise<void> => {
   e.preventDefault();      
     try 
@@ -66,9 +145,9 @@ const EditIDCard: React.FC <IDocParams> = ({params}) => {
                 sdkDocOwnr: data.sdkDocOwnr, 
                 sdkUpldDate: new Date(), 
                 sdkDocRel: data.sdkDocRel, 
-                sdkIdProof: data.sdkIdProof, 
+                sdkIdProof: image, 
                 sdkIdNbr: data.sdkIdNbr,
-                // usrId: data.usrId
+                updatedBy: loggedInUser.result._id,
             }),
           });
       
@@ -106,12 +185,28 @@ const EditIDCard: React.FC <IDocParams> = ({params}) => {
         <div className="flex flex-col gap-2">
             <label className='text-lg'>Relation:</label>
             <input className='inputBox' name="sdkDocRel" value={data.sdkDocRel}  onChange={handleChange}/>
+        </div>
+        <div className="w-full h-[350px] bg-gray-100">
+          {preview || data.sdkIdProof ? (
+          <img
+              src={preview || `/api/id-upload?name=${data.sdkIdProof}`}
+              alt="IdCard"
+              className="w-full h-full object-contain"
+          />
+          ) : null}
         </div> 
         <div className="flex flex-col gap-2">
           <label className='text-lg'>Upload ID:</label>
-          <div className="flex gap-1">
-            <input type='file' className='inputBox w-full' name="sdkPan" value={data.sdkIdProof} onChange={handleChange}/>
-            <button type='button' className='btnRight'>Upload</button>
+          <div className="flex items-center gap-1">
+            <input 
+              type='file' 
+              accept="image/*"
+              onChange={handleFileChange}
+              className='inputBox w-full' name="sdkIdProof" 
+            />
+            <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+                {isUploading ? "Uploading..." : "Upload"}
+            </button>
           </div>
         </div>
         <div className="flex gap-1 w-full mt-3">

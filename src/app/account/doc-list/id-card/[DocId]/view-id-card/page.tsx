@@ -3,6 +3,7 @@ import React, { FormEvent, use, useEffect, useState } from 'react';
 import Loading from '@/app/account/Loading';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Cookies from 'js-cookie';
 import { BASE_API_URL } from '@/app/utils/constant';
 import toast from 'react-hot-toast';
 
@@ -26,6 +27,32 @@ const ViewIDCard : React.FC<IDocParams> = ({params}) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [idData, setIDData] = useState<ViewIDCardProps>({sdkIdProof:"", sdkIdNbr:"", sdkRemarks:""});
     const [status, setStatus] = useState('');
+    const [loggedInUser, setLoggedInUser] = useState({
+        result: {
+          _id: '',
+          usrName: '',
+          usrRole: '',
+        },
+      });
+       
+      useEffect(() => {
+        try {
+          const userId = Cookies.get("loggedInUserId") || '';
+          const userName = Cookies.get("loggedInUserName") || '';
+          const userRole = Cookies.get("loggedInUserRole") || '';
+          setLoggedInUser({
+            result: {
+              _id: userId,
+              usrName: userName,
+              usrRole: userRole,
+            },
+          });
+        } catch (error) {
+            console.error("Error fetching loggedInUserData.");
+        } finally {
+          setIsLoading(false);
+        }
+      }, []);
 
     useEffect(() => {
         const fetchIDData = async () => {
@@ -61,10 +88,12 @@ const ViewIDCard : React.FC<IDocParams> = ({params}) => {
                 body: JSON.stringify({ 
                     sdkDocStatus:status, 
                     sdkRemarks: idData.sdkRemarks,
-                    sdkPanNbr: idData.sdkIdNbr,
+                    sdkIdNbr: idData.sdkIdNbr,
                     sdkAprDate: new Date(),
+                    updatedBy:loggedInUser.result._id
                 }),
             });
+            
             const post = await response.json();
             console.log(post);
             
@@ -72,10 +101,10 @@ const ViewIDCard : React.FC<IDocParams> = ({params}) => {
                 toast.error(post.msg);
             } else {
                 toast.success(post.msg);
-                router.push('/account/doc-list/id-card');
+                router.push('/account/doc-list/pan-card');
             }
         } catch (error) {
-            toast.error('Error updating idData.');
+            toast.error('Error updating panData.');
         }
     };
 
@@ -89,7 +118,10 @@ const ViewIDCard : React.FC<IDocParams> = ({params}) => {
     <div className='flex items-center justify-center'>
       <form className='formStyle  w-[450px] my-3' onSubmit={handleSubmit}>
          <div className=' bg-gray-200 w-auto h-auto rounded-md'>
-            <Image alt='idCardImg' src="/#" width={420} height={250}/>
+            {idData.sdkIdProof ?
+             (<Image src={`/api/id-upload?name=${idData.sdkIdProof}`} alt='ID Card' width={400} height={400} className='rounded-md'/>)
+             : null
+            }
          </div>
          <div className='flex flex-col gap-2'>
             <label>ID Number:</label>

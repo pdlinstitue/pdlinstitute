@@ -186,11 +186,13 @@ const EditMyAdsCard: React.FC <IDocParams> = ({params}) => {
             <input className='inputBox' name="sdkDocRel" value={data.sdkDocRel}  onChange={handleChange}/>
         </div> 
         <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+          {preview || data.sdkAdsProof ? (
           <img
-              src={data.sdkAdsProof || preview || "/images/uploadImage.jpg"}
-              alt="adsCard"
+              src={preview || `/api/adds-upload?name=${data.sdkAdsProof}`}
+              alt="Adds_Card"
               className="w-full h-full object-contain"
           />
+          ) : null}
         </div>    
         <div className="flex flex-col gap-2">
           <label className='text-lg'>Upload ID:</label>

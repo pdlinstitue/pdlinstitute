@@ -439,11 +439,13 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-6">
         <div className="flex flex-col gap-1">
           <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+            {preview || sdkData.sdkImg ? (
             <img
-              src={preview || sdkData.sdkImg || "/images/uploadImage.jpg"}
-              alt="Preview"
-              className="w-full h-full object-contain"
+                src={preview || `/api/profile-upload?name=${sdkData.sdkImg}`}
+                alt="Profile_Image"
+                className="w-full h-full object-contain"
             />
+            ) : null}
           </div>
           <div className="flex items-center gap-1">
             <input

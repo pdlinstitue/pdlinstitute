@@ -1,6 +1,5 @@
 "use client";
 import React, { FormEvent, use, useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Loading from '@/app/account/Loading';
@@ -218,12 +217,14 @@ const EditPracticeClass : React.FC<IPrcParams> = ({params}) => {
     <div className='flex justify-center items-center my-4 '>
       <form onSubmit={handleSubmit} className='formStyle w-[500px]'>
       <div className="flex flex-col gap-1">
-        <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-          <img
-            src={data.prcImg || preview || "/images/uploadImage.jpg"}
-            alt="course"
-            className="w-full h-full object-contain"
-          />
+      <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+          {preview || data.prcImg ? (
+            <img
+              src={preview || `/api/prc-upload?name=${data.prcImg}`}
+              alt="course"
+              className="w-full h-full object-contain"
+            />
+          ) : null}
         </div>
         <div className="flex items-center gap-1">
           <input

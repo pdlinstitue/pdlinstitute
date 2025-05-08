@@ -62,8 +62,14 @@ const ViewMyPracticeClass : React.FC<IPrcParams> = ({params}) => {
   return (
     <div className='flex justify-center items-center my-4 '>
       <form className='formStyle w-[500px]'>
-        <div className=' w-full h-auto'>
-            <Image src="/images/sadhak.jpg" alt='practice' width={450} height={275}/>
+      <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
+        {data.prcImg ? (
+          <img
+              src={`/api/prc-upload?name=${data.prcImg}`}
+              alt="Course_Cover"
+              className="w-full h-full object-contain"
+          />
+          ) : null}
         </div>
         <div className='flex flex-col gap-2 w-full'>
           <label>Class Name:</label>

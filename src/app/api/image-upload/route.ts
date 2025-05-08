@@ -28,56 +28,61 @@ export async function GET(req: NextRequest) {
 }  
 
 export async function POST(req: NextRequest) {
-    try {
-        const formData = await req.formData();
-        const file = formData.get("courseImage");
-        const fileName = formData.get("courseImageFileName")?.toString() || "";
+  try {
+      const formData = await req.formData();
+      const file = formData.get("courseImage");
+      const fileName = formData.get("courseImageFileName")?.toString() || "";
 
-        if (!file) {
-            return NextResponse.json({ success: false, msg: "No file uploaded" }, { status: 400 });
-        }
+      if (!file) {
+          return NextResponse.json({ success: false, msg: "No file uploaded" }, { status: 400 });
+      }
 
-        if (!(file instanceof File)) {
-            return NextResponse.json({ success: false, msg: "Invalid file type" }, { status: 400 });
-        }
+      if (!(file instanceof File)) {
+          return NextResponse.json({ success: false, msg: "Invalid file type" }, { status: 400 });
+      }
 
-        const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
-        if (!allowedTypes.includes(file.type)) {
-            return NextResponse.json({ success: false, msg: "Only JPG, JPEG, or PNG files are allowed" }, { status: 400 });
-        }
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!allowedTypes.includes(file.type)) {
+          return NextResponse.json({ success: false, msg: "Only JPG, JPEG, or PNG files are allowed" }, { status: 400 });
+      }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+      const buffer = Buffer.from(await file.arrayBuffer());
 
-        const resizedBuffer = await sharp(buffer)
-            .resize(600, 350)
-            .toFormat("jpeg")
-            .toBuffer();
+      // Resize image with padding and light gray background, maintaining aspect ratio
+      const resizedBuffer = await sharp(buffer)
+      .resize(600, 360, {
+        fit: "contain",
+        background: { r: 200, g: 200, b: 200, alpha: 1 }, // light gray background
+      })
+      .toFormat("jpeg", { quality: 80 }) // optimized JPEG
+      .toBuffer();
 
-        let uniqueName = fileName?.split("/").pop() || `courseImage_${Date.now()}.jpeg`;
-        if (!uniqueName || uniqueName === "undefined" || uniqueName === "null") {
-            uniqueName = `courseImage_${Date.now()}.jpeg`;
-        }
 
-        if (!UPLOAD_PATH) {
-            console.error("UPLOAD_PATH is not defined.");
-            return NextResponse.json({ success: false, msg: "Server misconfiguration: upload path not set" }, { status: 500 });
-        }
+      let uniqueName = fileName?.split("/").pop() || `courseImage_${Date.now()}.jpeg`;
+      if (!uniqueName || uniqueName === "undefined" || uniqueName === "null") {
+          uniqueName = `courseImage_${Date.now()}.jpeg`;
+      }
 
-        const filePath = path.resolve(`${UPLOAD_PATH}/course-images`, uniqueName);
+      if (!UPLOAD_PATH) {
+          console.error("UPLOAD_PATH is not defined.");
+          return NextResponse.json({ success: false, msg: "Server misconfiguration: upload path not set" }, { status: 500 });
+      }
 
-        // Ensure directory exists
-        await mkdir(dirname(filePath), { recursive: true });
+      const filePath = path.resolve(`${UPLOAD_PATH}/course-images`, uniqueName);
 
-        await writeFile(filePath, resizedBuffer);
-        await chmod(filePath, 0o644);
+      // Ensure directory exists
+      await mkdir(dirname(filePath), { recursive: true });
 
-        const imageUrl = `/course-images/${uniqueName}`;
+      await writeFile(filePath, resizedBuffer);
+      await chmod(filePath, 0o644);
 
-        revalidatePath("/");
-        return NextResponse.json({ success: true, imageUrl });
+      const imageUrl = `/course-images/${uniqueName}`;
 
-    } catch (error) {
-        console.error("Upload error:", error instanceof Error ? error.message : error);
-        return NextResponse.json({ success: false, msg: "Image upload failed" }, { status: 500 });
-    }
+      revalidatePath("/");
+      return NextResponse.json({ success: true, imageUrl });
+
+  } catch (error) {
+      console.error("Upload error:", error instanceof Error ? error.message : error);
+      return NextResponse.json({ success: false, msg: "Image upload failed" }, { status: 500 });
+  }
 }

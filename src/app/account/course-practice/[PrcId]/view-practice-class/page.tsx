@@ -1,8 +1,7 @@
 "use client";
-import React, { FormEvent, use, useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
 import Loading from '@/app/account/Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
 
@@ -64,7 +63,11 @@ const ViewPracticeClass : React.FC<IPrcParams> = ({params}) => {
     <div className='flex justify-center items-center my-4 '>
       <form className='formStyle w-[500px]'>
         <div className=' w-full h-auto'>
-            <Image src="/images/sadhak.jpg" alt='practice' width={450} height={275}/>
+            {
+              data.prcImg ? (
+                <Image src={`/api/prc-upload?name=${data.prcImg}`} alt='CourseCover' width={500} height={300} className='w-full h-[200px] object-cover rounded-md' />
+              ) : null
+            }
         </div>
         <div className='flex flex-col gap-2 w-full'>
           <label>Class Name:</label>

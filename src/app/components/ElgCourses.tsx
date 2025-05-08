@@ -15,14 +15,14 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
       {myCoData?.map((cor: any) => (
         <div className="max-w-[400px]" key={cor._id}>
           <div className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600">
-            {cor.coImg && (
+            {cor.coImg ? (
               <Image
-                src={cor.coImg}
+                src={`/api/image-upload?name=${cor.coImg}`}
                 alt="courseImage"
                 width={320}
                 height={220}
-              />
-            )}
+              />):null
+            }
             <h2 className="text-lg font-bold bg-gray-200 p-2 text-center">{cor.coName}</h2>
             <div className="flex justify-between text-sm gap-2">
               <p><span className="font-bold">Category:</span> {cor.coCat}</p>

@@ -28,17 +28,37 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
   const router = useRouter();
   const {DocId} = use(params);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [preview, setPreview] = useState<string>('');
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [image, setImage] = useState<File | string | null>(null);
   const [data, setData] = useState<EditPanCardProps>({sdkDocOwnr:'', sdkUpldDate:new Date(), sdkDocRel:'', sdkPan:'', sdkPanNbr:'', updatedBy:''});
   const [isLoading, setIsLoading] = useState(true);
-
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: '',
+      usrName: '',
+      usrRole: '',
+    },
+  });
+   
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || '';
+      const userName = Cookies.get("loggedInUserName") || '';
+      const userRole = Cookies.get("loggedInUserRole") || '';
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
     }
-  };
-  
+  }, []);
 
   useEffect(() => {
   const fetchPanData = async () => {
@@ -65,6 +85,56 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
     });     
   };
 
+  const handleFileChange = (e:any) => {
+    const file = e.target.files[0];
+    if (file) {
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    }
+  };
+  
+  const handleUpload = async () => {
+
+    if (!image) {
+      toast.error("Please select an image!");
+      return;
+    }
+
+    setIsUploading(true);
+  
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+        img.src = URL.createObjectURL(image);
+    } else {
+        toast.error("Invalid image format!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("panImage", image);
+    formData.append("panImageFileName", data.sdkPan);
+  
+      try {
+        const res = await fetch("/api/pan-upload", {
+          method: "POST",
+          body: formData,
+        });
+  
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Pan uploaded successfully!");            
+          setImage(data.imageUrl);
+        } else {
+          throw new Error(data.error || "Upload failed");
+        }
+      } catch (error:any) {
+        toast.error(error.message);
+      } finally {
+        setIsUploading(false);
+      }
+  };
+
   const handleSubmit = async (e:FormEvent<HTMLFormElement>):Promise<void> => {
   e.preventDefault();    
   setIsSaving(true);  
@@ -76,7 +146,7 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
                 sdkDocOwnr: data.sdkDocOwnr, 
                 sdkUpldDate: new Date(), 
                 sdkDocRel: data.sdkDocRel, 
-                sdkPan: data.sdkPan, 
+                sdkPan: image, 
                 sdkPanNbr: data.sdkPanNbr,
                 updatedBy: loggedInUser.result._id
             }),
@@ -115,11 +185,28 @@ const EditPanCard: React.FC <IDocParams> = ({params}) => {
             <label className='text-lg'>Relation:</label>
             <input className='inputBox' name="sdkDocRel" value={data.sdkDocRel}  onChange={handleChange}/>
         </div> 
+        <div className="w-full h-[350px] bg-gray-100">
+          {preview || data.sdkPan ? (
+          <img
+              src={preview || `/api/pan-upload?name=${data.sdkPan}`}
+              alt="PanCard"
+              className="w-full h-full object-contain"
+          />
+          ) : null}
+        </div>
         <div className="flex flex-col gap-2">
-          <label className='text-lg'>Upload Pan:</label>
-          <div className="flex gap-1">
-            <input type='file' className='inputBox w-full' name="sdkPan" value={data.sdkPan} onChange={handleChange}/>
-            <button type='button' className='btnRight'>Upload</button>
+          <label className='text-lg'>Upload Image:</label>
+          <div className="flex items-center gap-1">
+            <input 
+              type='file' 
+              accept="image/*" 
+              className='inputBox w-full' 
+              name="sdkPan" 
+              onChange={handleFileChange}
+            />
+            <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+                {isUploading ? "Uploading..." : "Upload"}
+            </button>
           </div>
         </div>
         <div className="flex flex-col gap-2">
