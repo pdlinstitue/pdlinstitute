@@ -68,7 +68,7 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
       <div className='formStyle my-3 max-w-[400px]'>
         {data.coImg && (
             <Image
-                src={data.coImg}
+                src={`/api/image-upload?name=${data.coImg}`}
                 alt="courseImage"
                 width={320}
                 height={220}
@@ -83,9 +83,9 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
                 <p>{data.coType}</p>
             </div>
         </div>
-        <div className='text-sm'>
+        {/* <div className='text-sm'>
             <p>{data.coShort}</p>
-        </div>
+        </div> */}
         <div className='grid grid-cols-3 gap-1'>
             <div className='text-sm'>
                 <p><span className='font-semibold uppercase mr-3'>Fee:</span>{data.coDon}</p>
