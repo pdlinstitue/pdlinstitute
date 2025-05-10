@@ -47,7 +47,8 @@ const data = React.useMemo(
       clsStartsAt: clsDetail.clsStartAt,
       clsEndsAt: clsDetail.clsEndAt,
       clsStatus:clsDetail.attendance?.status,
-      clsremarks:clsDetail.attendance?.absRemarks
+      clsremarks:clsDetail.attendance?.absRemarks,
+      _id: clsDetail._id,
     })),
   [classData]
 );
@@ -65,7 +66,7 @@ const columns = React.useMemo(() => [
   { header: 'Action', accessorKey: 'action', 
         cell: ({ row }: { row: any }) => ( 
           <div className='flex items-center gap-3 justify-center'> 
-            <button type='button' title='Screenshots' onClick={()=> router.push(`/account/my-attendance/${row.original.attendance._id}/my-classes`)} className='text-green-600 border-[1.5px] border-green-800 p-1 rounded-full  hover:border-black'><FiEye size={12}/></button>      
+            <button type='button' title='Screenshots' onClick={()=> router.push(`/account/my-attendance/${BthId}/my-classes/${row.original._id}/view-attendance`)} className='text-green-600 border-[1.5px] border-green-800 p-1 rounded-full  hover:border-black'><FiEye size={12}/></button>      
           </div> 
         ),
   },  
@@ -110,7 +111,6 @@ const columns = React.useMemo(() => [
         const res = await fetch(`${BASE_API_URL}/api/my-attendance/${BthId}/my-classes?sdkId=${Cookies.get("loggedInUserId")}`, { cache: "no-store" });
         const classList = await res.json();
         setClassData(classList.clsList);
-        console.log(classList.clsList);
     } catch (error) {
         console.error("Error fetching clsData:", error);
     } finally {

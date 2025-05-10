@@ -159,7 +159,7 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
           {previews?.map((src, index) => (
             <div key={index} className="relative w-24 h-24">
               <img
-                src={src}
+                src={src.includes("attd-images") ? `/api/attd-upload?name=${src}` : src}
                 alt={`Preview ${index}`}
                 className="w-full h-full object-cover rounded"
               />

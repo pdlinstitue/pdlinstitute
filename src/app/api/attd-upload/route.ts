@@ -26,65 +26,53 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
-}  
+}
 
 export async function POST(req: NextRequest) {
   try {
-      const formData = await req.formData();
-      const file = formData.get("attdImage");
-      const fileName = formData.get("attdImageFileName")?.toString() || "";
+    const formData = await req.formData();
 
-      if (!file) {
-          return NextResponse.json({ success: false, msg: "No file uploaded" }, { status: 400 });
-      }
+    const files: File[] = formData.getAll("attdImage").filter(item => item instanceof File) as File[];
 
-      if (!(file instanceof File)) {
-          return NextResponse.json({ success: false, msg: "Invalid file type" }, { status: 400 });
-      }
+    if (files.length === 0) {
+      return NextResponse.json({ success: false, msg: "No files uploaded" }, { status: 400 });
+    }
 
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    const savedFiles: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
       if (!allowedTypes.includes(file.type)) {
-          return NextResponse.json({ success: false, msg: "Only JPG, JPEG, or PNG files are allowed" }, { status: 400 });
+        return NextResponse.json({ success: false, msg: `Invalid file type: ${file.name}` }, { status: 400 });
       }
 
       const buffer = Buffer.from(await file.arrayBuffer());
 
-      // Resize image with padding and light gray background, maintaining aspect ratio
       const resizedBuffer = await sharp(buffer)
-      .resize(350, 900, {
-        fit: "contain",
-        background: { r: 200, g: 200, b: 200, alpha: 1 }, // light gray background
-      })
-      .toFormat("jpeg", { quality: 80 }) // optimized JPEG
-      .toBuffer();
+        .resize(350, 900, {
+          fit: "contain",
+          background: { r: 200, g: 200, b: 200, alpha: 1 },
+        })
+        .toFormat("jpeg", { quality: 80 })
+        .toBuffer();
 
+      const fileName = `attdImage_${Date.now()}_${i}.jpeg`;
+      const filePath = path.resolve(`${UPLOAD_PATH}/attd-images`, fileName);
 
-      let uniqueName = fileName?.split("/").pop() || `attdImage_${Date.now()}.jpeg`;
-      if (!uniqueName || uniqueName === "undefined" || uniqueName === "null") {
-          uniqueName = `attdImage_${Date.now()}.jpeg`;
-      }
-
-      if (!UPLOAD_PATH) {
-          console.error("UPLOAD_PATH is not defined.");
-          return NextResponse.json({ success: false, msg: "Server misconfiguration: upload path not set" }, { status: 500 });
-      }
-
-      const filePath = path.resolve(`${UPLOAD_PATH}/attd-images`, uniqueName);
-
-      // Ensure directory exists
       await mkdir(dirname(filePath), { recursive: true });
-
       await writeFile(filePath, resizedBuffer);
       await chmod(filePath, 0o644);
 
-      const imageUrl = `/attd-images/${uniqueName}`;
+      savedFiles.push(`/attd-images/${fileName}`);
+    }
 
-      revalidatePath("/");
-      return NextResponse.json({ success: true, imageUrl });
+    revalidatePath("/");
 
+    return NextResponse.json({ success: true, imageUrls: savedFiles });
   } catch (error) {
-      console.error("Upload error:", error instanceof Error ? error.message : error);
-      return NextResponse.json({ success: false, msg: "Image upload failed" }, { status: 500 });
+    console.error("Upload error:", error instanceof Error ? error.message : error);
+    return NextResponse.json({ success: false, msg: "Image upload failed" }, { status: 500 });
   }
 }
