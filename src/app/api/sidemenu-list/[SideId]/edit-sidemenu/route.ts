@@ -11,7 +11,7 @@ type SideMenuType = {
     menuUrl:string;
     isParent?:boolean;
     isChild?:boolean;
-    parentId?:mongoose.Schema.Types.ObjectId;
+    parentId?:mongoose.Types.ObjectId;
     updatedBy?:string;
 }
 
@@ -26,16 +26,21 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ SideI
     if(!SideId){
       return NextResponse.json({ message: "No menu found." }, { status: 404 });
     }else{
-      const sideById = await Sidemenues.findByIdAndUpdate(SideId, {menuName, menuIcon, menuUrl, isChild, isParent, parentId, updatedBy}, {runValidators:true});
-      return NextResponse.json({ sideById, success: true, msg:"Sidemenu updated successfully." }, {status:200});
+      const sideMenuById = await Sidemenues.findByIdAndUpdate(SideId, {menuName, menuIcon, menuUrl, isChild, isParent, parentId: parentId?new mongoose.Types.ObjectId(parentId):null, updatedBy}, {runValidators:true});
+      return NextResponse.json({ sideMenuById, success: true, msg:"Sidemenu updated successfully." }, {status:200});
     }
     
-  } catch (error:any) {
+  } catch (error: any) {
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((val:any) => val.message);
-      return NextResponse.json({ success: false, msg: messages }, {status:400});
-    }else{
-      return new NextResponse ("Error while saving catData: " + error, {status: 500});
+      const messages = Object.values(error.errors).map((val: any) => val.message);
+      return NextResponse.json({ success: false, msg: messages }, { status: 400 });
+    } else if (error.code === 11000) {
+      // Extract which field is duplicated
+      const field = Object.keys(error.keyPattern)[0];
+      const msg = `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
+      return NextResponse.json({ success: false, msg }, { status: 400 });
+    } else {
+      return new NextResponse("Error while saving menuData: " + error, { status: 500 });
     }
   }
 }

@@ -1,9 +1,10 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import Loading from '../Loading';
+import React, { use, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
+import Loading from '@/app/account/Loading';
+import { BASE_API_URL } from '@/app/utils/constant';
 
 
 interface SideMenuProps {
@@ -13,7 +14,7 @@ interface SideMenuProps {
   isParent: boolean;
   isChild: boolean;
   parentId: string;
-  createdBy: string;
+  updatedBy?: string;
 }
 
 interface SideMenuListProps {
@@ -21,9 +22,17 @@ interface SideMenuListProps {
   menuName: string;
 }
 
-const CreateSideMenu : React.FC = () => {
+interface ISideMenuParams {
+    params:Promise<{
+        SideId: string;
+    }>
+}
+
+const EditSideMenu : React.FC<ISideMenuParams> = ({params}) => {
   
   const router = useRouter();
+  const { SideId } = use(params);
+
   const [sideMenuList, setSideMenuList] = useState<SideMenuListProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [parent, setParent] = useState<boolean>(false);
@@ -36,7 +45,7 @@ const CreateSideMenu : React.FC = () => {
     isParent: false,
     isChild: false,
     parentId: '',
-    createdBy: '',
+    updatedBy: '',
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
@@ -100,12 +109,27 @@ const CreateSideMenu : React.FC = () => {
   fetchSideMenuList();
   },[]);
 
+  useEffect(() => {
+    async function fetchSideMenuById() {
+      try {
+        const response = await fetch(`${BASE_API_URL}/api/sidemenu-list/${SideId}/view-sidemenu`);
+        const data = await response.json();
+        setData(data?.sideMenuById);
+      } catch (error) {
+        console.error("Error fetching side menu data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchSideMenuById();
+  }, []);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const response = await fetch('/api/sidemenu-list', {
-        method: 'POST',
+      const response = await fetch(`${BASE_API_URL}/api/sidemenu-list/${SideId}/edit-sidemenu`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -116,7 +140,7 @@ const CreateSideMenu : React.FC = () => {
           isParent: parent,
           isChild: child,
           parentId: data.parentId,
-          createdBy: loggedInUser.result._id,
+          updatedBy: loggedInUser.result._id,
         }),
       });
 
@@ -173,10 +197,11 @@ const CreateSideMenu : React.FC = () => {
             </div>
             )
           }
-          {child === true && (
+          {
+            child === true && (
             <div className='flex flex-col gap-2'>
               <label>Parent ID:</label>
-              <select  name="parentId" value={data.parentId} onChange={handleChange} className="inputBox text-center uppercase" required>
+              <select  name="parentId" value={data.parentId} onChange={handleChange} className="inputBox text-center uppercase" required >
                 <option value="">--- Select Parent ID ---</option>
                 {sideMenuList?.map((menu) => (
                   <option key={menu._id} value={menu._id} className='uppercase'>
@@ -184,8 +209,9 @@ const CreateSideMenu : React.FC = () => {
                   </option>
                 ))}
               </select>
-          </div>
-          )}
+            </div>
+            )
+          }
           <div className='grid grid-cols-2 gap-1'>
           <button type="submit" className="btnLeft" disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save'}
@@ -199,4 +225,4 @@ const CreateSideMenu : React.FC = () => {
   );
 };
 
-export default CreateSideMenu;
+export default EditSideMenu;

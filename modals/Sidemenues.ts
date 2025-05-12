@@ -4,15 +4,18 @@ import Users from './Users';
 const sidemenuesSchema = new mongoose.Schema({
     menuName: { 
         type: String, 
-        unique: true,
+        unique: [true, 'Menu name already exists'],
+        required: [true, 'Menu name is required'],
     },
     menuIcon: { 
         type: String, 
-        unique: true,
+        unique: [true, 'Menu icon already exists'],
+        sparse:true
     },
     menuUrl: { 
         type: String, 
-        unique: true,
+        unique: [true, 'Menu URL already exists'],
+        sparse:true
     },
     isActive: {
         type: Boolean,

@@ -62,7 +62,7 @@ const ActiveSadhakList: React.FC = () => {
             <Link href={profileUrl} className="flex justify-center items-center">
               {sdkImg ? (
                 <img
-                  src={sdkImg}
+                  src={`/api/profile-upload?name=${sdkImg}`}
                   alt="Profile"
                   className="w-[50px] h-[50px] rounded-full object-cover"
                 />

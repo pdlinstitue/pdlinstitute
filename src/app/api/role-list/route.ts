@@ -31,12 +31,12 @@ export async function GET(req:NextRequest){
       const { roleType, createdBy }: RolType = await req.json();
       const normalizedRoleType = roleType.trim().toLowerCase();
   
-      if (normalizedRoleType === "admin") {
-        return NextResponse.json(
-          { success: false, msg: "You are unauthorized to create Admin role" },
-          { status: 403 }
-        );
-      }
+      // if (normalizedRoleType === "admin") {
+      //   return NextResponse.json(
+      //     { success: false, msg: "You are unauthorized to create Admin role" },
+      //     { status: 403 }
+      //   );
+      // }
   
       const isRoleTypeExists = await Roles.findOne({
         roleType: { $regex: new RegExp(`^${normalizedRoleType}$`, 'i') },

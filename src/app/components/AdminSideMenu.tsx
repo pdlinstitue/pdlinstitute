@@ -86,10 +86,6 @@ const AdminSideMenu: React.FC = () => {
               </div>
             )
           }         
-          <Link href="/account/attendance-list" className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-            <FaCalendarCheck size={24} className=' group-hover:text-black'/>
-            <p className='font-semibold group-hover:text-black'>ATTENDANCE</p>
-          </Link>
           <button type='button' onClick={() =>handleToggle(11)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
             <SiAdblock size={24} className=' group-hover:text-black'/>
             <p className='font-semibold group-hover:text-black'>PERMISSION</p>

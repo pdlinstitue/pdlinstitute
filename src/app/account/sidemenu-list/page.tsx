@@ -17,6 +17,7 @@ interface SideMenuListProps {
     isChild:boolean,
     isParent:boolean,
     parentId:string,
+    parentName:string,
 }
 
 const SideMenuList : React.FC = () => {
@@ -26,18 +27,26 @@ const SideMenuList : React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const data = React.useMemo(() => sideMenuData ?? [], [sideMenuData]);
   const columns = React.useMemo(() => [ 
-    { header: 'Menu', accessorKey: 'menuName'},
+    {
+      header: 'Menu',
+      accessorKey: 'menuName',
+      cell: ({ getValue }: { getValue: () => any }) => String(getValue()).toUpperCase(),
+    },
     { 
       header: 'Icon', 
       accessorKey: 'menuIcon', 
     },
+    {
+      header: 'Parent Menu',
+      accessorKey: 'parentName'
+    },
     { 
       header: 'Created By', 
-      accessorKey: 'createdBy', 
+      accessorKey: 'createdBy.sdkFstName', 
     },
     { 
       header: 'Update By', 
-      accessorKey: 'updatedBy', 
+      accessorKey: 'updatedBy.sdkFstName', 
     },
     { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 

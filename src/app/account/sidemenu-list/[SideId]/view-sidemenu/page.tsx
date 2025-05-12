@@ -1,9 +1,10 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import Loading from '../Loading';
+import React, { use, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
+import Loading from '@/app/account/Loading';
+import { BASE_API_URL } from '@/app/utils/constant';
 
 
 interface SideMenuProps {
@@ -13,7 +14,7 @@ interface SideMenuProps {
   isParent: boolean;
   isChild: boolean;
   parentId: string;
-  createdBy: string;
+  updatedBy?: string;
 }
 
 interface SideMenuListProps {
@@ -21,9 +22,16 @@ interface SideMenuListProps {
   menuName: string;
 }
 
-const CreateSideMenu : React.FC = () => {
+interface ISideMenuParams {
+    params:Promise<{
+        SideId: string;
+    }>
+}
+
+const ViewSideMenu : React.FC<ISideMenuParams> = ({params}) => {
   
   const router = useRouter();
+  const { SideId } = use(params);
   const [sideMenuList, setSideMenuList] = useState<SideMenuListProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [parent, setParent] = useState<boolean>(false);
@@ -36,7 +44,7 @@ const CreateSideMenu : React.FC = () => {
     isParent: false,
     isChild: false,
     parentId: '',
-    createdBy: '',
+    updatedBy: '',
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
@@ -100,39 +108,20 @@ const CreateSideMenu : React.FC = () => {
   fetchSideMenuList();
   },[]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    try {
-      const response = await fetch('/api/sidemenu-list', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          menuName: data.menuName,
-          menuIcon: data.menuIcon,
-          menuUrl: data.menuUrl,
-          isParent: parent,
-          isChild: child,
-          parentId: data.parentId,
-          createdBy: loggedInUser.result._id,
-        }),
-      });
-
-      const post = await response.json();  
-      if (post.success === false) {
-        toast.error(post.msg);
-      } else {
-        toast.success(post.msg);
-        router.push("/account/sidemenu-list");
+  useEffect(() => {
+    async function fetchSideMenuById() {
+      try {
+        const response = await fetch(`${BASE_API_URL}/api/sidemenu-list/${SideId}/view-sidemenu`);
+        const data = await response.json();
+        setData(data?.sideMenuById);
+      } catch (error) {
+        console.error("Error fetching side menu data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      toast.error('An error occurred while saving the menu.');
-    } finally {
-      setIsSaving(false);
     }
-  };
+    fetchSideMenuById();
+  }, []);
 
   if (isLoading) {
     return <div>
@@ -142,7 +131,7 @@ const CreateSideMenu : React.FC = () => {
 
   return (
     <div className='flex justify-center items-center py-10'>
-      <form onSubmit={handleSubmit} className="formStyle w-[600px]">
+      <form  className="formStyle w-[600px]">
           <div className='flex flex-col gap-2'>
               <label>Menu Name:</label>
               <input type="text" name="menuName" value={data.menuName} onChange={handleChange} required className="inputBox uppercase" />
@@ -173,7 +162,8 @@ const CreateSideMenu : React.FC = () => {
             </div>
             )
           }
-          {child === true && (
+          {
+            child === true && (
             <div className='flex flex-col gap-2'>
               <label>Parent ID:</label>
               <select  name="parentId" value={data.parentId} onChange={handleChange} className="inputBox text-center uppercase" required>
@@ -184,8 +174,9 @@ const CreateSideMenu : React.FC = () => {
                   </option>
                 ))}
               </select>
-          </div>
-          )}
+            </div>
+            )
+          }
           <div className='grid grid-cols-2 gap-1'>
           <button type="submit" className="btnLeft" disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save'}
@@ -199,4 +190,4 @@ const CreateSideMenu : React.FC = () => {
   );
 };
 
-export default CreateSideMenu;
+export default ViewSideMenu;

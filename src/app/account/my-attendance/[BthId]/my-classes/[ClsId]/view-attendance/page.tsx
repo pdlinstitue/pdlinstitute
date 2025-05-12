@@ -49,7 +49,7 @@ const ViewAttdImages: React.FC<IAtdParams> = ({ params }) => {
               <div key={index} className="relative w-24 h-24">
                 <img
                   key={index}
-                  src={src}
+                  src={`/api/attd-upload?name=${src}`}
                   alt={`Screenshot ${index + 1}`}
                   className="w-full h-full object-cover rounded"
                 />
@@ -60,14 +60,13 @@ const ViewAttdImages: React.FC<IAtdParams> = ({ params }) => {
           <p className="mt-4 text-lg">No screenshots available.</p>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-1">
-        <button
+      <button
+          type='button'
           onClick={()=>router.push(`/account/my-attendance/${BthId}/my-classes`)}
-          className="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600"
+          className="btnLeft"
         >
           Back
-        </button>
-      </div>
+      </button>
     </>
   );
 };

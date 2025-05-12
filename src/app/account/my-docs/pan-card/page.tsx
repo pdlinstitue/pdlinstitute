@@ -75,9 +75,9 @@ const MyPanCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'Sadhak', accessorKey: 'sdkFstName'},
-    {header: 'Sdk Id', accessorKey: 'sdkRegNo'},
-    {header: 'Phone', accessorKey: 'sdkPhone'},
+    // {header: 'Sadhak', accessorKey: 'sdkFstName'},
+    // {header: 'Sdk Id', accessorKey: 'sdkRegNo'},
+    // {header: 'Phone', accessorKey: 'sdkPhone'},
     {header: 'PAN', accessorKey: 'sdkPanNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
     {header: 'Relation', accessorKey: 'sdkDocRel'},
