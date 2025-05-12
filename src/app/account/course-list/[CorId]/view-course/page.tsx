@@ -66,14 +66,14 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
   return (
     <div className='flex items-center justify-center'>
       <div className='formStyle my-3 max-w-[400px]'>
-        {data.coImg && (
+        {data.coImg ? (
             <Image
                 src={`/api/image-upload?name=${data.coImg}`}
                 alt="courseImage"
                 width={320}
                 height={220}
-            />
-        )}
+            />):null
+        }
         <h2 className='font-semibold text-lg text-center text-white p-2 bg-orange-500'>{data.coName}</h2>
         <div className='grid grid-cols-2 gap-1 text-sm font-semibold'>
             <div>
@@ -95,8 +95,8 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
             <div className='text-sm'>
                 <p><span className='font-semibold uppercase mr-3'>ELG:</span>{data.coElg}</p>
             </div>
-            <div className='text-sm'>
-                <p><span className='font-semibold uppercase mr-3'>Fee:</span>{data.coDon}</p>
+            <div className='text-end text-sm'>
+                <p><span className='font-semibold uppercase mr-3'>Fee: &#8377;</span> {data?.coDon?.toLocaleString()}</p>
             </div>
         </div>
         <div className='grid grid-cols-2 gap-1'>

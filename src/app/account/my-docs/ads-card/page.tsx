@@ -75,9 +75,6 @@ const MyAdsCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    // {header: 'Sadhak', accessorKey: 'sdkFstName'},
-    // {header: 'Sdk Id', accessorKey: 'sdkRegNo'},
-    // {header: 'Phone', accessorKey: 'sdkPhone'},
     {header: 'Adds No.', accessorKey: 'sdkAdsNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
     {header: 'Relation', accessorKey: 'sdkDocRel'},
