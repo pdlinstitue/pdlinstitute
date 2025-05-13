@@ -8,6 +8,7 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { RxCross2 } from 'react-icons/rx';
 
 
 interface EnquiryListProps {
@@ -52,7 +53,9 @@ const EnquiryList : React.FC = () => {
     { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3 justify-center'> 
-          <button type='button' title='Message' onClick={()=> router.push(`/account/enquiry-list/${row.original._id}/view-enquiry`)} className='text-green-500 border-[1.5px] border-green-800 p-1 rounded-full hover:border-black'><HiOutlineMail size={12}/></button>         
+          <button type='button' title='Message' onClick={()=> router.push(`/account/enquiry-list/${row.original._id}/view-enquiry`)} className='text-green-500 border-[1.5px] border-green-800 p-1 rounded-full hover:border-black'><HiOutlineMail size={12}/></button>   
+           <button type='button' title='Delete' onClick={()=> router.push(`/account/enquiry-list/${row.original._id}/delete-enquiry`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>
+                
         </div> 
       ), 
     }, 

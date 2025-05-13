@@ -38,7 +38,15 @@ const SideMenuList : React.FC = () => {
     },
     {
       header: 'Parent Menu',
-      accessorKey: 'parentName'
+      accessorKey: 'parentName',
+      cell: ({ getValue }: { getValue: () => any }) => {
+        const value = String(getValue());
+        return value
+          .toLowerCase()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      }
     },
     { 
       header: 'Created By', 

@@ -12,8 +12,7 @@ import { RiCoupon3Line } from "react-icons/ri";
 import MyCourseMenu from './submenus/MyCourseMenu';
 import { GiMeditation } from "react-icons/gi";
 import MyDocMenu from './submenus/MyDocMenu';
-import Loading from '../account/Loading';
-
+ 
 
 
 const SadhakSideMenu: React.FC = () => {
