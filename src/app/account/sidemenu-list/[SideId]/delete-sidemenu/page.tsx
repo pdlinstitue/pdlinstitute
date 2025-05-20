@@ -6,38 +6,38 @@ import Loading from '@/app/account/Loading';
 import React, { FormEvent, useState } from 'react';
 import { BASE_API_URL } from '@/app/utils/constant';
 
-interface EqrNameProps {
-    eqrName:string
+interface SideMenuProps {
+    menuName:string
 }
 
-interface IEqrParams {
+interface ISideMenuParams {
     params: Promise<{
-        EqrId: string;
+        SideId: string;
     }>;
 }
 
-const DeleteEnquiry : React.FC <IEqrParams>= ({params}) => {
+const DeleteSideMenu : React.FC <ISideMenuParams>= ({params}) => {
 
     const router = useRouter();
-    const { EqrId } = use(params);
+    const { SideId } = use(params);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [enquirerName, setEnquirerName] = useState<EqrNameProps>({eqrName:''});
+    const [sideMenuName, setSideMenuName] = useState<SideMenuProps>({menuName:''});
 
   
     useEffect(() => { 
-    async function fetchEqrById() { 
+    async function fetchSideMenuById() { 
     try 
         { 
-            const res = await fetch(`${BASE_API_URL}/api/enquiries/${EqrId}/view-enquiry`, {cache: "no-store"}); 
-            const eqrData = await res.json(); 
-            setEnquirerName(eqrData.eqrById);      
+            const res = await fetch(`${BASE_API_URL}/api/sidemenu-list/${SideId}/view-sidemenu`, {cache: "no-store"}); 
+            const menuData = await res.json(); 
+            setSideMenuName(menuData.sideMenuById);      
         } catch (error) { 
             console.error("Error fetching classData:", error); 
         } finally {
             setIsLoading(false);
         }
-    } fetchEqrById(); 
+    } fetchSideMenuById(); 
     }, []);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -45,7 +45,7 @@ const DeleteEnquiry : React.FC <IEqrParams>= ({params}) => {
     setIsSaving(true);
         try 
         {
-            const response = await fetch(`${BASE_API_URL}/api/enquiries/${EqrId}/delete-enquiry`, {
+            const response = await fetch(`${BASE_API_URL}/api/sidemenu-list/${SideId}/delete-sidemenu`, {
                 method: 'DELETE',
             });
 
@@ -55,10 +55,10 @@ const DeleteEnquiry : React.FC <IEqrParams>= ({params}) => {
                 toast.error(post.msg);
             } else {
                 toast.success(post.msg);
-                router.push('/account/enquiry-list');
+                router.push('/account/sidemenu-list');
             }
         } catch (error) {
-            toast.error('Error deleting enquiry.');
+            toast.error('Error deleting sidemenu.');
         } finally {
             setIsSaving(false);
         }
@@ -77,13 +77,13 @@ const DeleteEnquiry : React.FC <IEqrParams>= ({params}) => {
                 <div className="flex flex-col items-center">
                     <h1 className="text-3xl p-3 text-red-600 font-semibold">Alert !</h1>
                     <p className="text-center"> Won't be able to restore. Are you sure to delete?</p>
-                    <p className="font-bold text-xl text-green-600">{enquirerName.eqrName}</p>
+                    <p className="font-bold text-xl text-green-600">{sideMenuName.menuName}</p>
                 </div>
                 <div className="flex gap-1">
                     <button type="submit"  className="btnLeft w-full" disabled={isSaving}>
                         {isSaving ? "Confirming..." : "Confirm"}
                     </button>
-                    <button type="button" onClick={() => router.push('/account/enquiry-list')} className="btnRight w-full">Cancel</button>
+                    <button type="button" onClick={() => router.push('/account/sidemenu-list')} className="btnRight w-full">Cancel</button>
                 </div>
             </form>
        </div>
@@ -91,4 +91,4 @@ const DeleteEnquiry : React.FC <IEqrParams>= ({params}) => {
   )
 }
 
-export default DeleteEnquiry;
+export default DeleteSideMenu;

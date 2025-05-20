@@ -11,7 +11,7 @@ export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ Cp
         const { CpnId } = await params;
 
         if (!CpnId) {
-            return new NextResponse("No Coupon Found", { status: 404 });
+            return NextResponse.json({ success: false, msg: "No Coupon Found" }, { status: 404 });
         } else {
             const delEve = await Coupons.findByIdAndDelete(CpnId);
             return NextResponse.json({delEve, success:true, msg: "Coupon deleted successfully." }, { status: 200 });

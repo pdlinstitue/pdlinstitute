@@ -2,10 +2,8 @@
 import { useRouter } from 'next/navigation';
 import React, { use, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import toast from 'react-hot-toast';
 import Loading from '@/app/account/Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
-
 
 interface SideMenuProps {
   menuName: string;
@@ -23,19 +21,17 @@ interface SideMenuListProps {
 }
 
 interface ISideMenuParams {
-    params:Promise<{
-        SideId: string;
-    }>
+  params: Promise<{
+    SideId: string;
+  }>;
 }
 
-const ViewSideMenu : React.FC<ISideMenuParams> = ({params}) => {
-  
+const ViewSideMenu: React.FC<ISideMenuParams> = ({ params }) => {
   const router = useRouter();
   const { SideId } = use(params);
   const [sideMenuList, setSideMenuList] = useState<SideMenuListProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [parent, setParent] = useState<boolean>(false);
-  const [child, setChild] = useState<boolean>(false);
+  const [selectedType, setSelectedType] = useState<'parent' | 'child' | ''>('');
   const [isSaving, setIsSaving] = useState(false);
   const [data, setData] = useState<SideMenuProps>({
     menuName: '',
@@ -54,7 +50,7 @@ const ViewSideMenu : React.FC<ISideMenuParams> = ({params}) => {
       usrRole: "",
     },
   });
-  
+
   useEffect(() => {
     try {
       const userId = Cookies.get("loggedInUserId") || "";
@@ -77,36 +73,29 @@ const ViewSideMenu : React.FC<ISideMenuParams> = ({params}) => {
   const handleChange = (e: any) => {
     const name = e.target.name;
     const value = e.target.value;
-    setData((prev) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
+    setData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleParent = () => {
-    setParent(!parent);
-  }
-
-  const handleChild = () => {
-    setChild(!child);
-  }
+  const handleTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSelectedType(value as 'parent' | 'child');
+  };
 
   useEffect(() => {
-    async function fetchSideMenuList(){
+    async function fetchSideMenuList() {
       try {
         const response = await fetch('/api/sidemenu-list');
         const data = await response.json();
         setSideMenuList(data?.menuList);
       } catch (error) {
         console.error("Error fetching side menu list:", error);
-      } finally {
-        setIsLoading(false);
       }
-    };
-  fetchSideMenuList();
-  },[]);
+    }
+    fetchSideMenuList();
+  }, []);
 
   useEffect(() => {
     async function fetchSideMenuById() {
@@ -114,6 +103,13 @@ const ViewSideMenu : React.FC<ISideMenuParams> = ({params}) => {
         const response = await fetch(`${BASE_API_URL}/api/sidemenu-list/${SideId}/view-sidemenu`);
         const data = await response.json();
         setData(data?.sideMenuById);
+
+        // Set selected radio based on database value
+        if (data?.sideMenuById?.isParent) {
+          setSelectedType('parent');
+        } else if (data?.sideMenuById?.isChild) {
+          setSelectedType('child');
+        }
       } catch (error) {
         console.error("Error fetching side menu data:", error);
       } finally {
@@ -124,65 +120,107 @@ const ViewSideMenu : React.FC<ISideMenuParams> = ({params}) => {
   }, []);
 
   if (isLoading) {
-    return <div>
-      <Loading />
-    </div>
-  };
+    return <Loading />;
+  }
 
   return (
     <div className='flex justify-center items-center py-10'>
-      <form  className="formStyle w-[600px]">
-          <div className='flex flex-col gap-2'>
-              <label>Menu Name:</label>
-              <input type="text" name="menuName" value={data.menuName} onChange={handleChange} required className="inputBox uppercase" />
+      <form className="formStyle w-[600px]">
+        <div className='flex flex-col gap-2'>
+          <label>Menu Name:</label>
+          <input
+            type="text"
+            name="menuName"
+            value={data.menuName}
+            onChange={handleChange}
+            required
+            className="inputBox uppercase"
+          />
+        </div>
+
+        <div className='grid grid-cols-2 gap-4 mt-4'>
+          <div className='flex items-center gap-2'>
+            <input
+              type="radio"
+              id="child"
+              name="menuType"
+              value="child"
+              checked={selectedType === 'child'}
+              onChange={handleTypeChange}
+            />
+            <label htmlFor="child">Is Child</label>
           </div>
-          <div className='grid grid-cols-2 gap-1'>
-            <div className='flex gap-2'> 
-              <input type="checkbox" name="isChild"  onChange={handleChild} />
-              <label>Is Child</label>
-            </div>
-            <div className='flex gap-2'>    
-                <input type="checkbox" name="isParent"  onChange={handleParent} />
-                <label>Is Parent</label>
-            </div>
+          <div className='flex items-center gap-2'>
+            <input
+              type="radio"
+              id="parent"
+              name="menuType"
+              value="parent"
+              checked={selectedType === 'parent'}
+              onChange={handleTypeChange}
+            />
+            <label htmlFor="parent">Is Parent</label>
           </div>
-          {
-            child === false && (
-            <div className='flex flex-col gap-2'>
-              <label>Menu Icon:</label>
-              <input type="text" name="menuIcon" value={data.menuIcon} onChange={handleChange} required className="inputBox" />
-            </div>
-            )
-          }
-          {
-            parent === false && (
-            <div className='flex flex-col gap-2'>
-              <label>Menu URL:</label>
-              <input type="text" name="menuUrl" value={data.menuUrl} onChange={handleChange} required className="inputBox" />
-            </div>
-            )
-          }
-          {
-            child === true && (
-            <div className='flex flex-col gap-2'>
-              <label>Parent ID:</label>
-              <select  name="parentId" value={data.parentId} onChange={handleChange} className="inputBox text-center uppercase" required>
-                <option value="">--- Select Parent ID ---</option>
-                {sideMenuList?.map((menu) => (
-                  <option key={menu._id} value={menu._id} className='uppercase'>
-                    {menu.menuName}
-                  </option>
-                ))}
-              </select>
-            </div>
-            )
-          }
-          <div className='grid grid-cols-2 gap-1'>
+        </div>
+
+        {selectedType !== 'child' && (
+          <div className='flex flex-col gap-2 mt-4'>
+            <label>Menu Icon:</label>
+            <input
+              type="text"
+              name="menuIcon"
+              value={data.menuIcon}
+              onChange={handleChange}
+              required
+              className="inputBox"
+            />
+          </div>
+        )}
+
+        {selectedType !== 'parent' && (
+          <div className='flex flex-col gap-2 mt-4'>
+            <label>Menu URL:</label>
+            <input
+              type="text"
+              name="menuUrl"
+              value={data.menuUrl}
+              onChange={handleChange}
+              required
+              className="inputBox"
+            />
+          </div>
+        )}
+
+        {selectedType === 'child' && (
+          <div className='flex flex-col gap-2 mt-4'>
+            <label>Parent ID:</label>
+            <select
+              name="parentId"
+              value={data.parentId}
+              onChange={handleChange}
+              className="inputBox text-center uppercase"
+              required
+            >
+              <option value="">--- Select Parent ID ---</option>
+              {sideMenuList?.map((menu) => (
+                <option key={menu._id} value={menu._id} className='uppercase'>
+                  {menu.menuName}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <div className='grid grid-cols-2 gap-1 mt-6'>
           <button type="submit" className="btnLeft" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? 'Saving...' : 'Save'}
           </button>
-          <button type="button" className="btnRight" onClick={()=> router.push('/account/sidemenu-list')}>
-              Back
+          <button
+            type="button"
+            className="btnRight"
+            onClick={() => router.push('/account/sidemenu-list')}
+          >
+            Back
           </button>
         </div>
       </form>

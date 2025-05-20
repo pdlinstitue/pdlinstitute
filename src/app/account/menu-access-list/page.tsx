@@ -25,14 +25,14 @@ const MenuAccessList : React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const data = React.useMemo(() => accMenuData ?? [], [accMenuData]);
   const columns = React.useMemo(() => [ 
-    { header: 'Role', accessorKey: 'roleType'},
+    { header: 'Role', accessorKey: 'roleId.roleType'},
     { 
       header: 'Created By', 
-      accessorKey: 'createdBy', 
+      accessorKey: 'createdBy.sdkFstName', 
     },
     { 
       header: 'Update By', 
-      accessorKey: 'updatedBy', 
+      accessorKey: 'updatedBy.sdkFstName', 
     },
     { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 

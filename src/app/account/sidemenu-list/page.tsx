@@ -8,6 +8,7 @@ import Loading from '../Loading';
 import Link from 'next/link';
 import { FiEye } from 'react-icons/fi';
 import { BiEditAlt } from 'react-icons/bi';
+import { RxCross2 } from 'react-icons/rx';
 
 
 interface SideMenuListProps {
@@ -60,7 +61,8 @@ const SideMenuList : React.FC = () => {
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3 justify-center'> 
           <button type='button' title='View' onClick={()=> router.push(`/account/sidemenu-list/${row.original._id}/view-sidemenu`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
-          <button type='button' title='Edit' onClick={()=> router.push(`/account/sidemenu-list/${row.original._id}/edit-sidemenu`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>      
+          <button type='button' title='Edit' onClick={()=> router.push(`/account/sidemenu-list/${row.original._id}/edit-sidemenu`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>
+          <button type='button' title='Delete' onClick={()=> router.push(`/account/sidemenu-list/${row.original._id}/delete-sidemenu`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full  hover:border-black'><RxCross2 size={12}/></button>                
         </div> 
       ), 
     }, 

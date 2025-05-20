@@ -10,6 +10,25 @@ type MenuAccessType = {
     updatedBy?:string;
 }
 
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ MacId: string }>}) {
+
+  try 
+  {
+    await dbConnect();
+    const { MacId } = await params;
+
+    if(!MacId){
+      return NextResponse.json({ message: "No menu-access found." }, { status: 404 });
+    }else{
+      const menuAccById = await Menuaccess.findById(MacId);
+      return NextResponse.json({ menuAccById, success: true}, {status:200});
+    }
+    
+  } catch (error:any) {
+    return new NextResponse ("Error while fetching menu access data: " + error, {status: 500});
+  }
+}
+
 export async function PUT(req: NextRequest,{ params }: { params: Promise<{ MacId: string }>}) {
 
   try 

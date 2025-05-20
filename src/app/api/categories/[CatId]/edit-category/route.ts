@@ -17,7 +17,7 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CatId
     const { catName, updatedBy }: CatType = await req.json();
 
     if(!CatId){
-      return NextResponse.json({ message: "No category found." }, { status: 404 });
+      return NextResponse.json({success:false, msg: "No category found." }, { status: 404 });
     }else{
       const catById = await Categories.findByIdAndUpdate(CatId, {catName, updatedBy}, {runValidators:true});
       return NextResponse.json({ catById, success: true, msg:"Category updated successfully." }, {status:200});

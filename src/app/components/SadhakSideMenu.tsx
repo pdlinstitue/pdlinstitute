@@ -3,12 +3,12 @@ import { usePathname } from 'next/navigation';
 import React, { useState } from 'react'
 import Link from 'next/link';
 import { MdDashboard } from "react-icons/md";
+import { RiCouponFill } from "react-icons/ri";
 import { MdPlaylistAddCheckCircle } from "react-icons/md";
 import { HiOutlineDocumentReport } from "react-icons/hi";
-import { MdCastForEducation } from "react-icons/md";
+import { IoBookSharp } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
 import { PiChalkboardTeacher } from "react-icons/pi";
-import { RiCoupon3Line } from "react-icons/ri";
 import MyCourseMenu from './submenus/MyCourseMenu';
 import { GiMeditation } from "react-icons/gi";
 import MyDocMenu from './submenus/MyDocMenu';
@@ -26,13 +26,13 @@ const SadhakSideMenu: React.FC = () => {
 
   return (
     <div>
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col gap-1'>
          <Link href='/account/sadhak-dashboard' className={`group flex gap-2 p-2 rounded-sm mt-3 ${pathName === '/account/dashboard' ? 'bg-white text-black' : 'text-white bg-orange-500 hover:bg-white hover:text-black'}`}>
            <MdDashboard size={24} className={pathName === '/account/dashboard' ? 'text-black' : 'group-hover:text-black'}/>
            <p className={`font-semibold ${pathName !== '/account/dashboard' && 'group-hover:text-black'}`}>DASHBOARD</p>
          </Link>
          <button type='button' onClick={() =>handleToggle(8)} className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-           <MdCastForEducation size={24} className=' group-hover:text-black'/>
+           <IoBookSharp size={24} className=' group-hover:text-black'/>
            <p className='font-semibold group-hover:text-black'>MY COURSES</p>
            <IoIosArrowDown size={24} className={`ml-auto group-hover:text-black ${selectedNumber === 7 ? 'rotate-180 duration-500' : ''}`} />      
          </button>
@@ -48,7 +48,7 @@ const SadhakSideMenu: React.FC = () => {
            <p className='font-semibold group-hover:text-black'>MY BATCHES</p>
          </Link>
          <Link href='/account/my-coupons' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>
-           <RiCoupon3Line size={24} className=' group-hover:text-black'/>
+           <RiCouponFill size={24} className=' group-hover:text-black'/>
            <p className='font-semibold group-hover:text-black'>MY COUPONS</p>
          </Link>
          <Link href='/account/my-practice-class' className='group flex gap-2 text-white bg-orange-500 hover:bg-white p-2 rounded-sm'>

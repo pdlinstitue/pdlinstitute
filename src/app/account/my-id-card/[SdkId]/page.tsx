@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Cookies from 'js-cookie';
 import Loading from '../../Loading';
 import { format, parse } from 'date-fns';
+import { FaUserCircle } from 'react-icons/fa';
 
 interface IDCardParams {
   params: Promise<{
@@ -116,7 +117,10 @@ const MyIDCard: React.FC<IDCardParams> = ({ params }) => {
         </div>
         <div className='grid grid-cols-2 gap-1'>
           <div className='flex justify-center items-center  bg-gray-100 rounded-lg'>
-            <Image src={myIDCard.sdkImg ? myIDCard.sdkImg : "/images/uploadImage.jpg"} alt="ID Card" width={200} height={200} className='rounded-full' />
+            {
+              myIDCard.sdkImg ? (<Image src={`/api/profile-upload?name=${myIDCard.sdkImg}`} className='rounded-full' width={200} height={200} alt='sdkImg'/>)
+              : <FaUserCircle className="text-gray-400 w-[200px] h-[200px] cursor-pointer" />
+            }
           </div>
           <div className='flex flex-col gap-1 bg-gray-100 rounded-lg p-3'>
             <h1 className='text-2xl font-bold uppercase'>{myIDCard.sdkFstName} {myIDCard.sdkMidName} {myIDCard.sdkLstName}</h1>

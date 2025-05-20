@@ -1,33 +1,38 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState, useRef } from 'react';
-import Loading from '../Loading';
+import React, { useEffect, use, useState, useRef } from 'react';
+import Loading from '@/app/account/Loading';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
 
 interface AccessMenuProps {
   roleId: string;
   menuId: string[];
-  createdBy: string;
+  updatedBy: string;
 }
 
-const CreateMenuAccess: React.FC = () => {
+interface IMenuAccessParams {
+  params: Promise<{
+    MacId: string;
+  }>;
+}
+
+const EditMenuAccess: React.FC<IMenuAccessParams> = ({ params }) => {
+  const { MacId } = use(params);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [roleList, setRoleList] = useState<any[]>([]);
-  //const [sideMenuList, setSideMenuList] = useState<any[]>([]);
   const [neutralMenus, setNeutralMenus] = useState<any[]>([]);
   const [parentMenus, setParentMenus] = useState<any[]>([]);
   const [childMenus, setChildMenus] = useState<any[]>([]);
-  //const [selectedParentId, setSelectedParentId] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [data, setData] = useState<AccessMenuProps>({
     menuId: [],
     roleId: '',
-    createdBy: '',
+    updatedBy: '',
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
@@ -74,22 +79,16 @@ const CreateMenuAccess: React.FC = () => {
     });
   };
 
-  // const handleParentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const parentId = e.target.value;
-  //   setSelectedParentId(parentId);
-  // };
-
   useEffect(() => {
     async function fetchData() {
       try {
         const [roleRes, menuRes] = await Promise.all([
           fetch('/api/role-list', { cache: 'no-store' }),
-          fetch('/api/sidemenu-list', { cache: 'no-store' }),
+          fetch('/api/sidemenu-list', { cache: 'no-store' }),          
         ]);
         const roleData = await roleRes.json();
         const menuData = await menuRes.json();
         setRoleList(roleData?.rolList);
-        //setSideMenuList(menuData?.menuList);
 
         const allMenus = menuData?.menuList || [];
 
@@ -104,6 +103,25 @@ const CreateMenuAccess: React.FC = () => {
       }
     }
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchMenuAccess() {
+      try {
+        const res = await fetch(`/api/menu-access-list/${MacId}/edit-menu-access`, { cache: 'no-store' });
+        const menuAccById = await res.json();
+        if (menuAccById?.success) {
+          setData({
+            menuId: menuAccById.menuAccById.menuId,
+            roleId: menuAccById.menuAccById.roleId,
+            updatedBy: loggedInUser.result._id,
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching menu access data:', error);
+      }
+    }
+    fetchMenuAccess();
   }, []);
 
   useEffect(() => {
@@ -122,8 +140,8 @@ const CreateMenuAccess: React.FC = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const response = await fetch('/api/menu-access-list', {
-        method: 'POST',
+      const response = await fetch(`/api/menu-access-list/${MacId}/edit-menu-access`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           menuId: data.menuId,
@@ -148,15 +166,13 @@ const CreateMenuAccess: React.FC = () => {
 
   if (isLoading) return <Loading />;
 
-  //const filteredChildMenus = childMenus.filter((menu: any) => menu.parentId === selectedParentId);
-
   return (
     <div className="flex justify-center items-center py-14">
       <form onSubmit={handleSubmit} className="formStyle w-[600px]">
         {/* Role dropdown */}
         <div className="flex flex-col gap-2 mb-4">
           <label>Role Type:</label>
-          <select name="roleId" value={data.roleId} onChange={handleChange} required className="inputBox text-center">
+          <select name="roleId" value={data.roleId} onChange={handleChange} disabled className="inputBox text-center">
             <option value="">--- Select Role ---</option>
             {roleList.map((role: any) => (
               <option key={role._id} value={role._id}>
@@ -183,25 +199,13 @@ const CreateMenuAccess: React.FC = () => {
           </div>
         </div>
 
-        {/* Parent Menu Dropdown */}
-        {/* <div className="flex flex-col gap-2 mb-4">
-          <label>Parent Menu:</label>
-          <select value={selectedParentId} onChange={handleParentChange} className="inputBox text-center">
-            <option value="">--- Select Parent ---</option>
-            {parentMenus.map((menu: any) => (
-              <option key={menu._id} value={menu._id}>
-                {menu.menuName}
-              </option>
-            ))}
-          </select>
-        </div> */}
-
+        {/* Parent/Child Menu Dropdown */}
         <div className="flex flex-col gap-2 mb-4" ref={dropdownRef}>
           <label>Parent & Child Menus:</label>
           <div className="border rounded px-3 py-2">
             {parentMenus.map((menu: any) => (
-              <div key={menu._id} >
-                <label className="flex items-center space-x-2">
+              <div key={menu._id}>
+                <label  className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     checked={data.menuId.includes(menu._id)}
@@ -226,25 +230,6 @@ const CreateMenuAccess: React.FC = () => {
           </div>
         </div>
 
-        {/* Child Menus */}
-        {/* {selectedParentId && (
-          <div className="flex flex-col gap-2 mb-4">
-            <label>Child Menus:</label>
-            <div className="border rounded p-2">
-              {filteredChildMenus.map((menu: any) => (
-                <label key={menu._id} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={data.menuId.includes(menu._id)}
-                    onChange={() => handleMenuCheckboxChange(menu._id)}
-                  />
-                  <span className='uppercase'>{menu.menuName}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )} */}
-
         {/* Buttons */}
         <div className="grid grid-cols-2 gap-1">
           <button type="submit" className="btnLeft" disabled={isSaving}>
@@ -263,4 +248,4 @@ const CreateMenuAccess: React.FC = () => {
   );
 };
 
-export default CreateMenuAccess;
+export default EditMenuAccess;

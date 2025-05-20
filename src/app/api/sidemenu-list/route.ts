@@ -8,10 +8,11 @@ type SideMenuType = {
   menuName: string;
   menuIcon: string;
   menuUrl: string;
+  menuOrder: number;
   isActive?: boolean;
   isParent?: boolean;
   isChild?: boolean;
-  parentId?: mongoose.Types.ObjectId;
+  parentId?: string;
   parentName?: string;
   createdBy?: string;
 };
@@ -59,20 +60,58 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
+
     const {
       menuName,
       menuIcon,
       menuUrl,
+      menuOrder,
       isChild,
       isParent,
       parentId,
       createdBy,
     }: SideMenuType = await req.json();
 
+    const nameExists = await Sidemenues.findOne({
+      menuName: { $regex: `^${menuName}$`, $options: "i" },
+    });
+
+    if (nameExists) {
+      return NextResponse.json(
+        { success: false, msg: "Menu name already exists." },
+        { status: 400 }
+      );
+    }
+
+    if (menuIcon) {
+      const iconExists = await Sidemenues.findOne({
+        menuIcon: { $regex: `^${menuIcon}$`, $options: "i" },
+      });
+
+      if (iconExists) {
+        return NextResponse.json(
+          { success: false, msg: "Menu icon already exists." },
+          { status: 400 }
+        );
+      }
+    }
+
+    const urlExists = await Sidemenues.findOne({
+      menuUrl: { $regex: `^${menuUrl}$`, $options: "i" },
+    });
+
+    if (urlExists) {
+      return NextResponse.json(
+        { success: false, msg: "Menu URL already exists." },
+        { status: 400 }
+      );
+    }
+
     const newMenu = new Sidemenues({
       menuName,
       menuIcon,
       menuUrl,
+      menuOrder,
       isChild,
       isParent,
       parentId: parentId ? new mongoose.Types.ObjectId(parentId) : null,
@@ -93,16 +132,9 @@ export async function POST(req: NextRequest) {
         { success: false, msg: messages },
         { status: 400 }
       );
-    } else if (error.code === 11000) {
-      // Extract which field is duplicated
-      const field = Object.keys(error.keyPattern)[0];
-      const msg = `${
-        field.charAt(0).toUpperCase() + field.slice(1)
-      } already exists.`;
-      return NextResponse.json({ success: false, msg }, { status: 400 });
     } else {
-      return new NextResponse("Error while saving menuData: " + error, {
-        status: 500,
+      return new NextResponse("Error while saving enrData: " + error, {
+        status: 400,
       });
     }
   }

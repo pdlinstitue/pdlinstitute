@@ -13,6 +13,7 @@ import Loading from '@/app/account/Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Image from 'next/image';
 import { FaIdCardClip } from "react-icons/fa6";
+import { FaUserCircle } from 'react-icons/fa';
 
 
 
@@ -90,8 +91,8 @@ const ProfMenu = () => {
       </div>
       <div className="relative group transition-all"> 
         {
-          userProfile.sdkImg ? (<Image src={userProfile.sdkImg} width={60} height={60} alt='sdkImg'/>)
-          : <RxAvatar size={44} className="text-orange-500 cursor-pointer" />
+          userProfile.sdkImg ? (<Image src={`/api/profile-upload?name=${userProfile.sdkImg}`} className='rounded-full' width={60} height={60} alt='sdkImg'/>)
+          : <FaUserCircle className="text-gray-400 w-[60px] h-[60px] cursor-pointer" />
         }
         <div className="absolute border-[1.5px] border-orange-700 divide-y z-50 group-hover:flex right-0 top-14 hidden w-[230px] flex-col transition-all px-3 py-3  bg-white rounded-md shadow-xl">
             <Link href={`/account/profile-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2  hover:bg-orange-500">
