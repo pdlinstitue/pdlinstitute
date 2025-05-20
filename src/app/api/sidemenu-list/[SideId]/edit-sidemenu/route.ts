@@ -14,11 +14,11 @@ type SideMenuType = {
   updatedBy?: string;
 };
 
-export async function PUT(req: NextRequest, { params }: { params: { SideId: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ SideId: string }> }) {
   try {
     await dbConnect();
 
-    const { SideId } = params;
+    const { SideId } = await params;
     const { menuName, menuIcon, menuUrl, menuOrder, isChild, isParent, parentId, updatedBy }: SideMenuType = await req.json();
 
     if (!SideId) {
