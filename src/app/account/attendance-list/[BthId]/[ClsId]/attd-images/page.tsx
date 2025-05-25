@@ -1,11 +1,11 @@
 "use client";
-import Loading from '@/app/account/Loading';
-import { useRouter } from 'next/navigation';
-import React, { use, useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import Loading from "@/app/account/Loading";
+import { useRouter } from "next/navigation";
+import React, { use, useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface IAtdParams {
-  params:Promise<{
+  params: Promise<{
     BthId: string;
     ClsId: string;
   }>;
@@ -16,13 +16,11 @@ interface AttdImagesProps {
   clsId: string;
   attdScreenshots: string[];
 }
-  
 
 const AttdImages: React.FC<IAtdParams> = ({ params }) => {
-    
-  const { BthId, ClsId } = use(params); 
+  const { BthId, ClsId } = use(params);
   const router = useRouter();
-  const [isUploading, setIsUploading] = useState<boolean>(false); 
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [files, setFiles] = useState<File[]>([]);
@@ -55,22 +53,25 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
   };
 
   useEffect(() => {
-      async function fetchScreenshots() {
-        try {
-          const res = await fetch(`/api/attd-screenshots?bthId=${BthId}&clsId=${ClsId}`, { cache: "no-store" });
-          const screenshots = await res.json();
-          
-          setAttdImages(screenshots.srnshots);  
-          setPreviews(screenshots.srnshots[0]?.attdSreenShots)        
-          setUploadedImageUrls(screenshots.srnshots[0]?.attdSreenShots)        
-        } catch (error) {
-            console.error("Error fetching class data:", error);
-        } finally {
-            setIsLoading(false);
-        }
+    async function fetchScreenshots() {
+      try {
+        const res = await fetch(
+          `/api/attd-screenshots?bthId=${BthId}&clsId=${ClsId}`,
+          { cache: "no-store" }
+        );
+        const screenshots = await res.json();
+
+        setAttdImages(screenshots.srnshots);
+        setPreviews(screenshots.srnshots[0]?.attdSreenShots);
+        setUploadedImageUrls(screenshots.srnshots[0]?.attdSreenShots);
+      } catch (error) {
+        console.error("Error fetching class data:", error);
+      } finally {
+        setIsLoading(false);
       }
-      fetchScreenshots();
-      }, []);
+    }
+    fetchScreenshots();
+  }, []);
 
   // Upload images and generate URLs
   const handleImageUpload = async () => {
@@ -105,33 +106,31 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
 
   // Store bthId, clsId, and image URLs in the database
   const handleSubmit = async () => {
-
     if (!uploadedImageUrls.length) {
       alert("Please upload images first.");
       return;
     }
 
-    setIsSubmitting(true); 
+    setIsSubmitting(true);
 
     try {
-
       const response = await fetch("/api/attd-screenshots", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            bthId: BthId,
-            clsId: ClsId,
-            attdSreenShots: uploadedImageUrls,
-          }),
+          bthId: BthId,
+          clsId: ClsId,
+          attdSreenShots: uploadedImageUrls,
+        }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to store data");
       }
       const data = await response.json();
-      if(data.success === false){
+      if (data.success === false) {
         toast.error(data.msg);
       } else {
         toast.success(data.msg);
@@ -156,24 +155,37 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
       <div className="formStyle w-full my-24">
         <h2 className="mb-4 text-xl font-bold">Upload Attendance Images</h2>
         <div className="flex gap-2 mt-2 flex-wrap">
-          {previews?.map((src, index) => (
-            <div key={index} className="relative w-24 h-24">
-              <img
-                src={src.includes("attd-images") ? `/api/attd-upload?name=${src}` : src}
-                alt={`Preview ${index}`}
-                className="w-full h-full object-cover rounded"
-              />
-              <button
-                onClick={() => handleRemove(index)}
-                className="absolute top-[-6px] right-[-6px] bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs shadow"
-                type="button"
-              >
-                ×
-              </button>
-            </div>
-          ))}
+          {previews?.map((src, index) => {
+            const imageUrl = src.includes("attd-images")
+              ? `/api/attd-upload?name=${src}`
+              : src;
+
+            return (
+              <div key={index} className="relative w-24 h-24">
+                <a
+                  href={imageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full h-full"
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`Preview ${index}`}
+                    className="w-full h-full object-cover rounded"
+                  />
+                </a>
+                <button
+                  onClick={() => handleRemove(index)}
+                  className="absolute top-[-6px] right-[-6px] bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs shadow"
+                  type="button"
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })}
         </div>
-        <div className='flex items-center gap-1'>
+        <div className="flex items-center gap-1">
           <input
             type="file"
             accept="image/jpeg,image/png"
@@ -190,9 +202,9 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
             {isUploading ? "Uploading..." : "Upload"}
           </button>
         </div>
-        <div className='grid grid-cols-2 gap-1'>
+        <div className="grid grid-cols-2 gap-1">
           <button
-            type='submit'
+            type="submit"
             onClick={handleSubmit}
             className="btnLeft"
             disabled={isSubmitting} // ✅ Disable when submitting
@@ -200,9 +212,9 @@ const AttdImages: React.FC<IAtdParams> = ({ params }) => {
             {isSubmitting ? "Submitting..." : "Submit"}
           </button>
           <button
-            type='button'
+            type="button"
             className="btnRight"
-            onClick={()=>router.push("/account/attendance-list")}
+            onClick={() => router.push("/account/attendance-list")}
           >
             BACK
           </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
 interface IAtdParams {
@@ -46,14 +46,19 @@ const ViewAttdImages: React.FC<IAtdParams> = ({ params }) => {
         ) : previews.length > 0 ? (
           <div className="flex gap-2 mt-2 flex-wrap">
             {previews.map((src, index) => (
-              <div key={index} className="relative w-24 h-24">
+              <a
+                key={index}
+                href={`/api/attd-upload?name=${src}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative w-24 h-24 block"
+              >
                 <img
-                  key={index}
                   src={`/api/attd-upload?name=${src}`}
                   alt={`Screenshot ${index + 1}`}
                   className="w-full h-full object-cover rounded"
                 />
-              </div>
+              </a>
             ))}
           </div>
         ) : (
@@ -61,11 +66,13 @@ const ViewAttdImages: React.FC<IAtdParams> = ({ params }) => {
         )}
       </div>
       <button
-          type='button'
-          onClick={()=>router.push(`/account/my-attendance/${BthId}/my-classes`)}
-          className="btnLeft"
-        >
-          Back
+        type="button"
+        onClick={() =>
+          router.push(`/account/my-attendance/${BthId}/my-classes`)
+        }
+        className="btnLeft"
+      >
+        Back
       </button>
     </>
   );

@@ -6,59 +6,57 @@ import React, { ChangeEvent, FormEvent, use, useEffect, useState } from "react";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "@/app/account/Loading";
 
-
-interface IActionParams{
-    params: Promise<{
-        AtnId: string;
-    }>
+interface IActionParams {
+  params: Promise<{
+    AtnId: string;
+  }>;
 }
 interface EditActionProps {
-    atnName:string, 
-    viewUrl:string,
-    listUrl:string,
-    addUrl:string,
-    editUrl:string,
-    enableUrl:string,
-    disableUrl:string,
-    deleteUrl:string,
-    markUrl:string,
-    amendUrl:string, 
-    attdeesUrl:string, 
-    attdImgUrl:string,
-    compUrl:string,
-    apvEnrUrl:string,
-    mnlEnrUrl:string,
-    apvDocUrl:string,
-    regPwdUrl:string,
-    updatedBy: string,
+  atnName: string;
+  viewUrl: string;
+  listUrl: string;
+  addUrl: string;
+  editUrl: string;
+  enableUrl: string;
+  disableUrl: string;
+  deleteUrl: string;
+  markUrl: string;
+  amendUrl: string;
+  attdeesUrl: string;
+  attdImgUrl: string;
+  compUrl: string;
+  apvEnrUrl: string;
+  mnlEnrUrl: string;
+  apvDocUrl: string;
+  regPwdUrl: string;
+  updatedBy: string;
 }
 
-const EditAction: React.FC<IActionParams> = ({params}) => {
-
+const EditAction: React.FC<IActionParams> = ({ params }) => {
   const router = useRouter();
   const { AtnId } = use(params);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [data, setData] = useState<EditActionProps>({
-    atnName:"", 
-    viewUrl:"",
-    listUrl:"",
-    addUrl:"",
-    editUrl:"",
-    enableUrl:"",
-    disableUrl:"",
-    deleteUrl:"",
-    amendUrl:"", 
-    attdeesUrl:"", 
-    attdImgUrl:"",
-    markUrl:"",
-    compUrl:"",
-    apvEnrUrl:"",
-    mnlEnrUrl:"",
-    apvDocUrl:"",
-    regPwdUrl:"",
-    updatedBy: ""
+    atnName: "",
+    viewUrl: "",
+    listUrl: "",
+    addUrl: "",
+    editUrl: "",
+    enableUrl: "",
+    disableUrl: "",
+    deleteUrl: "",
+    amendUrl: "",
+    attdeesUrl: "",
+    attdImgUrl: "",
+    markUrl: "",
+    compUrl: "",
+    apvEnrUrl: "",
+    mnlEnrUrl: "",
+    apvDocUrl: "",
+    regPwdUrl: "",
+    updatedBy: "",
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
@@ -82,9 +80,9 @@ const EditAction: React.FC<IActionParams> = ({params}) => {
         },
       });
     } catch (error) {
-        console.error("Error fetching loggedInUserData.");
+      console.error("Error fetching loggedInUserData.");
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -96,51 +94,56 @@ const EditAction: React.FC<IActionParams> = ({params}) => {
   useEffect(() => {
     const fetchActionData = async () => {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/actions/${AtnId}/view-action`, { cache: "no-store" });
+        const res = await fetch(
+          `${BASE_API_URL}/api/actions/${AtnId}/view-action`,
+          { cache: "no-store" }
+        );
         const actionData = await res.json();
         setData(actionData?.atnById);
       } catch (error) {
-          console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error);
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       }
     };
     fetchActionData();
-  },[]);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-
     e.preventDefault();
     setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
-    
+
     try {
       if (!data.atnName.trim()) {
         setErrorMessage("Module name is required.");
       } else {
-        const response = await fetch(`${BASE_API_URL}/api/actions/${AtnId}/edit-action`, {
-          method: "PUT",
-          body: JSON.stringify({
-            atnName: data.atnName,
-            viewUrl:data.viewUrl,
-            listUrl:data.listUrl,
-            addUrl:data.addUrl,
-            editUrl:data.editUrl,
-            enableUrl:data.enableUrl,
-            disableUrl:data.disableUrl,
-            deleteUrl:data.deleteUrl,
-            markUrl:data.markUrl,
-            amendUrl:data.amendUrl,
-            attdeesUrl:data.attdeesUrl,
-            attdImgUrl:data.attdImgUrl,
-            compUrl:data.compUrl,
-            apvEnrUrl:data.apvEnrUrl,
-            mnlEnrUrl:data.mnlEnrUrl,
-            apvDocUrl:data.apvDocUrl,
-            regPwdUrl:data.regPwdUrl,
-            updatedBy: loggedInUser.result?._id,
-          }),
-        });
+        const response = await fetch(
+          `${BASE_API_URL}/api/actions/${AtnId}/edit-action`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              atnName: data.atnName,
+              viewUrl: data.viewUrl,
+              listUrl: data.listUrl,
+              addUrl: data.addUrl,
+              editUrl: data.editUrl,
+              enableUrl: data.enableUrl,
+              disableUrl: data.disableUrl,
+              deleteUrl: data.deleteUrl,
+              markUrl: data.markUrl,
+              amendUrl: data.amendUrl,
+              attdeesUrl: data.attdeesUrl,
+              attdImgUrl: data.attdImgUrl,
+              compUrl: data.compUrl,
+              apvEnrUrl: data.apvEnrUrl,
+              mnlEnrUrl: data.mnlEnrUrl,
+              apvDocUrl: data.apvDocUrl,
+              regPwdUrl: data.regPwdUrl,
+              updatedBy: loggedInUser.result?._id,
+            }),
+          }
+        );
         const post = await response.json();
         if (post.success === false) {
           toast.error(post.msg);
@@ -150,11 +153,11 @@ const EditAction: React.FC<IActionParams> = ({params}) => {
         }
       }
     } catch (error) {
-        toast.error("Error creating action.");
-      } finally {
-        setIsSaving(false);
-      }
-    };
+      toast.error("Error creating action.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -179,7 +182,7 @@ const EditAction: React.FC<IActionParams> = ({params}) => {
         </div>
         <div className="grid grid-cols-2 gap-1">
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 hidden">
               <label className="text-lg">List Url:</label>
               <input
                 type="text"
@@ -259,97 +262,95 @@ const EditAction: React.FC<IActionParams> = ({params}) => {
                 onChange={handleChange}
               />
             </div>
-          </div>
-          <div className="flex flex-col gap-2"> 
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Delete Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="deleteUrl"
-              value={data?.deleteUrl}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Mark Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="markUrl"
-              value={data?.markUrl}
-              onChange={handleChange}
-            />
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Re-generate Password Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="regPwdUrl"
+                value={data?.regPwdUrl}
+                onChange={handleChange}
+              />
+            </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Amend Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="amendUrl"
-              value={data?.amendUrl}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Complete Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="compUrl"
-              value={data?.compUrl}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Approve Enrollment Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="apvEnrUrl"
-              value={data?.apvEnrUrl}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Manual Enrollment Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="mnlEnrUrl"
-              value={data?.mnlEnrUrl}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Approve Docs Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="apvDocUrl"
-              value={data?.apvDocUrl}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-lg">Re-generate Password Url:</label>
-            <input
-              type="text"
-              className="inputBox"
-              name="regPwdUrl"
-              value={data?.regPwdUrl}
-              onChange={handleChange}
-            />
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Delete Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="deleteUrl"
+                value={data?.deleteUrl}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Mark Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="markUrl"
+                value={data?.markUrl}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Amend Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="amendUrl"
+                value={data?.amendUrl}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Complete Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="compUrl"
+                value={data?.compUrl}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Approve Enrollment Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="apvEnrUrl"
+                value={data?.apvEnrUrl}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Manual Enrollment Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="mnlEnrUrl"
+                value={data?.mnlEnrUrl}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Approve Docs Url:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="apvDocUrl"
+                value={data?.apvDocUrl}
+                onChange={handleChange}
+              />
+            </div>
           </div>
         </div>
-        </div>
-        {errorMessage && (<p className="text-red-600 italic text-sm">{errorMessage}</p>)}
+        {errorMessage && (
+          <p className="text-red-600 italic text-sm">{errorMessage}</p>
+        )}
         <div className="flex gap-1 w-full">
-          <button 
-            type="submit" 
-            disabled={isSaving}
-            className="btnLeft w-full"
-          >
+          <button type="submit" disabled={isSaving} className="btnLeft w-full">
             {isSaving ? "Saving..." : "Save"}
           </button>
           <button
