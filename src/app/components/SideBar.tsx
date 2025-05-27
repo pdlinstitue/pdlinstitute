@@ -14,11 +14,13 @@ import * as GiIcons from "react-icons/gi";
 import * as IoIcons from "react-icons/io5";
 import * as RiIcons from "react-icons/ri";
 import * as PiIcons from "react-icons/pi";
+import * as FaIcons from "react-icons/fa";
 
 const SideBar: React.FC = () => {
   const pathName = usePathname();
 
   const [menuItems, setMenuItems] = useState<any[]>([]);
+  const [userData, setUserData] = useState<any>({});
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +41,29 @@ const SideBar: React.FC = () => {
     fetchMenuByRole();
   }, []);
 
+  useEffect(() => {
+    const fetchUserById = async () => {
+      try {
+        const userId = Cookies.get("loggedInUserId");
+        const response = await fetch(`/api/users/${userId}/view-sadhak`);
+        const data = await response.json();
+        if (data.success) {
+          setUserData(data.sdkById);
+        } else {
+          console.error("Failed to fetch user");
+        }
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    };
+    fetchUserById();
+  }, []);
+
+  const handleViewChange = (role: string, url: string) => {
+    Cookies.set("loggedInUserRole", role);
+    window.location.href = url;
+  };
+
   const renderIcon = (iconName: string) => {
     const allIcons = {
       ...MdIcons,
@@ -50,6 +75,7 @@ const SideBar: React.FC = () => {
       ...IoIcons,
       ...RiIcons,
       ...PiIcons,
+      ...FaIcons,
     };
 
     const trimmedName = iconName?.trim();
@@ -166,9 +192,86 @@ const SideBar: React.FC = () => {
                 )
               );
             }
-
-            return null;
           })}
+
+          {(userData.isAdmin === "Yes" || userData.isVolunter === "Yes") && (
+            <>
+              <div key={"admin-volunter"}>
+                <button
+                  type="button"
+                  onClick={() => handleToggle("admin-volunter")}
+                  className="group flex gap-2 text-white bg-orange-500 hover:bg-white hover:text-black p-2 rounded-sm w-full"
+                >
+                  {renderIcon("FaEye")}
+                  <p className="font-semibold group-hover:text-black">
+                    {"View As".toUpperCase()}
+                  </p>
+                  <IoIosArrowDown
+                    size={24}
+                    className={`ml-auto group-hover:text-black ${
+                      selectedParentId === "admin-volunter"
+                        ? "rotate-180 duration-500"
+                        : ""
+                    }`}
+                  />
+                </button>
+              </div>
+              {Cookies.get("loggedInUserRole") !== "Admin" &&
+                userData.isAdmin == "Yes" &&
+                selectedParentId === "admin-volunter" && (
+                  <div
+                    key={"admin-volunter-child-1"}
+                    className="flex flex-col w-full px-[35px]"
+                  >
+                    <button
+                      onClick={() =>
+                        handleViewChange("Admin", "/account/admin-dashboard")
+                      }
+                      className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"
+                    >
+                      - ADMIN
+                    </button>
+                  </div>
+                )}
+              {Cookies.get("loggedInUserRole") !== "Sadhak" &&
+                selectedParentId === "admin-volunter" && (
+                  <div
+                    key={"admin-volunter-child-2"}
+                    className="flex flex-col w-full px-[35px]"
+                  >
+                    <button
+                      onClick={() =>
+                        handleViewChange("Sadhak", "/account/sadhak-dashboard")
+                      }
+                      className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"
+                    >
+                      - SADHAK
+                    </button>
+                  </div>
+                )}
+
+              {Cookies.get("loggedInUserRole") !== "Volunter" &&
+                userData.isVolunter == "Yes" &&
+                selectedParentId === "admin-volunter" && (
+                  <div
+                    key={"admin-volunter-child-3"}
+                    className="flex flex-col w-full px-[35px]"
+                  >
+                    <button
+                      onClick={() =>
+                        handleViewChange(
+                          "Volunter",
+                          "/account/volunter-dashboard"
+                        )
+                      }
+                      className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"
+                    >
+                      - VOLUNTER
+                    </button>
+                  </div>
+                )}
+            </>
+          )}
         </div>
       </div>
     </div>
