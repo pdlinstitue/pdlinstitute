@@ -80,7 +80,7 @@ const DoneCourses : React.FC = () => {
    };
 
    return (
-    <div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
       {myCoData && myCoData.length > 0 ? (
         <div className="flex gap-9 justify-start w-full">
           {myCoData?.map((cor: any) => (

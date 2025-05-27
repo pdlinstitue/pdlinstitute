@@ -11,7 +11,7 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
   const router = useRouter();
 
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4'>
+    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 p-4'>
       {myCoData?.map((cor: any) => (
         <div className="max-w-[400px]" key={cor._id}>
           <div className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600">
