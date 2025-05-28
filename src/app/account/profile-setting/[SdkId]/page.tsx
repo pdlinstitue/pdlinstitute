@@ -411,11 +411,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
           toast.error(post.msg);
         } else {
           toast.success(post.msg);
-          if (loggedInUser.result.usrRole === "Admin") {
-            router.push("/account/admin-dashboard");
-          } else {
-            router.push("/account/sadhak-dashboard");
-          }
+          router.back();
         }
       } 
     } catch (error) {
@@ -762,13 +758,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
           <button
             type="button"
             className="btnRight"
-            onClick={() => {
-              if (loggedInUser.result.usrRole === "Admin" || loggedInUser.result.usrRole === "View-Admin") {
-                router.push("/account/admin-dashboard");
-              } else {
-                router.push("/account/sadhak-dashboard");
-              }
-            }}
+            onClick={() => router.back()}
           >
             Back
           </button>
