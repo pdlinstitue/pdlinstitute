@@ -262,14 +262,13 @@ const PermissionList: React.FC = () => {
   }
 
   const permissionLabels: Record<string, string> = {
-    isListEnabled: "List",
     isViewEnabled: "View",
     isAddEnabled: "Add",
     isEditEnabled: "Edit",
     isRegPwdEnabled: "Reset Password",
     isEnbEnabled: "Enable",
     isDisEnabled: "Disable",
-    isDelEnabled: "Delete"
+    isDelEnabled: "Delete",
   };
 
   const permissionLabels2: Record<string, string> = {
@@ -280,9 +279,9 @@ const PermissionList: React.FC = () => {
     isCompEnabled: "Complete",
     isApvEnrEnabled: "Approve Enrollment",
     isMnlEnrEnabled: "Manual Enrollment",
-    isAvpDocEnabled: "Approve Document"
-  };  
-  
+    isAvpDocEnabled: "Approve Document",
+  };
+
   return (
     <form onSubmit={handleSubmit} className="formStyle w-full">
       <div className="grid grid-cols-2 gap-1">
@@ -325,41 +324,41 @@ const PermissionList: React.FC = () => {
       </h1>
 
       <div className="grid grid-cols-2 gap-1">
-      <div className="flex flex-col gap-1 mt-6">
-  {Object.keys(permissionLabels).map((field) => (
-    <div key={field} className="flex gap-4 items-center">
-      <input
-        type="checkbox"
-        name={field}
-        className="w-5 h-5"
-        checked={
-          permitAllowed[field as keyof typeof permitAllowed] as boolean
-        }
-        onChange={handleChange}
-      />
-      <label>{permissionLabels[field]}</label>
-    </div>
-  ))}
-</div>
         <div className="flex flex-col gap-1 mt-6">
-        {Object.keys(permissionLabels2).map((field) => (
-  <div key={field} className="flex gap-4 items-center">
-    <input
-      type="checkbox"
-      name={field}
-      className="w-5 h-5"
-      checked={
-        permitAllowed[field as keyof typeof permitAllowed] as boolean
-      }
-      onChange={handleChange}
-    />
-    <label>{permissionLabels2[field]}</label>
-  </div>
-))}
+          {Object.keys(permissionLabels).map((field) => (
+            <div key={field} className="flex gap-4 items-center">
+              <input
+                type="checkbox"
+                name={field}
+                className="w-5 h-5"
+                checked={
+                  permitAllowed[field as keyof typeof permitAllowed] as boolean
+                }
+                onChange={handleChange}
+              />
+              <label>{permissionLabels[field]}</label>
+            </div>
+          ))}
           <div className="flex gap-4 items-center">
             <input type="checkbox" className="w-5 h-5" onChange={checkAll} />
             <label>Check All</label>
           </div>
+        </div>
+        <div className="flex flex-col gap-1 mt-6">
+          {Object.keys(permissionLabels2).map((field) => (
+            <div key={field} className="flex gap-4 items-center">
+              <input
+                type="checkbox"
+                name={field}
+                className="w-5 h-5"
+                checked={
+                  permitAllowed[field as keyof typeof permitAllowed] as boolean
+                }
+                onChange={handleChange}
+              />
+              <label>{permissionLabels2[field]}</label>
+            </div>
+          ))}
         </div>
       </div>
 

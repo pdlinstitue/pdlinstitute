@@ -14,7 +14,13 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ success: false, token: '', msg: 'Missing credentials!' }, { status: 400 });
     }
 
-    const user = await Users.findOne({ $or: [{ sdkPhone: sdkCred }, { sdkEmail: sdkCred }] });
+    const user = await Users.findOne({
+      $and: [
+        { isActive: true },
+        { $or: [{ sdkPhone: sdkCred }, { sdkEmail: sdkCred }] },
+      ],
+    });
+
     if (!user) {
       return NextResponse.json({ success: false, token: '', msg: 'Invalid user!' }, { status: 400 });
     }

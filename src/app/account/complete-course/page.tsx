@@ -108,7 +108,7 @@ const CompleteCourse : React.FC = () => {
     const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
     const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
     const [pageInput, setPageInput] = React.useState(1);
-    const [selectedDuration, setSelectedDuration]=useState<number>(1);
+    const [selectedDuration, setSelectedDuration]=useState<number>(0);
     const data = React.useMemo(() => enrData ?? [], [enrData]);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
@@ -266,6 +266,7 @@ const CompleteCourse : React.FC = () => {
               {isSaving ? "Completing" : "Complete"}
             </button>
             <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+              <option value="0">Select Duration</option>
               <option value="1">Last One Month</option>
               <option value="2">Last Two Month</option>
               <option value="3">Last Three Month</option>

@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
     const filter: Record<string, any> = {};
 
-    if (durInMonth && !isNaN(durInMonth)) {
+    if (durInMonth && !isNaN(durInMonth) && durInMonth > 0) {
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - durInMonth);
       filter.createdAt = { $gte: startDate };
