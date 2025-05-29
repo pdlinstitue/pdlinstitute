@@ -27,15 +27,15 @@ export async function GET(req: NextRequest) {
     await dbConnect();
     const corId = req.nextUrl.searchParams.get("corId");
     const bthId = req.nextUrl.searchParams.get("bthId");
-    const durInMonth = Number(req.nextUrl.searchParams.get("dur"));
+    // const durInMonth = Number(req.nextUrl.searchParams.get("dur"));
 
     const filter: Record<string, any> = {};
 
-    if (durInMonth && !isNaN(durInMonth) && durInMonth > 0) {
-      const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - durInMonth);
-      filter.createdAt = { $gte: startDate };
-    }
+    // if (durInMonth && !isNaN(durInMonth) && durInMonth > 0) {
+    //   const startDate = new Date();
+    //   startDate.setMonth(startDate.getMonth() - durInMonth);
+    //   filter.createdAt = { $gte: startDate };
+    // }
 
     if (corId && mongoose.Types.ObjectId.isValid(corId)) {
       filter.corId = new mongoose.Types.ObjectId(corId);

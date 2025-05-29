@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
         startDate.setMonth(startDate.getMonth() - durInMonth);
 
         const filter: Record<string, any> = { createdAt: { $gte: startDate } };
+        
         if (corId && mongoose.Types.ObjectId.isValid(corId)) {
             filter.corId = new mongoose.Types.ObjectId(corId);
         }

@@ -53,13 +53,20 @@
 
 .inputBox{
   padding: 9px 16px;
-  border: 1.5px solid #ea580c;
+  border: 1.5px solid #d1d5db;
   border-radius: 4px;
  }
 
 .inputBox:focus {
   outline: 1.5px solid #FFA500;
   background-color: #FFEBCC;
+}
+
+.inputBox:hover {
+  outline: 1.5px solid #FFA500;
+  background-color: #FFEBCC;
+  border: 1.5px solid #FFEBCC;
+  border-radius: 4px;
 }
 
 .formStyle {

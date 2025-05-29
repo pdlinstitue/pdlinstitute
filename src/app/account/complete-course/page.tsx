@@ -15,7 +15,7 @@ import { FiEye } from 'react-icons/fi';
 import { Checkbox } from '@mui/material';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '../Loading';
- 
+import Select from 'react-select';
 
 interface SelectedCourseProps {
   _id:string,
@@ -108,7 +108,7 @@ const CompleteCourse : React.FC = () => {
     const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
     const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
     const [pageInput, setPageInput] = React.useState(1);
-    const [selectedDuration, setSelectedDuration]=useState<number>(0);
+    // const [selectedDuration, setSelectedDuration]=useState<number>(0);
     const data = React.useMemo(() => enrData ?? [], [enrData]);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
@@ -117,7 +117,7 @@ const CompleteCourse : React.FC = () => {
     
     async function fetchEnrollmentData(){
       try {
-        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
         const enrDataList = await res.json();
         const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
           return {
@@ -137,7 +137,7 @@ const CompleteCourse : React.FC = () => {
 
   useEffect(()=>{    
     fetchEnrollmentData();
-  },[selectedCourse, selectedBatch, selectedDuration])
+  },[selectedCourse, selectedBatch])
 
     const table = useReactTable(
       {
@@ -150,7 +150,7 @@ const CompleteCourse : React.FC = () => {
         state: {
           sorting: sorting,
           globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+          pagination: { pageIndex: pageInput - 1, pageSize: 100 }
         },
         onSortingChange: setSorting,
         getFilteredRowModel: getFilteredRowModel(),
@@ -208,9 +208,9 @@ const CompleteCourse : React.FC = () => {
         setSelectedBatch(e.target.value);
       };
 
-        const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-          setSelectedDuration(Number(e.target.value));
-        };
+        // const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        //   setSelectedDuration(Number(e.target.value));
+        // };
         
       if(isLoading){
         return <div>
@@ -261,36 +261,113 @@ const CompleteCourse : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className="flex gap-2 items-center w-[900px]">
+          <div className="flex gap-2 items-center w-[800px]">
             <button type='button' className='btnLeft' onClick={handleComplete} disabled={isSaving}>
               {isSaving ? "Completing" : "Complete"}
             </button>
-            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+            {/* <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
               <option value="0">Select Duration</option>
               <option value="1">Last One Month</option>
               <option value="2">Last Two Month</option>
               <option value="3">Last Three Month</option>
-            </select>
-            <select className="inputBox w-full text-center" name="corId" value={selectedCourse} onChange={handleCourseChange}>
-              <option value="" className='text-center'>--- Select Course ---</option>
-              {courseList?.map((item: any) => {
-              return (
-                <option key={item._id} value={item._id}>
-                  {item.coName}
-                </option>
-              );
-             })}
-            </select>
-            <select className="inputBox w-full text-center" name="corId" value={selectedBatch} onChange={handleBatchChange}>
-              <option value="" className='text-center'>--- Select Batch ---</option>
-              {batchList?.map((item: any) => {
-              return (
-                <option key={item._id} value={item._id}>
-                  {item.bthName}
-                </option>
-              );
-             })}
-            </select>
+            </select> */}
+            <Select
+              className="w-full"
+              placeholder="--- Select Course ---"
+              options={courseList.map((course) => ({
+                label: course.coName,
+                value: course._id
+              }))}
+              value={courseList.find(c => c._id === selectedCourse) ? {
+                label: courseList.find(c => c._id === selectedCourse)!.coName,
+                value: selectedCourse
+              } : null}
+              onChange={(option) => {
+                setSelectedCourse(option?.value || '');
+                setSelectedBatch(''); // Reset batch when course changes
+              }}
+              isSearchable
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  padding: '4px', // ⬅ Matches horizontal padding
+                  minHeight: '46px',
+                  boxShadow: state.isFocused ? '0 0 0 1.5px #FFA500' : 'none', // ⬅ Focus outline
+                  backgroundColor: state.isFocused ? '#FFEBCC' : 'white',
+                  '&:hover': {
+                    borderColor: '#ea580c',
+                  },
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 200,
+                  overflowY: 'auto',
+                  zIndex: 5,
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  paddingTop: '4px',
+                  paddingBottom: '4px',
+                }),
+                input: (provided) => ({
+                  ...provided,
+                  margin: 0,
+                  padding: 0,
+                }),
+                placeholder: (provided) => ({
+                  ...provided,
+                  color: '#666',
+                }),
+                
+              }}
+            />
+            <Select
+              className="w-full"
+              placeholder="--- Select Batch ---"
+              options={batchList.map((batch) => ({
+                label: batch.bthName,
+                value: batch._id
+              }))}
+              value={batchList.find(b => b._id === selectedBatch) ? {
+                label: batchList.find(b => b._id === selectedBatch)!.bthName,
+                value: selectedBatch
+              } : null}
+              onChange={(option) => {
+                setSelectedBatch(option?.value || '');
+              }}
+              styles={{
+              control: (provided, state) => ({
+                ...provided,
+                padding: '4px', // ⬅ Matches horizontal padding
+                minHeight: '46px',
+                boxShadow: state.isFocused ? '0 0 0 1.5px #FFA500' : 'none', // ⬅ Focus outline
+                backgroundColor: state.isFocused ? '#FFEBCC' : 'white',
+                '&:hover': {
+                  borderColor: '#ea580c',
+                },
+              }),
+              menu: (provided) => ({
+                ...provided,
+                maxHeight: 200,
+                overflowY: 'auto',
+                zIndex: 5,
+              }),
+              valueContainer: (provided) => ({
+                ...provided,
+                paddingTop: '4px',
+                paddingBottom: '4px',
+              }),
+              input: (provided) => ({
+                ...provided,
+                margin: 0,
+                padding: 0,
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: '#666',
+              }),
+            }}
+          />
           </div>
           <div className='flex gap-2 items-center'>
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>

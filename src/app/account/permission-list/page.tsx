@@ -262,6 +262,7 @@ const PermissionList: React.FC = () => {
   }
 
   const permissionLabels: Record<string, string> = {
+    isListEnabled: "List",
     isViewEnabled: "View",
     isAddEnabled: "Add",
     isEditEnabled: "Edit",
@@ -339,10 +340,6 @@ const PermissionList: React.FC = () => {
               <label>{permissionLabels[field]}</label>
             </div>
           ))}
-          <div className="flex gap-4 items-center">
-            <input type="checkbox" className="w-5 h-5" onChange={checkAll} />
-            <label>Check All</label>
-          </div>
         </div>
         <div className="flex flex-col gap-1 mt-6">
           {Object.keys(permissionLabels2).map((field) => (
@@ -359,6 +356,10 @@ const PermissionList: React.FC = () => {
               <label>{permissionLabels2[field]}</label>
             </div>
           ))}
+          <div className="flex gap-4 items-center">
+            <input type="checkbox" className="w-5 h-5" onChange={checkAll} />
+            <label>Check All</label>
+          </div>
         </div>
       </div>
 
