@@ -45,7 +45,7 @@ const EnrollmentList : React.FC = () => {
   const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
   const [filtered, setFiltered] = React.useState('');
   const [pageInput, setPageInput] = React.useState(1);
-  // const [selectedDuration, setSelectedDuration]=useState<number>(1);
+  const [selectedDuration, setSelectedDuration]=useState<string>("current");
   const data = React.useMemo(() => enrData ?? [], [enrData]);
 
   //changing the status color as per the status
@@ -94,7 +94,7 @@ const EnrollmentList : React.FC = () => {
   useEffect(()=>{
     async function fetchEnrollmentData(){
       try {
-        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
         const enrDataList = await res.json();
         const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
           return { 
@@ -117,7 +117,7 @@ const EnrollmentList : React.FC = () => {
       }
     }
     fetchEnrollmentData();
-  },[selectedCourse, selectedBatch])
+  },[selectedCourse, selectedBatch, selectedDuration])
 
   const table = useReactTable(
     {
@@ -177,20 +177,9 @@ const EnrollmentList : React.FC = () => {
     fetchBatchesByCorId();
   }, [selectedCourse]); 
 
-  // Handle course change
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCourse(e.target.value);
-    setSelectedBatch(''); // Reset batch selection when course changes
+  const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+     setSelectedDuration(e.target.value);
   };
-
-  // Handle batch change
-  const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedBatch(e.target.value);
-  };
-
-  // const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   setSelectedDuration(Number(e.target.value));
-  // };
 
   if(isLoading){
     return <div>
@@ -203,11 +192,11 @@ const EnrollmentList : React.FC = () => {
       <div>
         <div className='flex mb-2 items-center justify-between'>
           <div className="flex gap-2 items-center w-[800px]">
-            {/* <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
-              <option value="1">Last One Month</option>
-              <option value="2">Last Two Month</option>
-              <option value="3">Last Three Month</option>
-            </select> */}
+            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+              <option value="current">Current</option>
+              <option value="previous">Previous</option>
+              <option value="upcoming">Upcoming</option>
+            </select>
             <Select
               className="w-full"
               placeholder="--- Select Course ---"
@@ -261,12 +250,12 @@ const EnrollmentList : React.FC = () => {
             <Select
               className="w-full"
               placeholder="--- Select Batch ---"
-              options={batchList.map((batch) => ({
+              options={batchList?.map((batch) => ({
                 label: batch.bthName,
                 value: batch._id
               }))}
-              value={batchList.find(b => b._id === selectedBatch) ? {
-                label: batchList.find(b => b._id === selectedBatch)!.bthName,
+              value={batchList?.find(b => b._id === selectedBatch) ? {
+                label: batchList?.find(b => b._id === selectedBatch)!.bthName,
                 value: selectedBatch
               } : null}
               onChange={(option) => {

@@ -17,25 +17,23 @@ type EnrType = {
   createdBy: mongoose.Types.ObjectId;
   ttlJoiners?: number;
   batchAttendance?: number;
-  isReEnroll:boolean
+  isReEnroll: boolean;
 };
 
 export async function GET(req: NextRequest) {
-
   try {
-
     await dbConnect();
     const corId = req.nextUrl.searchParams.get("corId");
     const bthId = req.nextUrl.searchParams.get("bthId");
-    // const durInMonth = Number(req.nextUrl.searchParams.get("dur"));
+    const duration = req.nextUrl.searchParams.get("dur");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
 
     const filter: Record<string, any> = {};
-
-    // if (durInMonth && !isNaN(durInMonth) && durInMonth > 0) {
-    //   const startDate = new Date();
-    //   startDate.setMonth(startDate.getMonth() - durInMonth);
-    //   filter.createdAt = { $gte: startDate };
-    // }
 
     if (corId && mongoose.Types.ObjectId.isValid(corId)) {
       filter.corId = new mongoose.Types.ObjectId(corId);
@@ -45,12 +43,23 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch enrollments with population
-    const enrList = await Enrollments.find(filter)
+    let enrList = await Enrollments.find(filter)
       .populate("corId", "coName coNick coType")
       .populate("bthId", "bthName bthStart")
       .populate("sdkId", "sdkFstName sdkPhone sdkRegNo")
       .populate("createdBy", "sdkFstName")
       .lean();
+
+    if (duration) {
+      enrList = enrList?.filter(
+        (session: any) =>
+          session?.isActive &&
+          ((duration === "previous" && session.createdAt < today) ||
+            (duration === "current" &&
+              session.createdAt.setHours(0, 0, 0, 0) === today) ||
+            (duration === "upcoming" && session.createdAt >= tomorrow))
+      );
+    }
 
     const batchClassCounts: Record<string, number> = {};
     const batchClassIds: Record<string, mongoose.Types.ObjectId[]> = {};
@@ -90,52 +99,89 @@ export async function GET(req: NextRequest) {
           status: "Present",
         });
 
-        const batchAttendance = totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0;
+        const batchAttendance =
+          totalClasses > 0 ? (attendedClasses / totalClasses) * 100 : 0;
         return { ...enr, ttlJoiners, batchAttendance };
       })
     );
 
-    return NextResponse.json({ enrList: enrListWithStats, success: true }, { status: 200 });
+    return NextResponse.json(
+      { enrList: enrListWithStats, success: true },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Error fetching enrollments:", error);
-    return new NextResponse(`Error fetching enrollments: ${error.message}`, { status: 500 });
+    return new NextResponse(`Error fetching enrollments: ${error.message}`, {
+      status: 500,
+    });
   }
 }
-  
+
 export async function POST(req: NextRequest) {
+  try {
+    await dbConnect();
+    const {
+      enrTnsNo,
+      cpnName,
+      enrSrnShot,
+      enrRemarks,
+      corId,
+      bthId,
+      sdkId,
+      createdBy,
+      isReEnroll,
+    }: EnrType = await req.json();
 
-    try {
+    const newEnr = new Enrollments({
+      enrTnsNo,
+      cpnName,
+      enrSrnShot,
+      enrRemarks,
+      corId,
+      bthId,
+      sdkId,
+      createdBy,
+      isApproved:
+        corId.toString() == "67d262857db737af7a47a679" ? "Approved" : "Pending",
+    });
+    const savedEnr = await newEnr.save();
 
-        await dbConnect();
-        const { enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy, isReEnroll }: EnrType = await req.json();
+    if (savedEnr) {
+      if (isReEnroll) {
+        const reenrollment = await Reenrollments.findOne({
+          reqBy: sdkId,
+          corId: corId,
+        }).sort({ createdAt: -1 });
 
-        const newEnr = new Enrollments({ enrTnsNo, cpnName, enrSrnShot, enrRemarks, corId, bthId, sdkId, createdBy, isApproved: corId.toString() == "67d262857db737af7a47a679" ? "Approved" : "Pending" });
-        const savedEnr = await newEnr.save();
-
-        if (savedEnr) {
-            if (isReEnroll) {
-                const reenrollment = await Reenrollments.findOne({
-                    reqBy: sdkId,
-                    corId: corId,
-                }).sort({ createdAt: -1 });
-
-                if (reenrollment) {
-                    reenrollment.reqStatus = "ReEnrolled";
-                    await reenrollment.save();
-                }
-            }
-
-            return NextResponse.json({ savedEnr, success: true, msg: "Enrolled successfully." }, { status: 200 });
-        } else {
-            return NextResponse.json({ savedEnr, success: false, msg: "Enrollment failed." }, { status: 200 });
+        if (reenrollment) {
+          reenrollment.reqStatus = "ReEnrolled";
+          await reenrollment.save();
         }
+      }
 
-    } catch (error: any) {
-        if (error.name === 'ValidationError') {
-            const messages = Object.values(error.errors).map((val: any) => val.message);
-            return NextResponse.json({ success: false, msg: messages }, { status: 400 });
-        } else {
-            return new NextResponse("Error while saving enrData: " + error, { status: 400 });
-        }
+      return NextResponse.json(
+        { savedEnr, success: true, msg: "Enrolled successfully." },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { savedEnr, success: false, msg: "Enrollment failed." },
+        { status: 200 }
+      );
     }
+  } catch (error: any) {
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map(
+        (val: any) => val.message
+      );
+      return NextResponse.json(
+        { success: false, msg: messages },
+        { status: 400 }
+      );
+    } else {
+      return new NextResponse("Error while saving enrData: " + error, {
+        status: 400,
+      });
+    }
+  }
 }

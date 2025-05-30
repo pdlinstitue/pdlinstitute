@@ -108,7 +108,7 @@ const CompleteCourse : React.FC = () => {
     const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
     const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
     const [pageInput, setPageInput] = React.useState(1);
-    // const [selectedDuration, setSelectedDuration]=useState<number>(0);
+    const [selectedDuration, setSelectedDuration]=useState<string>("current");
     const data = React.useMemo(() => enrData ?? [], [enrData]);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
@@ -117,7 +117,7 @@ const CompleteCourse : React.FC = () => {
     
     async function fetchEnrollmentData(){
       try {
-        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
         const enrDataList = await res.json();
         const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
           return {
@@ -137,7 +137,7 @@ const CompleteCourse : React.FC = () => {
 
   useEffect(()=>{    
     fetchEnrollmentData();
-  },[selectedCourse, selectedBatch])
+  },[selectedCourse, selectedBatch, selectedDuration])
 
     const table = useReactTable(
       {
@@ -188,29 +188,18 @@ const CompleteCourse : React.FC = () => {
         try {
           const res = await fetch(`${BASE_API_URL}/api/batches`, { cache: 'no-store' });
           const batchData = await res.json();
-          const filteredBatches = batchData.bthList.filter((batch: any) => batch.corId._id === selectedCourse);
+          const filteredBatches = batchData.bthList?.filter((batch: any) => batch.corId._id === selectedCourse);
           setBatchList(filteredBatches);
         } catch (error) {
           console.error('Error fetching batch data:', error);
         }
       }
       fetchBatchesByCorId();
-    }, [selectedCourse]); 
-    
-      // Handle course change
-      const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCourse(e.target.value);
-        setSelectedBatch(''); // Reset batch selection when course changes
-      };
-    
-      // Handle batch change
-      const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedBatch(e.target.value);
-      };
+    }, [selectedCourse]);     
 
-        // const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        //   setSelectedDuration(Number(e.target.value));
-        // };
+        const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+           setSelectedDuration(e.target.value);
+        };
         
       if(isLoading){
         return <div>
@@ -261,16 +250,15 @@ const CompleteCourse : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className="flex gap-2 items-center w-[800px]">
+          <div className="flex gap-2 items-center w-[900px]">
             <button type='button' className='btnLeft' onClick={handleComplete} disabled={isSaving}>
               {isSaving ? "Completing" : "Complete"}
             </button>
-            {/* <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
-              <option value="0">Select Duration</option>
-              <option value="1">Last One Month</option>
-              <option value="2">Last Two Month</option>
-              <option value="3">Last Three Month</option>
-            </select> */}
+            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>                            
+              <option value="current">Current</option>
+              <option value="previous">Previous</option>
+              <option value="upcoming">Upcoming</option>
+            </select>
             <Select
               className="w-full"
               placeholder="--- Select Course ---"
@@ -324,12 +312,12 @@ const CompleteCourse : React.FC = () => {
             <Select
               className="w-full"
               placeholder="--- Select Batch ---"
-              options={batchList.map((batch) => ({
+              options={batchList?.map((batch) => ({
                 label: batch.bthName,
                 value: batch._id
               }))}
-              value={batchList.find(b => b._id === selectedBatch) ? {
-                label: batchList.find(b => b._id === selectedBatch)!.bthName,
+              value={batchList?.find(b => b._id === selectedBatch) ? {
+                label: batchList?.find(b => b._id === selectedBatch)!.bthName,
                 value: selectedBatch
               } : null}
               onChange={(option) => {

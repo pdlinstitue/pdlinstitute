@@ -47,7 +47,7 @@ const ClassList : React.FC = () => {
 const router = useRouter();
 const [classData, setClassData] = useState<ClassListProps[] | null>([]);
 const [isLoading, setIsLoading] = useState<boolean>(true);
-// const [selectedDuration, setSelectedDuration]=useState<number>(1);
+const [selectedDuration, setSelectedDuration]=useState<string>("current");
 const [selectedCourse, setSelectedCourse] = useState<string>(''); 
 const [selectedBatch, setSelectedBatch] = useState<string>('')
 const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
@@ -236,26 +236,15 @@ useEffect(() => {
     }
     fetchBatchesByCorId();
   }, [selectedCourse]); 
-
-  // Handle course change
-    const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setSelectedCourse(e.target.value);
-      setSelectedBatch(''); // Reset batch selection when course changes
-    };
   
-    // Handle batch change
-    const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setSelectedBatch(e.target.value);
+    const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+       setSelectedDuration(e.target.value);
     };
-  
-    // const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    //   setSelectedDuration(Number(e.target.value));
-    // };
 
   useEffect(() => {
   async function fetchClassData() {
     try {
-        const res = await fetch(`${BASE_API_URL}/api/classes?corId=${selectedCourse}&bthId=${selectedBatch}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/classes?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
         const classList = await res.json();
         setClassData(classList.clsList);
     } catch (error) {
@@ -265,7 +254,7 @@ useEffect(() => {
     }
   }
   fetchClassData();
-  }, [selectedCourse, selectedBatch]);
+  }, [selectedCourse, selectedBatch, selectedDuration]);
 
   if(isLoading){
     return<div>
@@ -278,11 +267,11 @@ useEffect(() => {
       <div>
         <div className='flex mb-2 items-center justify-between'>
           <div className='flex gap-1 items-center w-[800px]'>
-            {/* <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
-              <option value="1">Last One Month</option>
-              <option value="2">Last Two Month</option>
-              <option value="3">Last Three Month</option>
-            </select> */}
+            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+              <option value="current">Current</option>
+              <option value="previous">Previous</option>
+              <option value="upcoming">Upcoming</option>
+            </select>
             <Select
               className="w-full"
               placeholder="--- Select Course ---"
@@ -336,12 +325,12 @@ useEffect(() => {
             <Select
               className="w-full"
               placeholder="--- Select Batch ---"
-              options={batchList.map((batch) => ({
+              options={batchList?.map((batch) => ({
                 label: batch.bthName,
                 value: batch._id
               }))}
-              value={batchList.find(b => b._id === selectedBatch) ? {
-                label: batchList.find(b => b._id === selectedBatch)!.bthName,
+              value={batchList?.find(b => b._id === selectedBatch) ? {
+                label: batchList?.find(b => b._id === selectedBatch)!.bthName,
                 value: selectedBatch
               } : null}
               onChange={(option) => {
