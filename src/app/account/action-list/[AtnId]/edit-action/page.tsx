@@ -253,7 +253,7 @@ const EditAction: React.FC<IActionParams> = ({ params }) => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-lg">Attd Image Url:</label>
+              <label className="text-lg">Attd Upload Url:</label>
               <input
                 type="text"
                 className="inputBox"

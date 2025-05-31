@@ -92,7 +92,7 @@ const CompleteCourse : React.FC = () => {
     { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center justify-center'> 
-          <button type='button' title='Update' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/edit-enrollment`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+          <button type='button' title='Edit' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/edit-enrollment`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
         </div> 
       ), 
     },
