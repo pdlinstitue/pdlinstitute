@@ -2,7 +2,9 @@
 import Loading from '@/app/account/Loading';
 import { StepperContext } from '@/app/context/StepperContext';
 import { BASE_API_URL } from '@/app/utils/constant';
+import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 interface countryListProps {
  country_id:string,
@@ -199,6 +201,10 @@ const CommDetails : React.FC = () => {
               <input type='checkbox' checked={isSamePin} onChange={handleSamePinToggle} className='ml-2' />{""}Check if same
             </div>
             <input type='number' name='sdkComPinCode' value={userData.sdkComPinCode} placeholder='For communication address' onChange={handleChange} className='inputBox' disabled={isSamePin} />
+          </div>
+          <div className='flex flex-col gap-2 items-center justify-center p-4 bg-gray-100 rounded-lg mt-4'>
+            <p className='italic text-md'>Join support group for any kind of assistance.</p>
+            <Link href="https://chat.whatsapp.com/KHb4NUXolhb52QfLp0YXcE" target='_blank'><FaWhatsapp /></Link>
           </div>
         </div>
     </div>

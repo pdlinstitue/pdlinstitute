@@ -88,7 +88,7 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
                 <p><span className='font-semibold uppercase mr-3'>Days:</span>{data.durDays}</p>
             </div>
             <div className='text-end text-sm'>
-                <p><span className='font-semibold uppercase mr-3'>Hrs:</span>{data.durHrs}</p>
+                <p><span className='font-semibold uppercase mr-3'>Min/-Day:</span>{data.durHrs}</p>
             </div>
         </div>
         <div className='grid grid-cols-2 gap-1'>

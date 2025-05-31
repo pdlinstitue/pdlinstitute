@@ -417,7 +417,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Course Duration-DAYS:</label>
+            <label className="text-lg">DAYS:</label>
             <input
               name="durDays"
               value={data.durDays}
@@ -427,7 +427,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Course Duration-HRS:</label>
+            <label className="text-lg">Min/-Day:</label>
             <input
               name="durHrs"
               value={data.durHrs}

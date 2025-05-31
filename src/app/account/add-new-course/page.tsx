@@ -395,7 +395,7 @@ const AddNewCourse: React.FC = () => {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-lg">Hours:<span className="text-red-600">*</span></label>
+            <label className="text-lg">Min/-Day:<span className="text-red-600">*</span></label>
             <input
               name="durHrs"
               value={data.durHrs}

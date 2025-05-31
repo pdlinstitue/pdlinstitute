@@ -1,6 +1,8 @@
 "use client";
 import { StepperContext } from '@/app/context/StepperContext';
+import Link from 'next/link';
 import React, { useContext } from 'react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const CreatePass : React.FC = () => {
 
@@ -27,6 +29,10 @@ const CreatePass : React.FC = () => {
         <div className='flex flex-col gap-2'>
           <label>Confirm Password:*</label>
           <input type='password' name='sdkConfPwd' placeholder='Min 8 characters' value={userData.sdkConfPwd} onChange={handleChange} className='inputBox' />
+        </div>
+        <div className='flex flex-col gap-2 items-center justify-center p-4 bg-gray-100 rounded-lg mt-4'>
+          <p className='italic text-md'>Join support group for any kind of assistance.</p>
+          <Link href="https://chat.whatsapp.com/KHb4NUXolhb52QfLp0YXcE" target='_blank'><FaWhatsapp /></Link>
         </div>
       </div>
     </div>

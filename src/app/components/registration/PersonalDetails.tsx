@@ -1,6 +1,8 @@
 import React from 'react';
 import { useContext } from 'react';
 import { StepperContext } from '@/app/context/StepperContext';
+import Link from 'next/link';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const PersonalDetails : React.FC = () => {
 
@@ -57,6 +59,10 @@ const PersonalDetails : React.FC = () => {
             <option value='Unmarried'>Unmarried</option>
             <option value='Other'>Other</option>
           </select>
+        </div>
+        <div className='flex flex-col gap-2 items-center justify-center p-4 bg-gray-100 rounded-lg mt-4'>
+          <p className='italic text-md'>Join support group for any kind of assistance.</p>
+          <Link href="https://chat.whatsapp.com/KHb4NUXolhb52QfLp0YXcE" target='_blank'><FaWhatsapp /></Link>
         </div>
       </div>
     </div>
