@@ -166,8 +166,8 @@ const MyClassAttd: React.FC<IBthParams> = ({ params }) => {
   return (
     <div>
       {!data || data.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 italic">
-          No data found.
+        <div className="flex h-screen items-center justify-center text-gray-500 italic">
+         <span>No classes found for this batch.</span>
         </div>
       ) : (
         <>

@@ -194,14 +194,14 @@ useEffect(() => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-2 items-center w-[800px]'>
-            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+          <div className='flex gap-2 items-center w-auto'>
+            <select className="inputBox w-[120px] h-11" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
               <option value="current">Current</option>
               <option value="previous">Previous</option>
               <option value="upcoming">Upcoming</option>
             </select>
             <Select
-              className="w-full"
+              className="w-[260px]"
               placeholder="--- Select Course ---"
               options={courseList.map((course) => ({
                 label: course.coName,
@@ -251,7 +251,7 @@ useEffect(() => {
               }}
             />
             <Select
-              className="w-full"
+              className="w-[260px]"
               placeholder="--- Select Batch ---"
               options={batchList?.map((batch) => ({
                 label: batch.bthName,

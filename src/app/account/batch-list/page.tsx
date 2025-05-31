@@ -209,8 +209,8 @@ const BatchList: React.FC = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-2 items-center w-[800px]">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex gap-1 items-center w-auto">
           <Link
             href="/account/add-new-batch"
             title="Create Batch"
@@ -219,7 +219,7 @@ const BatchList: React.FC = () => {
             <BiLayerPlus size={24} />
           </Link>
           <select
-            className="inputBox w-[300px]"
+            className="inputBox w-[120px]"
             name="duration"
             value={selectedDuration}
             onChange={handleDurationChange}

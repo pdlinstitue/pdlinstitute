@@ -250,17 +250,17 @@ const CompleteCourse : React.FC = () => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className="flex gap-2 items-center w-[900px]">
+          <div className="flex gap-1 items-center w-auto">
             <button type='button' className='btnLeft' onClick={handleComplete} disabled={isSaving}>
               {isSaving ? "Completing" : "Complete"}
             </button>
-            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>                            
+            <select className="inputBox w-[120px] h-11" name="duration" value={selectedDuration} onChange={handleDurationChange}>                            
               <option value="current">Current</option>
               <option value="previous">Previous</option>
               <option value="upcoming">Upcoming</option>
             </select>
             <Select
-              className="w-full"
+              className="w-[260px]"
               placeholder="--- Select Course ---"
               options={courseList.map((course) => ({
                 label: course.coName,
@@ -305,12 +305,11 @@ const CompleteCourse : React.FC = () => {
                 placeholder: (provided) => ({
                   ...provided,
                   color: '#666',
-                }),
-                
+                }),               
               }}
             />
             <Select
-              className="w-full"
+              className="w-[260px]"
               placeholder="--- Select Batch ---"
               options={batchList?.map((batch) => ({
                 label: batch.bthName,

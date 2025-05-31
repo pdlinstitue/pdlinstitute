@@ -266,14 +266,15 @@ useEffect(() => {
     <div>
       <div>
         <div className='flex mb-2 items-center justify-between'>
-          <div className='flex gap-1 items-center w-[800px]'>
-            <select className="inputBox w-full" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+          <div className='flex gap-1 items-center w-auto'>
+            <Link href="/account/add-new-class" title='Create Class' className='btnLeft'><PiChalkboardTeacherFill size={26}/></Link>
+            <select className="inputBox h-11 w-[120px]" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
               <option value="current">Current</option>
               <option value="previous">Previous</option>
               <option value="upcoming">Upcoming</option>
             </select>
             <Select
-              className="w-full"
+              className="w-[260px]"
               placeholder="--- Select Course ---"
               options={courseList.map((course) => ({
                 label: course.coName,
@@ -323,7 +324,7 @@ useEffect(() => {
               }}
             />
             <Select
-              className="w-full"
+              className="w-[260px]"
               placeholder="--- Select Batch ---"
               options={batchList?.map((batch) => ({
                 label: batch.bthName,
@@ -371,7 +372,6 @@ useEffect(() => {
           />
           </div>
           <div className='flex gap-1 items-center'>
-            <Link href="/account/add-new-class" title='Create Class' className='btnLeft'><PiChalkboardTeacherFill size={24}/></Link>
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
           </div>
         </div>

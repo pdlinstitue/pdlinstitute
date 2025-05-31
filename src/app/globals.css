@@ -4,7 +4,7 @@
 
 
 .btnLeft{
-  padding: 9px 16px;
+  padding: 7.5px 16px;
   background-color: #ea580c;
   text-transform: capitalize;
   color: white;
@@ -20,7 +20,7 @@
 }
 
 .btnRight{
-  padding: 9px 16px;
+  padding: 7.5px 16px;
   border: 1.5px solid #ea580c; 
   background-color: #FFFFFF;
   text-transform: capitalize;
