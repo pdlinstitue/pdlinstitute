@@ -275,9 +275,11 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
     return (
         <div>
             <div className="flex mb-2 items-center justify-between">
-                <button type="button" className="btnLeft" onClick={markAsPresent}>
-                    Mark Multiple
-                </button>
+                { loggedInUser?.result?.usrRole !== "View-Admin" &&(
+                    <button type="button" className="btnLeft" onClick={markAsPresent}>
+                        Mark Multiple
+                    </button>)
+                }
                 <input
                     type="text"
                     className="inputBox w-[300px]"

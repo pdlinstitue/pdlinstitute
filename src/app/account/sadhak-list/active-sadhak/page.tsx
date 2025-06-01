@@ -22,6 +22,7 @@ import Loading from "../../Loading";
 import { TbPasswordFingerprint } from "react-icons/tb";
 import { BASE_API_URL } from "@/app/utils/constant";
 import { format } from "date-fns";
+import Cookies from "js-cookie";
 
 interface SadhakListProps {
   sdkFstName: string;
@@ -30,7 +31,7 @@ interface SadhakListProps {
   sdkRegNo: string;
   sdkBthDate: Date;
   sdkGender: string;
-  isMedIssue:string,
+  isMedIssue: string;
   sdkMarStts: string;
   sdkSpouce: string;
   sdkPhone: string;
@@ -43,12 +44,13 @@ interface SadhakListProps {
 }
 
 const ActiveSadhakList: React.FC = () => {
-
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [activeSdk, setActiveSdk] = useState<SadhakListProps[] | null>([]);
   const data = React.useMemo(() => activeSdk ?? [], [activeSdk]);
-  const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
+  const formatDate = (date: string) => {
+    return format(new Date(date), "MMM dd, yyyy");
+  };
   const columns = React.useMemo(
     () => [
       {
@@ -57,9 +59,12 @@ const ActiveSadhakList: React.FC = () => {
         cell: ({ row }: { row: any }) => {
           const { sdkImg, _id } = row.original;
           const profileUrl = `/account/profile-setting/${_id}`;
-  
+
           return (
-            <Link href={profileUrl} className="flex justify-center items-center">
+            <Link
+              href={profileUrl}
+              className="flex justify-center items-center"
+            >
               {sdkImg ? (
                 <img
                   src={`/api/profile-upload?name=${sdkImg}`}
@@ -75,17 +80,20 @@ const ActiveSadhakList: React.FC = () => {
       },
       { header: "Sadhak", accessorKey: "sdkFstName" },
       { header: "Sdk ID", accessorKey: "sdkRegNo" },
-      { header: 'DOR', 
-        accessorKey: 'createdAt',
+      {
+        header: "DOR",
+        accessorKey: "createdAt",
         cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
       },
-      { header: "Phone", accessorKey: "sdkPhone",
+      {
+        header: "Phone",
+        accessorKey: "sdkPhone",
         cell: ({ row }: { row: any }) => (
-          <Link href={`tel:${row.original.sdkPhone}`} className='text-blue-700'>
+          <Link href={`tel:${row.original.sdkPhone}`} className="text-blue-700">
             {row.original.sdkPhone}
           </Link>
-        )
-       },
+        ),
+      },
       // { header: "WhatsApp", accessorKey: "sdkWhtNbr" },
       { header: "Medical", accessorKey: "isMedIssue" },
       { header: "State", accessorKey: "sdkState" },
@@ -209,14 +217,40 @@ const ActiveSadhakList: React.FC = () => {
 
         const sadhakData = await res.json();
         setActiveSdk(sadhakData.activeSdkList);
-
       } catch (error) {
-          console.error("Error fetching sadhak data:", error);
+        console.error("Error fetching sadhak data:", error);
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       }
     }
     fetchSadhakData();
+  }, []);
+
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: "",
+      usrName: "",
+      usrRole: "",
+    },
+  });
+
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
+      setLoggedInUser({
+        result: {
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   if (isLoading) {
@@ -229,9 +263,22 @@ const ActiveSadhakList: React.FC = () => {
 
   return (
     <div>
-      <div className='flex gap-2 items-center justify-between mb-4'>
-          <Link href="/account/add-new-sadhak" title="Add New Sadhak" className='btnLeft'><FaUserPlus size={24}/></Link>
-        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
+      <div className="flex gap-2 items-center justify-between mb-4">
+        {loggedInUser.result.usrRole !== "View-Admin" && (
+          <Link
+            href="/account/add-new-sadhak"
+            title="Add New Sadhak"
+            className="btnLeft"
+          >
+            <FaUserPlus size={24} />
+          </Link>
+        )}
+        <input
+          type="text"
+          className="inputBox w-[300px]"
+          placeholder="Search anything..."
+          onChange={(e) => setFiltered(e.target.value)}
+        />
       </div>
       <div className="overflow-auto max-h-[412px]">
         <DataTable table={table} />

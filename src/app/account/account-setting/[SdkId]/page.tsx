@@ -27,11 +27,13 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  
   const [contactDetails, setContactDetails] = useState<AccountSettingProps>({
     sdkPhone: "",
     sdkWhtNbr: "",
     sdkEmail: "",
   });
+
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
       _id: "",

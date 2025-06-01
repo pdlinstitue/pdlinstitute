@@ -14,11 +14,9 @@ interface ActionListProps {
   _id: string;
   atnName: string;
 }
-
 interface PermitAllowedProps {
   atnId: string;
   rolId: string;
-  isListEnabled: boolean;
   isViewEnabled: boolean;
   isAddEnabled: boolean;
   isEditEnabled: boolean;
@@ -43,7 +41,6 @@ const PermissionList: React.FC = () => {
   const [permitAllowed, setPermitAllowed] = useState<PermitAllowedProps>({
     atnId: "",
     rolId: "",
-    isListEnabled: false,
     isViewEnabled: false,
     isAddEnabled: false,
     isEditEnabled: false,
@@ -64,7 +61,7 @@ const PermissionList: React.FC = () => {
   const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [activity, setActivity] = useState("Module");
+  const [activity, setActivity] = useState("-");
 
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
@@ -126,7 +123,6 @@ const PermissionList: React.FC = () => {
         if (permission) {
           setPermitAllowed((prev) => ({
             ...prev,
-            isListEnabled: permission.isListEnabled,
             isViewEnabled: permission.isViewEnabled,
             isAddEnabled: permission.isAddEnabled,
             isEditEnabled: permission.isEditEnabled,
@@ -148,7 +144,6 @@ const PermissionList: React.FC = () => {
           // If no permission found, reset toggles but keep atnId and rolId
           setPermitAllowed((prev) => ({
             ...prev,
-            isListEnabled: false,
             isViewEnabled: false,
             isAddEnabled: false,
             isEditEnabled: false,
@@ -186,7 +181,6 @@ const PermissionList: React.FC = () => {
     const { checked } = e.target;
     setPermitAllowed((prev) => ({
       ...prev,
-      isListEnabled: checked,
       isViewEnabled: checked,
       isAddEnabled: checked,
       isEditEnabled: checked,
@@ -221,10 +215,10 @@ const PermissionList: React.FC = () => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+
     e.preventDefault();
     setIsSaving(true);
     setErrorMessage("");
-
     try {
       if (!permitAllowed.rolId.trim()) {
         return setErrorMessage("Role is required.");
@@ -262,7 +256,6 @@ const PermissionList: React.FC = () => {
   }
 
   const permissionLabels: Record<string, string> = {
-    isListEnabled: "List",
     isViewEnabled: "View",
     isAddEnabled: "Add",
     isEditEnabled: "Edit",
@@ -270,14 +263,14 @@ const PermissionList: React.FC = () => {
     isEnbEnabled: "Enable",
     isDisEnabled: "Disable",
     isDelEnabled: "Delete",
+    isAttdeesEnabled: "Attendees",
   };
 
   const permissionLabels2: Record<string, string> = {
-    isAttdeesEnabled: "Attendees",
-    isAttdImgEnabled: "Attendance Image",
-    isAmendEnabled: "Amend",
-    isMarkEnabled: "Mark",
-    isCompEnabled: "Complete",
+    isAttdImgEnabled: "Upload Attendance",
+    isAmendEnabled: "Amend Attendance",
+    isMarkEnabled: "Mark Attendance",
+    isCompEnabled: "Complete Course",
     isApvEnrEnabled: "Approve Enrollment",
     isMnlEnrEnabled: "Manual Enrollment",
     isAvpDocEnabled: "Approve Document",
@@ -321,9 +314,8 @@ const PermissionList: React.FC = () => {
       </div>
 
       <h1 className="text-center text-xl p-3 bg-gray-200 font-semibold uppercase">
-        Module:{activity}
+        Module-{activity}
       </h1>
-
       <div className="grid grid-cols-2 gap-1">
         <div className="flex flex-col gap-1 mt-6">
           {Object.keys(permissionLabels).map((field) => (

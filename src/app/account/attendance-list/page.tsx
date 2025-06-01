@@ -42,7 +42,7 @@ const AttendanceList : React.FC = () => {
   const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
   const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
 
-useEffect(() => {
+  useEffect(() => {
     async function fetchCourseData() {
       try {
           const res = await fetch(`${BASE_API_URL}/api/courses`, {cache: "no-store"});
@@ -75,16 +75,16 @@ useEffect(() => {
     fetchBatchesByCorId();
   }, [selectedCourse]); 
 
-  // Handle course change
-  const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCourse(e.target.value);
-    setSelectedBatch(''); // Reset batch selection when course changes
-  };
+  // // Handle course change
+  // const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedCourse(e.target.value);
+  //   setSelectedBatch(''); // Reset batch selection when course changes
+  // };
 
-  // Handle batch change
-  const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedBatch(e.target.value);
-  };
+  // // Handle batch change
+  // const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   setSelectedBatch(e.target.value);
+  // };
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
      setSelectedDuration(e.target.value);

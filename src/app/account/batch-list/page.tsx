@@ -21,6 +21,7 @@ import { FiEye } from "react-icons/fi";
 import { BiEditAlt } from "react-icons/bi";
 import { RxCross2 } from "react-icons/rx";
 import Loading from "../Loading";
+import Cookies from "js-cookie";
 import { HiMinus } from "react-icons/hi";
 
 interface BatchListProps {
@@ -131,6 +132,7 @@ const BatchList: React.FC = () => {
     ],
     []
   );
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [filtered, setFiltered] = React.useState("");
   const [pageInput, setPageInput] = React.useState(1);
@@ -199,6 +201,33 @@ const BatchList: React.FC = () => {
     table.setPageIndex(page);
   };
 
+  const [loggedInUser, setLoggedInUser] = useState({
+      result: {
+        _id: "",
+        usrName: "",
+        usrRole: "",
+      },
+    });
+  
+    useEffect(() => {
+      try {
+        const userId = Cookies.get("loggedInUserId") || "";
+        const userName = Cookies.get("loggedInUserName") || "";
+        const userRole = Cookies.get("loggedInUserRole") || "";
+        setLoggedInUser({
+          result: {
+            _id: userId,
+            usrName: userName,
+            usrRole: userRole,
+          },
+        });
+      } catch (error) {
+        console.error("Error fetching loggedInUserData.");
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
+
   if (isLoading) {
     return (
       <div>
@@ -211,13 +240,15 @@ const BatchList: React.FC = () => {
     <div>
       <div className="flex items-center justify-between mb-2">
         <div className="flex gap-1 items-center w-auto">
-          <Link
-            href="/account/add-new-batch"
-            title="Create Batch"
-            className="btnLeft"
-          >
-            <BiLayerPlus size={24} />
-          </Link>
+          { loggedInUser?.result?.usrRole !== "View-Admin" &&
+            (<Link
+              href="/account/add-new-batch"
+              title="Create Batch"
+              className="btnLeft"
+            >
+              <BiLayerPlus size={24} />
+            </Link>)
+          }
           <select
             className="inputBox w-[120px]"
             name="duration"

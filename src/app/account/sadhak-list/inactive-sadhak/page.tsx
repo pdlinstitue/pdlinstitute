@@ -69,8 +69,7 @@ const InActiveSadhakList : React.FC = () => {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
-
+ 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
     };
@@ -86,7 +85,7 @@ const InActiveSadhakList : React.FC = () => {
         state: {
           sorting: sorting,
           globalFilter: filtered,
-          pagination: { pageIndex: pageInput - 1, pageSize: 25 }
+          pagination: { pageIndex: pageInput - 1, pageSize: 100 }
         },
         onSortingChange: setSorting,
         getFilteredRowModel: getFilteredRowModel(),
@@ -134,7 +133,6 @@ const InActiveSadhakList : React.FC = () => {
     <div>
       <div className='flex mb-2 items-center justify-between'>
           <div className='flex gap-2 items-center'>
-            <Link href="/account/add-new-sadhak" className='btnLeft'><FaUserPlus size={24}/></Link>
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
           </div>
       </div>
