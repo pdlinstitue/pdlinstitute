@@ -37,7 +37,6 @@ const MenuAccessList : React.FC = () => {
     { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3 justify-center'> 
-          <button type='button' title='View' onClick={()=> router.push(`/account/menu-access-list/${row.original._id}/view-menu-access`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
           <button type='button' title='Edit' onClick={()=> router.push(`/account/menu-access-list/${row.original._id}/edit-menu-access`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><BiEditAlt size={12}/></button>      
         </div> 
       ), 
