@@ -3,82 +3,21 @@ import Users from './Users';
 import Modules from './Modules';
 import Roles from './Roles';
 
-const permissionsSchema = new mongoose.Schema({
-    atnId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:Modules,
-        required:[true, "Action ID is required."],
-    },
+const permissionsSchema = new mongoose.Schema({    
     rolId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:Roles,
         required:[true, "Role ID is required."],
     },
-    isListEnabled:{
-        type:Boolean,
-        default:false
+    modId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:Modules,
+        required:[true, "Module ID is required."],
     },
-    isViewEnabled:{
-        type:Boolean,
-        default:false
+    modAtnIds:{
+        type:[mongoose.Schema.Types.ObjectId],
     },
-    isAddEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isEditEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isRegPwdEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isEnbEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isDisEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isDelEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isMarkEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isAttdeesEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isAttdImgEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isAmendEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isCompEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isApvEnrEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isMnlEnrEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isAvpDocEnabled:{
-        type:Boolean,
-        default:false
-    },
-    isActive: {
+    isActive: {        
         type: Boolean,
         default:true
     },

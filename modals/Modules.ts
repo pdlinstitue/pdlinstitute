@@ -3,58 +3,22 @@ import Users from "./Users";
 
 const modulesSchema = new mongoose.Schema(
   {
-    atnName: {
+    modName: {
       type: String,
-      required: [true, "Action name is required."],
+      required: [true, "Module name is required."],
     },
-    listUrl: {
-      type: String,
-    },
-    addUrl: {
-      type: String,
-    },
-    viewUrl: {
-      type: String,
-    },
-    editUrl: {
-      type: String,
-    },
-    enableUrl: {
-      type: String,
-    },
-    disableUrl: {
-      type: String,
-    },
-    deleteUrl: {
-      type: String,
-    },
-    attdeesUrl:{
-      type:String
-    },
-    attdImgUrl:{
-      type:String
-    },
-    markUrl: {
-      type: String,
-    },
-    amendUrl: {
-      type: String,
-    },
-    regPwdUrl: {
-      type: String,
-    },
-    compUrl: {
-      type: String,
-    },
-    apvEnrUrl: {
-      type: String,
-    },
-    mnlEnrUrl: {
-      type: String,
-    },
-    apvDocUrl: {
-      type: String,
-    },
+    modActions:[
+      {
+        name: {
+          type: String,
+          required: [true, "Action name is required."],
+        },
+        url: {
+          type: String,
+          required: [true, "Action URL is required."],
+        },
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,

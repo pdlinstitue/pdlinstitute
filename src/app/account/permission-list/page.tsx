@@ -10,59 +10,43 @@ interface RoleListProps {
   roleType: string;
 }
 
-interface ActionListProps {
+interface ModuleListProps {
   _id: string;
-  atnName: string;
+  modName: string;
 }
+
+interface PermissionLabelProps {
+  _id: string;
+  name: string;
+  label: string;
+}
+
 interface PermitAllowedProps {
-  atnId: string;
   rolId: string;
-  isViewEnabled: boolean;
-  isAddEnabled: boolean;
-  isEditEnabled: boolean;
-  isRegPwdEnabled: boolean;
-  isEnbEnabled: boolean;
-  isDisEnabled: boolean;
-  isDelEnabled: boolean;
-  isMarkEnabled: boolean;
-  isAttdeesEnabled: boolean;
-  isAttdImgEnabled: boolean;
-  isAmendEnabled: boolean;
-  isCompEnabeled: boolean;
-  isApvEnrEnabled: boolean;
-  isMnlEnrEnabled: boolean;
-  isAvpDocEnabled: boolean;
+  modId: string;
+  modAtnIds: string[];
+  createdBy: string;
   updatedBy: string;
 }
 
 const PermissionList: React.FC = () => {
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [actionList, setActionList] = useState<ActionListProps[] | null>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [roleList, setRoleList] = useState<RoleListProps[]>([]);
+  const [moduleList, setModuleList] = useState<ModuleListProps[]>([]);
+  const [permissionLabels, setPermissionLabels] = useState<
+    PermissionLabelProps[]
+  >([]);
+  const [isCheckedAll, setIsCheckedAll] = useState(false);
   const [permitAllowed, setPermitAllowed] = useState<PermitAllowedProps>({
-    atnId: "",
     rolId: "",
-    isViewEnabled: false,
-    isAddEnabled: false,
-    isEditEnabled: false,
-    isRegPwdEnabled: false,
-    isDelEnabled: false,
-    isEnbEnabled: false,
-    isDisEnabled: false,
-    isAttdeesEnabled: false,
-    isAttdImgEnabled: false,
-    isAmendEnabled: false,
-    isMarkEnabled: false,
-    isCompEnabeled: false,
-    isApvEnrEnabled: false,
-    isMnlEnrEnabled: false,
-    isAvpDocEnabled: false,
+    modId: "",
+    modAtnIds: [],
+    createdBy: "",
     updatedBy: "",
   });
-  const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [activity, setActivity] = useState("-");
-
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
       _id: "",
@@ -72,93 +56,59 @@ const PermissionList: React.FC = () => {
   });
 
   useEffect(() => {
-    async function fetchRolesData() {
+    async function fetchInitialData() {
       try {
-        const response = await fetch(`${BASE_API_URL}/api/role-list`);
-        const data = await response.json();
-        setRoleList(data?.rolList || []);
+        const [roleRes, moduleRes] = await Promise.all([
+          fetch(`${BASE_API_URL}/api/role-list`),
+          fetch(`${BASE_API_URL}/api/modules`),
+        ]);
+
+        const roles = await roleRes.json();
+        const modules = await moduleRes.json();
+
+        setRoleList(roles?.rolList || []);
+        setModuleList(modules?.modules || []);
       } catch (error) {
-        console.error("Error fetching roles:", error);
+        console.error("Error loading initial data:", error);
+      } finally {
+        setIsLoading(false);
       }
+
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
+      setLoggedInUser({
+        result: { _id: userId, usrName: userName, usrRole: userRole },
+      });
     }
 
-    async function fetchActionListData() {
-      try {
-        const response = await fetch(`${BASE_API_URL}/api/actions`);
-        const data = await response.json();
-        setActionList(data?.atnList || []);
-      } catch (error) {
-        console.error("Error fetching actions:", error);
-      }
-    }
-
-    const userId = Cookies.get("loggedInUserId") || "";
-    const userName = Cookies.get("loggedInUserName") || "";
-    const userRole = Cookies.get("loggedInUserRole") || "";
-    setLoggedInUser({
-      result: {
-        _id: userId,
-        usrName: userName,
-        usrRole: userRole,
-      },
-    });
-
-    Promise.all([fetchRolesData(), fetchActionListData()]).finally(() =>
-      setIsLoading(false)
-    );
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
-    async function getPermissionData() {
-      if (!permitAllowed.atnId || !permitAllowed.rolId) return;
+    async function fetchPermission() {
+      if (!permitAllowed.rolId || !permitAllowed.modId) return;
 
       try {
         const response = await fetch(
-          `${BASE_API_URL}/api/permissions?atnId=${permitAllowed.atnId}&rolId=${permitAllowed.rolId}`
+          `${BASE_API_URL}/api/permissions?rolId=${permitAllowed.rolId}&modId=${permitAllowed.modId}`
         );
         const data = await response.json();
-
         const permission = data?.pmtList?.[0];
 
         if (permission) {
           setPermitAllowed((prev) => ({
             ...prev,
-            isViewEnabled: permission.isViewEnabled,
-            isAddEnabled: permission.isAddEnabled,
-            isEditEnabled: permission.isEditEnabled,
-            isRegPwdEnabled: permission.isRegPwdEnabled,
-            isEnbEnabled: permission.isEnbEnabled,
-            isDisEnabled: permission.isDisEnabled,
-            isDelEnabled: permission.isDelEnabled,
-            isMarkEnabled: permission.isMarkEnabled,
-            isAttdeesEnabled: permission.isAttdeesEnabled,
-            isAttdImgEnabled: permission.isAttdImgEnabled,
-            isAmendEnabled: permission.isAmendEnabled,
-            isCompEnabled: permission.isCompEnabled,
-            isApvEnrEnabled: permission.isApvEnrEnabled,
-            isMnlEnrEnabled: permission.isMnlEnrEnabled,
-            isAvpDocEnabled: permission.isAvpDocEnabled,
-            updatedBy: prev.updatedBy || permission.updatedBy || "",
+            modAtnIds: permission.modAtnIds || [],
+            createdBy: permission.createdBy || "",
+            updatedBy: permission.updatedBy || "",
           }));
         } else {
-          // If no permission found, reset toggles but keep atnId and rolId
           setPermitAllowed((prev) => ({
             ...prev,
-            isViewEnabled: false,
-            isAddEnabled: false,
-            isEditEnabled: false,
-            isRegPwdEnabled: false,
-            isEnbEnabled: false,
-            isDisEnabled: false,
-            isDelEnabled: false,
-            isAttdeesEnabled: false,
-            isAttdImgEnabled: false,
-            isAmendEnabled: false,
-            isMarkEnabled: false,
-            isCompEnabled: false,
-            isApvEnrEnabled: false,
-            isMnlEnrEnabled: false,
-            isAvpDocEnabled: false,
+            modAtnIds: [],
+            createdBy: "",
+            updatedBy: "",
           }));
         }
       } catch (error) {
@@ -166,38 +116,30 @@ const PermissionList: React.FC = () => {
       }
     }
 
-    getPermissionData();
-  }, [permitAllowed.atnId, permitAllowed.rolId]);
+    async function fetchPermissionLabels() {
+      if (!permitAllowed.modId) return;
+      try {
+        const response = await fetch(
+          `${BASE_API_URL}/api/modules/${permitAllowed.modId}/view-module`
+        );
+        const data = await response.json();
+        setPermissionLabels(data.modById?.modActions || []);
+      } catch (error) {
+        console.error("Error fetching action labels:", error);
+      }
+    }
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setPermitAllowed((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
+    fetchPermission();
+    fetchPermissionLabels();
+  }, [permitAllowed.rolId, permitAllowed.modId]);
 
-  const checkAll = (e: ChangeEvent<HTMLInputElement>) => {
-    const { checked } = e.target;
-    setPermitAllowed((prev) => ({
-      ...prev,
-      isViewEnabled: checked,
-      isAddEnabled: checked,
-      isEditEnabled: checked,
-      isRegPwdEnabled: checked,
-      isEnbEnabled: checked,
-      isDisEnabled: checked,
-      isDelEnabled: checked,
-      isMarkEnabled: checked,
-      isAttdeesEnabled: checked,
-      isAttdImgEnabled: checked,
-      isAmendEnabled: checked,
-      isCompEnabled: checked,
-      isApvEnrEnabled: checked,
-      isMnlEnrEnabled: checked,
-      isAvpDocEnabled: checked,
-    }));
-  };
+  useEffect(() => {
+    if (permissionLabels.length > 0 && permitAllowed.modId) {
+      const allSelected =
+        permitAllowed.modAtnIds?.length === permissionLabels.length;
+      setIsCheckedAll(allSelected);
+    }
+  }, [permissionLabels, permitAllowed]);
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -205,76 +147,63 @@ const PermissionList: React.FC = () => {
     setPermitAllowed((prev) => ({
       ...prev,
       [name]: value,
+      modAtnIds: [],
     }));
 
-    // If module (atnId) is changed, set activity name
-    if (name === "atnId") {
-      const selectedAction = actionList?.find((action) => action._id === value);
-      setActivity(selectedAction?.atnName || "Activity");
+    setIsCheckedAll(false);
+
+    if (name === "modId") {
+      const selected = moduleList.find((mod) => mod._id === value);
+      setActivity(selected?.modName || "-");
     }
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleCheckAll = (e: ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setIsCheckedAll(checked);
 
+    if (checked) {
+      setPermitAllowed((prev) => ({
+        ...prev,
+        modAtnIds: permissionLabels.map((perm) => perm._id),
+      }));
+    } else {
+      setPermitAllowed((prev) => ({
+        ...prev,
+        modAtnIds: [],
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     setErrorMessage("");
+
     try {
-      if (!permitAllowed.rolId.trim()) {
-        return setErrorMessage("Role is required.");
-      } else if (!permitAllowed.atnId.trim()) {
-        return setErrorMessage("Module is required.");
-      } else {
-        const response = await fetch(`${BASE_API_URL}/api/permissions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...permitAllowed,
-            updatedBy: loggedInUser.result._id,
-          }),
-        });
+      if (!permitAllowed.rolId) return setErrorMessage("Role is required.");
+      if (!permitAllowed.modId) return setErrorMessage("Module is required.");
 
-        const post = await response.json();
+      const response = await fetch(`${BASE_API_URL}/api/permissions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...permitAllowed,
+          createdBy: loggedInUser.result._id,
+          updatedBy: loggedInUser.result._id,
+        }),
+      });
 
-        if (post.success === false) {
-          toast.error(post.msg);
-        } else {
-          toast.success(post.msg);
-        }
-      }
-    } catch (error) {
-      toast.error("Error saving permissions.");
+      const result = await response.json();
+      toast[result.success ? "success" : "error"](result.msg);
+    } catch {
+      toast.error("Failed to save permission.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  const permissionLabels: Record<string, string> = {
-    isViewEnabled: "View",
-    isAddEnabled: "Add",
-    isEditEnabled: "Edit",
-    isRegPwdEnabled: "Reset Password",
-    isEnbEnabled: "Enable",
-    isDisEnabled: "Disable",
-    isDelEnabled: "Delete",
-    isAttdeesEnabled: "Attendees",
-  };
-
-  const permissionLabels2: Record<string, string> = {
-    isAttdImgEnabled: "Upload Attendance",
-    isAmendEnabled: "Amend Attendance",
-    isMarkEnabled: "Mark Attendance",
-    isCompEnabled: "Complete Course",
-    isApvEnrEnabled: "Approve Enrollment",
-    isMnlEnrEnabled: "Manual Enrollment",
-    isAvpDocEnabled: "Approve Document",
-  };
+  if (isLoading) return <Loading />;
 
   return (
     <form onSubmit={handleSubmit} className="formStyle w-full">
@@ -282,31 +211,32 @@ const PermissionList: React.FC = () => {
         <div className="flex flex-col gap-2">
           <label className="font-semibold uppercase">Roles:</label>
           <select
-            className="inputBox text-center"
             name="rolId"
+            className="inputBox text-center"
             value={permitAllowed.rolId}
             onChange={handleSelectChange}
           >
-            <option value=""> --- Select Roles --- </option>
-            {roleList?.map((role) => (
+            <option value="">--- Select Role ---</option>
+            {roleList.map((role) => (
               <option key={role._id} value={role._id}>
                 {role.roleType}
               </option>
             ))}
           </select>
         </div>
+
         <div className="flex flex-col gap-2">
           <label className="font-semibold uppercase">Modules:</label>
           <select
+            name="modId"
             className="inputBox text-center"
-            name="atnId"
-            value={permitAllowed.atnId}
+            value={permitAllowed.modId}
             onChange={handleSelectChange}
           >
-            <option value=""> --- Select Module --- </option>
-            {actionList?.map((atn) => (
-              <option key={atn._id} value={atn._id}>
-                {atn.atnName}
+            <option value="">--- Select Module ---</option>
+            {moduleList.map((mod) => (
+              <option key={mod._id} value={mod._id}>
+                {mod.modName}
               </option>
             ))}
           </select>
@@ -314,54 +244,52 @@ const PermissionList: React.FC = () => {
       </div>
 
       <h1 className="text-center text-xl p-3 bg-gray-200 font-semibold uppercase">
-        Module-{activity}
+        Module - {activity}
       </h1>
-      <div className="grid grid-cols-2 gap-1">
-        <div className="flex flex-col gap-1 mt-6">
-          {Object.keys(permissionLabels).map((field) => (
-            <div key={field} className="flex gap-4 items-center">
+
+      <div className="flex flex-col gap-3 mt-6">
+        <div className="grid grid-cols-2 gap-4">
+          {permissionLabels?.map((item: any, index: number) => (
+            <div key={index} className="flex items-center gap-2">
               <input
                 type="checkbox"
-                name={field}
+                name={item.name}
                 className="w-5 h-5"
-                checked={
-                  permitAllowed[field as keyof typeof permitAllowed] as boolean
-                }
-                onChange={handleChange}
+                checked={permitAllowed.modAtnIds.includes(item._id)}
+                onChange={(e) => {
+                  const { checked } = e.target;
+                  setPermitAllowed((prev) => {
+                    const newIds = checked
+                      ? [...prev.modAtnIds, item._id]
+                      : prev.modAtnIds.filter((id) => id !== item._id);
+                    return { ...prev, modAtnIds: newIds };
+                  });
+                }}
               />
-              <label>{permissionLabels[field]}</label>
+              <label>{item.label || item.name}</label>
             </div>
           ))}
-        </div>
-        <div className="flex flex-col gap-1 mt-6">
-          {Object.keys(permissionLabels2).map((field) => (
-            <div key={field} className="flex gap-4 items-center">
+          {permissionLabels?.length > 0 && (
+            <div className="flex gap-2 items-center">
               <input
                 type="checkbox"
-                name={field}
                 className="w-5 h-5"
-                checked={
-                  permitAllowed[field as keyof typeof permitAllowed] as boolean
-                }
-                onChange={handleChange}
+                onChange={handleCheckAll}
+                checked={isCheckedAll}
               />
-              <label>{permissionLabels2[field]}</label>
+              <label>Check All</label>
             </div>
-          ))}
-          <div className="flex gap-4 items-center">
-            <input type="checkbox" className="w-5 h-5" onChange={checkAll} />
-            <label>Check All</label>
-          </div>
+          )}
         </div>
       </div>
 
-      {errorMessage && (
-        <p className="text-sm italic text-red-600">{errorMessage}</p>
-      )}
+      {errorMessage && <p className="text-red-600 italic">{errorMessage}</p>}
 
-      <button type="submit" className="btnLeft" disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save"}
-      </button>
+      {permissionLabels?.length > 0 && (
+        <button type="submit" className="btnLeft" disabled={isSaving}>
+          {isSaving ? "Saving..." : "Save"}
+        </button>
+      )}
     </form>
   );
 };

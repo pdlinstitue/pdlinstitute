@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../../dbConnect";
 import Permissions from "../../../../../modals/Permissions";
-import { Types } from "mongoose";
 import Roles from "../../../../../modals/Roles";
 
 export async function GET(
@@ -28,7 +27,8 @@ export async function GET(
 
       if (perm.isListEnabled && action.listUrl)
         allowedUrls.push(action.listUrl);
-      if (perm.isAddEnabled && action.addUrl) allowedUrls.push(action.addUrl);
+      if (perm.isAddEnabled && action.addUrl) 
+        allowedUrls.push(action.addUrl);
       if (perm.isEditEnabled && action.editUrl)
         allowedUrls.push(action.editUrl);
       if (perm.isEnbEnabled && action.enableUrl)

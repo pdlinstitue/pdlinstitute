@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/unauthorized"];
+const PUBLIC_PATHS = ["/login", "/account/unauthorized"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -28,12 +28,21 @@ export async function middleware(request: NextRequest) {
     // const data = await res.json();
     // const allowedUrls: string[] = data.allowedUrls || [];
 
-    // // If the current path is not allowed for the user's role, redirect
-    // if (!allowedUrls.includes(pathname)) {
-    //   return NextResponse.redirect(new URL("/account/unauthorized", request.url));
+    // const matchesAllowedUrl = allowedUrls.some((pattern) => {
+    //   const regex = new RegExp(
+    //     "^" + pattern.replace(/\[.*?\]/g, "[^/]+").replace(/\//g, "\\/") + "$"
+    //   );
+    //   return regex.test(pathname);
+    // });
+
+    // If the current path is not allowed for the user's role, redirect
+    // if (!matchesAllowedUrl) {
+    //   return NextResponse.redirect(
+    //     new URL("/account/unauthorized", request.url)
+    //   );
     // }
 
-     return NextResponse.next();
+    return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);
     return NextResponse.redirect(new URL("/account/unauthorized", request.url));

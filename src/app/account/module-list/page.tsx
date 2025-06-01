@@ -6,7 +6,6 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   FilterFn,
-  flexRender,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
@@ -19,30 +18,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Cookies from "js-cookie";
 
-interface ActionListProps {
-  atnName: string;
-  listUrl: string;
-  addUrl: string;
-  editUrl: string;
-  enableUrl: string;
-  disableUrl: string;
-  deleteUrl: string;
-  markUrl: string;
-  compUrl: string;
-  apvEnrUrl: string;
-  mnlEnrUrl: string;
-  avpDocUrl: string;
-  createdBy: string;
-}
-
-const ActionList: React.FC = () => {
+const ModuleList: React.FC = () => {
   const router = useRouter();
-  const [actionList, setActionList] = useState<ActionListProps[] | null>([]);
+  const [moduleList, setModuleList] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const data = React.useMemo(() => actionList ?? [], [actionList]);
+  const data = React.useMemo(() => moduleList ?? {}, [moduleList]);
   const columns = React.useMemo(
     () => [
-      { header: "Module", accessorKey: "atnName" },
+      { header: "Module", accessorKey: "modName" },
       { header: "Created By", accessorKey: "createdBy.sdkFstName" },
       { header: "Updated By", accessorKey: "updatedBy.sdkFstName" },
       {
@@ -55,7 +38,7 @@ const ActionList: React.FC = () => {
               title="View"
               onClick={() =>
                 router.push(
-                  `/account/action-list/${row.original._id}/view-action`
+                  `/account/module-list/${row.original._id}/view-module`
                 )
               }
               className="text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black"
@@ -67,7 +50,7 @@ const ActionList: React.FC = () => {
               title="Edit"
               onClick={() =>
                 router.push(
-                  `/account/action-list/${row.original._id}/edit-action`
+                  `/account/module-list/${row.original._id}/edit-module`
                 )
               }
               className="text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black"
@@ -123,20 +106,20 @@ const ActionList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    async function fetchActionData() {
+    async function fetchModuleData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/actions`, {
+        const res = await fetch(`${BASE_API_URL}/api/modules`, {
           cache: "no-store",
         });
-        const actionData = await res.json();
-        setActionList(actionData.atnList);
+        const moduleData = await res.json();
+        setModuleList(moduleData.modules);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
         setIsLoading(false);
       }
     }
-    fetchActionData();
+    fetchModuleData();
   }, []);
 
   const table = useReactTable({
@@ -174,7 +157,7 @@ const ActionList: React.FC = () => {
     <div>
       <div className="flex mb-2 items-center justify-between">
         {loggedInUser?.result?.usrRole !== "View-Admin" && (
-          <Link href="/account/add-new-action" className="btnLeft">
+          <Link href="/account/add-new-module" className="btnLeft">
             CREATE MODULE
           </Link>
         )}
@@ -259,4 +242,4 @@ const ActionList: React.FC = () => {
   );
 };
 
-export default ActionList;
+export default ModuleList;
