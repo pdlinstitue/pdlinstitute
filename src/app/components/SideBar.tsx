@@ -159,12 +159,12 @@ const SideBar: React.FC = () => {
                     className="group flex gap-2 text-white bg-orange-500 hover:bg-white hover:text-black p-2 rounded-sm w-full"
                   >
                     {renderIcon(item.menuIcon)}
-                    <p className="font-semibold group-hover:text-black">
+                    <p className="hidden md:flex font-semibold group-hover:text-black">
                       {item.menuName.toUpperCase()}
                     </p>
                     <IoIosArrowDown
                       size={24}
-                      className={`ml-auto group-hover:text-black ${
+                      className={`hidden md:flex ml-auto group-hover:text-black ${
                         selectedParentId === item._id
                           ? "rotate-180 duration-500"
                           : ""
@@ -203,12 +203,12 @@ const SideBar: React.FC = () => {
                   className="group flex gap-2 text-white bg-orange-500 hover:bg-white hover:text-black p-2 rounded-sm w-full"
                 >
                   {renderIcon("FaEye")}
-                  <p className="font-semibold group-hover:text-black">
+                  <p className="hidden md:flex font-semibold group-hover:text-black">
                     {"View As".toUpperCase()}
                   </p>
                   <IoIosArrowDown
                     size={24}
-                    className={`ml-auto group-hover:text-black ${
+                    className={`hidden md:flex ml-auto group-hover:text-black ${
                       selectedParentId === "admin-volunter"
                         ? "rotate-180 duration-500"
                         : ""
