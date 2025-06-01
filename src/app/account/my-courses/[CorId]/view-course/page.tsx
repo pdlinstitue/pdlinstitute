@@ -87,10 +87,10 @@ const ViewCourse : React.FC<ICourseParams> = ({params}) => {
         </div>
         <div className='flex justify-between text-sm gap-2'>
             <div className='text-sm'>
-                <p><span className='font-semibold uppercase mr-3'>Days:</span>{data.durDays}</p>
+                <p><span className='font-semibold mr-3'>Days:</span>{data.durDays}</p>
             </div>
             <div className='text-end text-sm'>
-                <p><span className='font-semibold uppercase mr-3'>Min/-Day:</span>{data.durHrs}</p>
+                <p><span className='font-semibold mr-3'>Min/-Day:</span>{data.durHrs}</p>
             </div>
         </div>
         <div className='flex justify-between text-sm gap-2'>

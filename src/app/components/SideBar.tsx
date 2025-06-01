@@ -82,19 +82,20 @@ const SideBar: React.FC = () => {
     if (!trimmedName || !(trimmedName in allIcons)) return null;
 
     const IconComponent = allIcons[trimmedName as keyof typeof allIcons];
-    return IconComponent ? <IconComponent size={24} /> : null;
-  };
+      return IconComponent ? <IconComponent size={24} /> : null;
+    };
 
-  const handleToggle = (parentId: string) => {
-    setSelectedParentId(selectedParentId === parentId ? null : parentId);
-  };
+    const handleToggle = (parentId: string) => {
+      setSelectedParentId(selectedParentId === parentId ? null : parentId);
+    };
 
   const getOrderedMenu = () => {
+
     const parentsAndNeutrals = menuItems
       .filter((item) => !item.isChild)
       .sort((a, b) => a.menuOrder - b.menuOrder);
-    const children = menuItems.filter((item) => item.isChild);
 
+    const children = menuItems.filter((item) => item.isChild);
     const result: any[] = [];
 
     for (const item of parentsAndNeutrals) {
@@ -107,7 +108,6 @@ const SideBar: React.FC = () => {
         result.push(...childItems);
       }
     }
-
     return result;
   };
 
@@ -115,8 +115,8 @@ const SideBar: React.FC = () => {
 
   return (
     <div>
-      <div className="flex flex-col w-[230px] bg-orange-600 h-screen p-4">
-        <div className="flex gap-2 items-center bg-orange-500 rounded-sm mb-1">
+      <div className="flex flex-col w-full h-auto  md:w-[230px] bg-orange-600 md:h-screen p-4">
+        <div className="hidden md:flex gap-2 items-center bg-orange-500 rounded-sm mb-1">
           <Image
             alt="pdlinstitute"
             src="/images/pdlLogo.jpg"
@@ -125,7 +125,7 @@ const SideBar: React.FC = () => {
           />
           <p className="text-white font-bold">PDL INSTITUTE</p>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex md:flex-col gap-1">
           {orderedMenu.map((item) => {
             if (!item.isChild && !item.isParent) {
               return (
@@ -140,7 +140,7 @@ const SideBar: React.FC = () => {
                 >
                   {renderIcon(item.menuIcon)}
                   <p
-                    className={`font-semibold ${
+                    className={`hidden md:block font-semibold   ${
                       pathName !== item.menuUrl && "group-hover:text-black"
                     }`}
                   >
@@ -266,7 +266,7 @@ const SideBar: React.FC = () => {
                       }
                       className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"
                     >
-                      - VOLUNTER
+                      - VOLUNTEER
                     </button>
                   </div>
                 )}

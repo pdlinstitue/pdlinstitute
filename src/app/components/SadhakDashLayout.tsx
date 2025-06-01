@@ -60,8 +60,8 @@ const SadhakDashLayout : React.FC = () => {
    };
 
   return (
-    <div className='flex flex-col gap-9 p-9'>
-      <div className='grid grid-cols-4 gap-9 w-full p-4'>
+    <div className='flex flex-col gap-9 md:p-9'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-9 w-full p-2 md:p-4'>
         <div className='bg-gray-100 shadow-xl rounded-md h-[120px]'>
 
         </div>

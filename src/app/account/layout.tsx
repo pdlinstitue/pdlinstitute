@@ -9,17 +9,17 @@ interface LayoutProps {
 
 const InnerLayout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="flex flex-col">
-      <div className="flex h-screen">
-          <div className="w-auto">
-              <SideBar/>
-          </div>
-          <div className="w-full">
-              <InnerHead/>
-              <main className="max-h-[620px] p-6 overflow-auto">
-                  {children}
-              </main>
-          </div>
+    <div>
+      <div className="flex flex-col md:flex-row h-screen">
+        <div className="order-2 md:order-1 w-auto">
+          <SideBar />
+        </div>
+        <div className="order-1 md:order-2 w-full">
+          <InnerHead />
+          <main className="max-h-[620px] p-6 overflow-auto">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );

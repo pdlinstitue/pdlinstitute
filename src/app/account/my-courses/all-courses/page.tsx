@@ -2,15 +2,11 @@
 import DataTable from '@/app/components/table/DataTable';
 import { BASE_API_URL } from '@/app/utils/constant';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
-import { IoCreateOutline } from "react-icons/io5";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Loading from '../../Loading';
 import { FiEye } from 'react-icons/fi';
-import { BiEditAlt } from 'react-icons/bi';
-import { HiMinus } from 'react-icons/hi';
-import { RxCross2 } from 'react-icons/rx';
+
 
 interface AllCourseListProps {
   coName: string, 

@@ -79,7 +79,7 @@ const CompletedCourse: React.FC <MyCourseDataProps> = ({myCoData}) => {
                   DAYS
                 </p>
                 <p className="text-sm">
-                  <span className="font-bold">Hrs:</span> {cor.durHrs}
+                  <span className="font-bold">Min/-Day:</span> {cor.durHrs}
                 </p>
               </div>
               <div className="flex justify-between text-sm gap-2">

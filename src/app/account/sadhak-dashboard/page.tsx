@@ -66,10 +66,11 @@ const SadhakDashBoard: React.FC = () => {
   
   return (    
     <div className='flex flex-col border-[1.5px] border-orange-500 rounded-md'>
-      <div className='relative flex h-[250px] w-full justify-center'>
+      <div className='relative flex h-[180px] md:h-[250px] w-full justify-center'>
         <Image alt="pdlInstitute"  src="/images/dashImage.png" width={1540} height={250}/>
-        <div className='absolute top-[140px]  text-white bg-black bg-opacity-50 px-4 py-1 rounded-md text-lg font-semibold'>
-          Sadhak ID:{sdkData.sdkRegNo}
+        <div className='absolute  md:flex top-[60px] md:top-[120px]  text-white bg-black bg-opacity-50 px-4 py-1 rounded-md text-lg font-semibold'>
+          <div className='uppercase'>Sdk ID:</div>
+          <div>{sdkData.sdkRegNo}</div>
         </div>
       </div>
       <div className="overflow-auto p-6 max-h-[320px]" >

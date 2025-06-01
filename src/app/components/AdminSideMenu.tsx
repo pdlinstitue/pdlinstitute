@@ -7,7 +7,6 @@ import { MdOutlineAppRegistration } from "react-icons/md";
 import { BiSolidUserRectangle } from "react-icons/bi";
 import { SiGoogleclassroom } from "react-icons/si";
 import { BiSolidDockTop } from "react-icons/bi";
-import { FaCalendarCheck } from "react-icons/fa6";
 import { HiOutlineDocumentReport } from "react-icons/hi";
 import { MdCastForEducation } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";

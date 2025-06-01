@@ -11,7 +11,7 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
   const router = useRouter();
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 p-4'>
+    <div className='grid grid-cols-1 md:grid-cols-3 gap-4 p-2 md:p-4'>
       {myCoData?.map((cor: any) => (
         <div className="max-w-[400px]" key={cor._id}>
           <div className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600">
@@ -24,16 +24,25 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
               />):null
             }
             <h2 className="text-lg font-bold bg-gray-200 p-2 text-center">{cor.coName}</h2>
-            <div className="flex justify-between text-sm gap-2">
-              <p><span className="font-bold">Category:</span> {cor.coCat}</p>
-              <p><span className="font-bold">Type:</span> {cor.coType}</p>
+            <div className="md:flex md:justify-between text-sm gap-2">
+              <div className='md:flex gap-2'>
+                <div className="font-bold">Category:</div> 
+                <div>{cor.coCat}</div>
+              </div>
+              <div className='flex gap-2'>
+                <div className="font-bold">Type:</div> 
+                <div>{cor.coType}</div>
+              </div>
             </div>
-            <div className="flex justify-between text-sm gap-2">
+            <div className="md:flex md:justify-between text-sm gap-2">
               <p><span className="font-bold">Duration:</span> {cor.durDays} DAYS</p>
-              <p><span className="font-bold">Hrs:</span> {cor.durHrs}</p>
+              <p><span className="font-bold">Min/-Day:</span> {cor.durHrs}</p>
             </div>
-            <div className='flex justify-between text-sm gap-2'>
-              <p className="text-sm"><span className="font-bold">Eligibility:</span> {cor.eligibilityName}</p>
+            <div className="md:flex md:justify-between text-sm gap-2">
+              <div className="md:flex text-sm gap-2">
+                <div className="font-bold">Eligibility:</div>
+                <div> {cor.eligibilityName}</div>
+              </div>
               <p className="text-sm"><span className="font-bold">Fee: &#8377;</span> {cor.coDon?.toLocaleString()}</p>
             </div>
             <button 
@@ -43,7 +52,7 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
             >
               Google Form
             </button>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
               <button
                 type="button"
                 className="btnLeft"
