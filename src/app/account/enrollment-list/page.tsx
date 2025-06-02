@@ -12,9 +12,9 @@ import Select from 'react-select';
 import Loading from '../Loading';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiEye } from 'react-icons/fi';
 import { BASE_API_URL } from '@/app/utils/constant';
 import { format } from 'date-fns';
+import { MdOutlineThumbsUpDown } from 'react-icons/md';
 interface EnrollmentListProps {
   sdkRegNo:string,
   enrBthName:string,
@@ -81,7 +81,7 @@ const EnrollmentList : React.FC = () => {
     { header: 'Action', accessorKey: 'action', 
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center justify-center'> 
-          <button type='button' title='View' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/view-enrollment`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
+          <button type='button' title='Approve' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/view-enrollment`)} className='text-blue-500 border-[1.5px] border-blue-700 p-1 rounded-full hover:border-black'><MdOutlineThumbsUpDown size={12} /></button>
         </div> 
       ), 
     },

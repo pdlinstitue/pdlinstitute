@@ -11,12 +11,12 @@ import {
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FiEye } from "react-icons/fi";
 import { Checkbox } from "@mui/material";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "../Loading";
 import Select from "react-select";
 import Cookies from "js-cookie";
+import { BiEditAlt } from "react-icons/bi";
 
 interface SelectedCourseProps {
   _id: string;
@@ -104,9 +104,9 @@ const CompleteCourse: React.FC = () => {
                   `/account/enrollment-list/${row.original._id}/edit-enrollment`
                 )
               }
-              className="text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black"
+              className="text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black"
             >
-              <FiEye size={12} />
+              <BiEditAlt size={12} />
             </button>
           </div>
         ),

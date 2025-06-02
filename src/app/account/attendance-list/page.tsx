@@ -4,11 +4,11 @@ import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender
 import { useRouter } from 'next/navigation';
 import { RiUpload2Fill } from "react-icons/ri";
 import React, { useEffect, useState } from 'react';
-import { FiEye } from 'react-icons/fi';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Loading from '../Loading';
 import { format } from 'date-fns';
 import Select from 'react-select';
+import { HiUserGroup } from 'react-icons/hi';
 
 interface AttendanceListProps {
  clsDay:string,
@@ -106,8 +106,8 @@ const AttendanceList : React.FC = () => {
     { header: 'Action', accessorKey: 'action', 
         cell: ({ row }: { row: any }) => ( 
           <div className='flex items-center justify-center gap-3'> 
-            <button type='button' title='Attendees' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attendees`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
-            <button type='button' title='Upload Screenshots' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attd-images`)} className='text-blue-600 border-[1.5px] border-blue-800 p-1 rounded-full hover:border-black'><RiUpload2Fill size={12}/></button>
+            <button type='button' title='Attendees' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attendees`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full hover:border-black'><HiUserGroup size={12}/></button>
+            <button type='button' title='Upload' onClick={()=> router.push(`/account/attendance-list/${row.original.bthId}/${row.original._id}/attd-images`)} className='text-blue-600 border-[1.5px] border-blue-800 p-1 rounded-full hover:border-black'><RiUpload2Fill size={12}/></button>
           </div> 
         ), 
       },
