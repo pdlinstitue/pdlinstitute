@@ -58,7 +58,7 @@ export const POST = async (request: NextRequest) => {
     user.sdkPwd = null;
 
     const res = NextResponse.json({
-      result: { id: user._id, usrName: user.sdkFstName, usrRole: user.sdkRole, usrToken: token, success: true }
+      result: { id: user._id, usrName: user.sdkFstName, usrRole: user.sdkRole, isAdmin:user.isAdmin, usrToken: token, success: true }
     }, { status: 200 });
     
     return res;

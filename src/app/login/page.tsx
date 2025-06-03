@@ -82,7 +82,7 @@ const LoginPage : NextPage = () => {
                 toast.success("Logged in successfully.");
                 
                 // Redirect conditionally based on user role
-                if (post.result.usrRole === "Admin" || post.result.usrRole === "View-Admin") {
+                if (post.result.isAdmin === "Yes") {
                     router.push("/account/admin-dashboard");
                 } else {
                     router.push("/account/sadhak-dashboard");
