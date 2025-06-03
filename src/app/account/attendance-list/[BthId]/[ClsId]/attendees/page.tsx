@@ -1,13 +1,13 @@
 "use client";
 import DataTable from "@/app/components/table/DataTable";
 import {
-    useReactTable,
-    getCoreRowModel,
-    getFilteredRowModel,
-    FilterFn,
-    getPaginationRowModel,
-    getSortedRowModel,
-    SortingState,
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  FilterFn,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import React, { use, useEffect, useState } from "react";
@@ -19,280 +19,374 @@ import { BiEditAlt } from "react-icons/bi";
 import Cookies from "js-cookie";
 
 interface IAtdParams {
-    params: Promise<{
-        BthId: string;
-        ClsId: string;
-    }>;
+  params: Promise<{
+    BthId: string;
+    ClsId: string;
+  }>;
 }
 
 interface ClassAttendeesProps {
-    _id: string;
-    clsId: string;
-    sdkId: string;
-    sdkFstName: string;
-    sdkPhone: string;
-    status: string;
-    absRemarks: string;
-    clsStartAt: Date;
-    clsEndAt: Date;
+  _id: string;
+  clsId: string;
+  sdkId: string;
+  sdkFstName: string;
+  sdkPhone: string;
+  status: string;
+  absRemarks: string;
+  clsStartAt: Date;
+  clsEndAt: Date;
 }
 
 const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
 
-    const router = useRouter();
-    const { BthId, ClsId } = use(params);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [enrollData, setEnrollData] = useState<ClassAttendeesProps[]>([]);
-    const [rowSelection, setRowSelection] = useState({});
-    const [loggedInUser, setLoggedInUser] = useState({
+  const router = useRouter();
+  const { BthId, ClsId } = use(params);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [enrollData, setEnrollData] = useState<ClassAttendeesProps[]>([]);
+  const [rowSelection, setRowSelection] = useState({});
+  const [loggedInUser, setLoggedInUser] = useState({
+    result: {
+      _id: "",
+      usrName: "",
+      usrRole: "",
+    },
+  });
+
+  const getLocalDateTime = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset() * 60000;
+    return new Date(now.getTime() - offset).toISOString().slice(0, -1);
+  };
+
+  const [localDateTime, setLocalDateTime] = useState(getLocalDateTime);
+
+  // Optional: Auto-update every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLocalDateTime(getLocalDateTime());
+    }, 1000); // update every 1 second
+
+    return () => clearInterval(interval); // cleanup
+  }, []);
+
+  useEffect(() => {
+    try {
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
+      setLoggedInUser({
         result: {
-            _id: "",
-            usrName: "",
-            usrRole: "",
+          _id: userId,
+          usrName: userName,
+          usrRole: userRole,
         },
-    });
+      });
+    } catch (error) {
+      console.error("Error fetching loggedInUserData.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    const getLocalDateTime = () => {
-        const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000;
-        return new Date(now.getTime() - offset).toISOString().slice(0, -1);
-    };
-
-    const [localDateTime, setLocalDateTime] = useState(getLocalDateTime);
-
-    // Optional: Auto-update every second
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setLocalDateTime(getLocalDateTime());
-        }, 1000); // update every 1 second
-
-        return () => clearInterval(interval); // cleanup
-    }, []);
-
-    useEffect(() => {
-        try {
-            const userId = Cookies.get("loggedInUserId") || "";
-            const userName = Cookies.get("loggedInUserName") || "";
-            const userRole = Cookies.get("loggedInUserRole") || "";
-            setLoggedInUser({
-                result: {
-                    _id: userId,
-                    usrName: userName,
-                    usrRole: userRole,
-                },
-            });
-        } catch (error) {
-            console.error("Error fetching loggedInUserData.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    const StatusCell = ({ row }: { row: any }) => {
-        const statusClass = (value: string) =>
-            value === "Present"
-                ? "text-green-500 italic"
-                : value === "Absent"
-                    ? "text-red-500 italic"
-                    : value === "Pending"
-                        ? "text-orange-500 italic"
-                        : "text-black";
-        return <span className={statusClass(row.original.status)}>{row.original.status}</span>;
-    };
-
-    const data = React.useMemo(() => enrollData ?? [], [enrollData]);
-    const columns = React.useMemo(
-        () => [
-            {
-                id: "select",
-                header: ({ table }: { table: any }) => (
-                    <Checkbox
-                        checked={table.getIsAllRowsSelected()}
-                        indeterminate={table.getIsSomeRowsSelected()}
-                        onChange={(e) => {
-                            table.toggleAllRowsSelected(e.target.checked);
-                        }}
-                    />
-                ),
-                cell: ({ row }: { row: any }) => (
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onChange={(e) => {
-                            row.toggleSelected(e.target.checked);
-                        }}
-                    />
-                ),
-            },
-            { header: "Sadhak Name", accessorKey: "sdkFstName" },
-            { header: "Sadhak Phone", accessorKey: "sdkPhone" },
-            { header: "Status", accessorKey: "status", cell: StatusCell },
-            { header: "Remarks", accessorKey: "absRemarks" },
-            {
-                header: "Action",
-                accessorKey: "action",
-                cell: ({ row }: { row: any }) => {
-                    const clsStartAt = row.original.clsStartAt;
-                    const clsEndAt = row.original.clsEndAt;                        ;
-                    const isVolunteer = Cookies.get("loggedInUserRole") === "Volunteer";
-                    
-                    return (
-                        <div className="flex items-center gap-4">
-                            {isVolunteer && localDateTime >= clsStartAt && localDateTime <= clsEndAt && (
-                                <button
-                                    type="button"
-                                    title="Mark"
-                                    onClick={() =>
-                                        router.push(
-                                            `/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}`
-                                        )
-                                    }
-                                    className="text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black"
-                                >
-                                    <FiEye size={12} />
-                                </button>
-                            )}
-
-                            <button
-                                type="button"
-                                title="Amend"
-                                onClick={() =>
-                                    router.push(
-                                        `/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}/amend-attendance`
-                                    )
-                                }
-                                className="text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full hover:border-black"
-                            >
-                                <BiEditAlt size={12} />
-                            </button>
-                        </div>
-                    );
-                },
-            },
-        ],
-        [localDateTime]
-    );
-
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [filtered, setFiltered] = useState("");
-    const [pageInput, setPageInput] = useState(1);
-    const [pageSize] = useState(25);
-
-    const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => {
-        return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase());
-    };
-
-    useEffect(() => {
-        async function fetchBatchData() {
-            try {
-                const res = await fetch(`${BASE_API_URL}/api/enrollment-by-batch-id/${BthId}/${ClsId}`, {
-                    cache: "no-store",
-                });
-                const attendData = await res.json();
-
-                const enrollList: ClassAttendeesProps[] = attendData.enrollments?.map((item: any) => ({
-                    _id: item._id,
-                    clsId: ClsId,
-                    sdkFstName: item.sdkId.sdkFstName,
-                    sdkPhone: item.sdkId.sdkPhone || "",
-                    sdkId: item.sdkId._id,
-                    status: item.attendanceStatus,
-                    absRemarks: item.attendanceRemark,
-                    clsStartAt: item.clsStartAt,
-                    clsEndAt: item.clsEndAt,
-                }));
-
-                setEnrollData(enrollList);
-            } catch (error) {
-                console.error("Error fetching class data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-        fetchBatchData();
-    }, [BthId, ClsId]);
-
-
-    const markAsPresent = async () => {
-
-        const selectedData = table.getSelectedRowModel().rows.map((row) => row.original);
-
-        if (selectedData.length === 0) {
-            alert("No rows selected!");
-            return;
-        }
-
-        try {
-            const response = await fetch(`${BASE_API_URL}/api/mark-attendance/${BthId}/${ClsId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    sdkIds: selectedData.map((row) => row.sdkId), // ✅ Send correct data
-                    status: "Present",
-                    absRemarks: "",
-                    markedBy: loggedInUser.result._id
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to update attendance");
-            }
-
-            alert("Attendance marked as Present successfully!");
-
-            setEnrollData((prevData) =>
-                prevData.map((item) =>
-                    selectedData.some((row) => row.sdkId === item.sdkId)
-                        ? { ...item, status: "Present", absRemarks: "" }
-                        : item
-                )
-            );
-
-            table.resetRowSelection();
-        } catch (error) {
-            console.error("Error updating attendance:", error);
-            alert("Error updating attendance!");
-        }
-    };
-
-    const table = useReactTable({
-        data,
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        globalFilterFn,
-        state: { sorting, globalFilter: filtered, pagination: { pageIndex: pageInput - 1, pageSize }, rowSelection },
-        onSortingChange: setSorting,
-        onGlobalFilterChange: setFiltered,
-        onRowSelectionChange: setRowSelection,
-    });
-
-    if (isLoading) return <Loading />;
-
+  const StatusCell = ({ row }: { row: any }) => {
+    const statusClass = (value: string) =>
+      value === "Present"
+        ? "text-green-500 italic"
+        : value === "Absent"
+        ? "text-red-500 italic"
+        : value === "Pending"
+        ? "text-orange-500 italic"
+        : "text-black";
     return (
-        <div>
-            <div className="flex mb-2 items-center justify-between">
-                { loggedInUser?.result?.usrRole !== "View-Admin" &&(
-                    <button type="button" className="btnLeft" onClick={markAsPresent}>
-                        Mark Multiple
-                    </button>)
-                }
-                <input
-                    type="text"
-                    className="inputBox w-[300px]"
-                    placeholder="Search anything..."
-                    onChange={(e) => setFiltered(e.target.value)}
-                />
-            </div>
-
-            <div className="overflow-auto max-h-[412px]">
-                <DataTable table={table} />
-            </div>
-        </div>
+      <span className={statusClass(row.original.status)}>
+        {row.original.status}
+      </span>
     );
+  };
+
+  const data = React.useMemo(() => enrollData ?? [], [enrollData]);
+  const columns = React.useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }: { table: any }) => (
+          <Checkbox
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={(e) => {
+              table.toggleAllRowsSelected(e.target.checked);
+            }}
+          />
+        ),
+        cell: ({ row }: { row: any }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onChange={(e) => {
+              row.toggleSelected(e.target.checked);
+            }}
+          />
+        ),
+      },
+      { header: "Sadhak Name", accessorKey: "sdkFstName" },
+      { header: "Sadhak Phone", accessorKey: "sdkPhone" },
+      { header: "Status", accessorKey: "status", cell: StatusCell },
+      { header: "Remarks", accessorKey: "absRemarks" },
+      {
+        header: "Action",
+        accessorKey: "action",
+        cell: ({ row }: { row: any }) => {
+          const clsStartAt = row.original.clsStartAt;
+          const clsEndAt = row.original.clsEndAt;
+          const isVolunteer = Cookies.get("loggedInUserRole") === "Volunteer";
+
+          return (
+            <div className="flex items-center gap-4">
+              {isVolunteer &&
+                localDateTime >= clsStartAt &&
+                localDateTime <= clsEndAt && (
+                  <button
+                    type="button"
+                    title="Mark"
+                    onClick={() =>
+                      router.push(
+                        `/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}`
+                      )
+                    }
+                    className="text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black"
+                  >
+                    <FiEye size={12} />
+                  </button>
+                )}
+
+              <button
+                type="button"
+                title="Amend"
+                onClick={() =>
+                  router.push(
+                    `/account/attendance-list/${BthId}/${ClsId}/attendees/mark-attendance/${row.original.sdkId}/amend-attendance`
+                  )
+                }
+                className="text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full hover:border-black"
+              >
+                <BiEditAlt size={12} />
+              </button>
+            </div>
+          );
+        },
+      },
+    ],
+    [localDateTime]
+  );
+
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [filtered, setFiltered] = useState("");
+  const [pageInput, setPageInput] = useState(1);
+
+  const globalFilterFn: FilterFn<any> = (
+    row,
+    columnId: string,
+    filterValue
+  ) => {
+    return String(row.getValue(columnId))
+      .toLowerCase()
+      .includes(String(filterValue).toLowerCase());
+  };
+
+  useEffect(() => {
+    async function fetchBatchData() {
+      try {
+        const res = await fetch(
+          `${BASE_API_URL}/api/enrollment-by-batch-id/${BthId}/${ClsId}`,
+          {
+            cache: "no-store",
+          }
+        );
+        const attendData = await res.json();
+        const enrollList: ClassAttendeesProps[] = attendData.enrollments?.map(
+          (item: any) => ({
+            _id: item._id,
+            clsId: ClsId,
+            sdkFstName: item.sdkId.sdkFstName,
+            sdkPhone: item.sdkId.sdkPhone || "",
+            sdkId: item.sdkId._id,
+            status: item.attendanceStatus,
+            absRemarks: item.attendanceRemark,
+            clsStartAt: item.clsStartAt,
+            clsEndAt: item.clsEndAt,
+          })
+        );
+
+        setEnrollData(enrollList);
+      } catch (error) {
+        console.error("Error fetching class data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchBatchData();
+  }, [BthId, ClsId]);
+
+  const markAsPresent = async () => {
+    const selectedData = table
+      .getSelectedRowModel()
+      .rows.map((row) => row.original);
+
+    if (selectedData.length === 0) {
+      alert("No rows selected!");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${BASE_API_URL}/api/mark-attendance/${BthId}/${ClsId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sdkIds: selectedData.map((row) => row.sdkId), // ✅ Send correct data
+            status: "Present",
+            absRemarks: "",
+            markedBy: loggedInUser.result._id,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update attendance");
+      }
+
+      alert("Attendance marked as Present successfully!");
+
+      setEnrollData((prevData) =>
+        prevData.map((item) =>
+          selectedData.some((row) => row.sdkId === item.sdkId)
+            ? { ...item, status: "Present", absRemarks: "" }
+            : item
+        )
+      );
+
+      table.resetRowSelection();
+    } catch (error) {
+      console.error("Error updating attendance:", error);
+      alert("Error updating attendance!");
+    }
+  };
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn,
+    state: {
+      sorting,
+      globalFilter: filtered,
+      pagination: { pageIndex: pageInput - 1, pageSize: 100 },
+      rowSelection,
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setFiltered,
+    onRowSelectionChange: setRowSelection,
+  });
+
+  const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const page = e.target.value ? Number(e.target.value) - 1 : 0;
+    setPageInput(Number(e.target.value));
+    table.setPageIndex(page);
+  };
+
+  if (isLoading) return <Loading />;
+
+  return (
+    <div>
+      <div className="flex mb-2 items-center justify-between">
+        {loggedInUser?.result?.usrRole !== "View-Admin" && (
+          <button type="button" className="btnLeft" onClick={markAsPresent}>
+            Mark Multiple
+          </button>
+        )}
+        <input
+          type="text"
+          className="inputBox w-[300px]"
+          placeholder="Search anything..."
+          onChange={(e) => setFiltered(e.target.value)}
+        />
+      </div>
+      <div className="overflow-auto max-h-[440px]">
+        <DataTable table={table} />
+      </div>
+      <div>
+        <div className="flex mt-4 gap-1">
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput(1);
+              table.setPageIndex(0);
+            }}
+          >
+            {"<<"}
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput((prev) => Math.max(prev - 1, 1));
+              table.previousPage();
+            }}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput((prev) => Math.min(prev + 1, table.getPageCount()));
+              table.nextPage();
+            }}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput(table.getPageCount());
+              table.setPageIndex(table.getPageCount() - 1);
+            }}
+          >
+            {">>"}
+          </button>
+        </div>
+        <div className="flex mt-4 items-center justify-between">
+          <div className="flex flex-col">
+            <p className="italic">Total Pages: &nbsp; {table.getPageCount()}</p>
+            <p className="italic">
+              You are on page: &nbsp;{" "}
+              {(table.options.state.pagination?.pageIndex ?? 0) + 1}
+            </p>
+          </div>
+          <div className="flex gap-1 items-center">
+            <p className="italic">Jump to page: &nbsp;</p>
+            <input
+              type="number"
+              className="px-2 py-1 rounded-lg border-[1.5px] border-black w-[70px] inline"
+              value={pageInput}
+              onChange={handlePageChange}
+              min={1}
+              max={table.getPageCount()}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ClassAttendees;
