@@ -115,8 +115,8 @@ const SideBar: React.FC = () => {
 
   return (
     <div>
-      <div className="flex flex-col w-full h-auto  md:w-[230px] bg-orange-600 md:h-screen p-4">
-        <div className="hidden md:flex gap-2 items-center bg-orange-500 rounded-sm mb-1">
+      <div className="flex flex-col h-screen w-[230px] bg-orange-600 p-4">
+        <div className="flex gap-2 items-center bg-orange-500 rounded-sm mb-1">
           <Image
             alt="pdlinstitute"
             src="/images/pdlLogo.jpg"
@@ -125,7 +125,7 @@ const SideBar: React.FC = () => {
           />
           <p className="text-white font-bold">PDL INSTITUTE</p>
         </div>
-        <div className="flex md:flex-col gap-1">
+        <div className="flex flex-col gap-1">
           {orderedMenu.map((item) => {
             if (!item.isChild && !item.isParent) {
               return (
@@ -140,7 +140,7 @@ const SideBar: React.FC = () => {
                 >
                   {renderIcon(item.menuIcon)}
                   <p
-                    className={`hidden md:block font-semibold   ${
+                    className={`font-semibold ${
                       pathName !== item.menuUrl && "group-hover:text-black"
                     }`}
                   >
@@ -159,12 +159,12 @@ const SideBar: React.FC = () => {
                     className="group flex gap-2 text-white bg-orange-500 hover:bg-white hover:text-black p-2 rounded-sm w-full"
                   >
                     {renderIcon(item.menuIcon)}
-                    <p className="hidden md:flex font-semibold group-hover:text-black">
+                    <p className="flex font-semibold group-hover:text-black">
                       {item.menuName.toUpperCase()}
                     </p>
                     <IoIosArrowDown
                       size={24}
-                      className={`hidden md:flex ml-auto group-hover:text-black ${
+                      className={`flex ml-auto group-hover:text-black ${
                         selectedParentId === item._id
                           ? "rotate-180 duration-500"
                           : ""
@@ -203,12 +203,12 @@ const SideBar: React.FC = () => {
                   className="group flex gap-2 text-white bg-orange-500 hover:bg-white hover:text-black p-2 rounded-sm w-full"
                 >
                   {renderIcon("FaEye")}
-                  <p className="hidden md:flex font-semibold group-hover:text-black">
+                  <p className="flex font-semibold group-hover:text-black">
                     {"View As".toUpperCase()}
                   </p>
                   <IoIosArrowDown
                     size={24}
-                    className={`hidden md:flex ml-auto group-hover:text-black ${
+                    className={`flex ml-auto group-hover:text-black ${
                       selectedParentId === "admin-volunter"
                         ? "rotate-180 duration-500"
                         : ""
@@ -224,6 +224,7 @@ const SideBar: React.FC = () => {
                     className="flex flex-col w-full px-[35px]"
                   >
                     <button
+                      type="button"
                       onClick={() =>
                         handleViewChange(userData.sdkRole, "/account/admin-dashboard")
                       }

@@ -51,18 +51,28 @@ const PersonalDetails : React.FC = () => {
             </select>
           </div>
         </div>
-        <div className='flex flex-col gap-2'>
-          <label>Marital Status:<span className='text-red-500'>*</span></label>
-          <select name='sdkMarStts' value={userData.sdkMarStts} onChange={handleChange} className='inputBox h-[45px] '>
-            <option className='text-center' value=''>--- Select ---</option>
-            <option value='Married'>Married</option>
-            <option value='Unmarried'>Unmarried</option>
-            <option value='Other'>Other</option>
-          </select>
+        <div className='grid grid-cols-3 gap-1'>
+          <div className='flex flex-col gap-2'>
+            <label>Marital Status:<span className='text-red-500'>*</span></label>
+            <select name='sdkMarStts' value={userData.sdkMarStts} onChange={handleChange} className='inputBox h-[45px] '>
+              <option className='text-center' value=''>--- Select ---</option>
+              <option value='Married'>Married</option>
+              <option value='Unmarried'>Unmarried</option>
+              <option value='Other'>Other</option>
+            </select>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <label>Referer Name:<span className='text-red-500'>*</span></label>
+            <input type='text' name='sdkRefName' value={userData.sdkRefName} onChange={handleChange} className='inputBox' />
+          </div>
+          <div className='flex flex-col gap-2'>
+            <label>Referer Phone:<span className='text-red-500'>*</span></label>
+            <input type='number' name='sdkRefCont' value={userData.sdkRefCont} onChange={handleChange} className='inputBox' />
+          </div>
         </div>
-        <div className='flex flex-col gap-2 items-center justify-center p-4 bg-gray-100 rounded-lg mt-4'>
+        <div className='flex gap-2 items-center justify-center p-4 bg-gray-100 rounded-lg mt-4'>
           <Link href="https://chat.whatsapp.com/KHb4NUXolhb52QfLp0YXcE" target='_blank'><FaWhatsapp size={24}/></Link>
-          <p className='italic text-md'>Join support group for any kind of assistance.</p>
+          <p className='italic text-md'>Join support group for assistance.</p>
         </div>
       </div>
     </div>

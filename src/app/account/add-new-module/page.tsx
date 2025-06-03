@@ -107,7 +107,7 @@ const AddNewModule: React.FC = () => {
   }
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-center w-auto">
       <form onSubmit={handleSubmit} className="formStyle w-[800px]">
         <div className="flex flex-col gap-2">
           <label className="font-bold text-lg">Module Name:</label>
@@ -119,9 +119,8 @@ const AddNewModule: React.FC = () => {
             onChange={handleChange}
           />
         </div>
-
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-1">
+          <div className="flex flex-col gap-2 w-full">
             <label className="font-bold">Action Name:</label>
             <input
               type="text"
@@ -131,23 +130,28 @@ const AddNewModule: React.FC = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="font-bold">Action URL:</label>
-            <input
-              type="text"
-              name="url"
-              className="inputBox"
-              value={currentAction.url}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2 justify-end">
-            <button type="button" className="btnLeft" onClick={handleAddAction}>
-              +
-            </button>
+          <div className="flex gap-1 w-full items-end">
+            <div className="flex flex-col gap-2 w-full">
+              <label className="font-bold">Action URL:</label>
+              <input
+                type="text"
+                name="url"
+                className="inputBox"
+                value={currentAction.url}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <button
+                type="button"
+                className="btnLeft h-11"
+                onClick={handleAddAction}
+              >
+                +
+              </button>
+            </div>
           </div>
         </div>
-
         {data.modActions.length > 0 && (
           <div className="mt-4">
             <h3 className="font-bold mb-2">Module Actions:</h3>

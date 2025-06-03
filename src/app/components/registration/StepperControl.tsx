@@ -9,7 +9,7 @@ interface StepperControlProps {
 const StepperControl : React.FC<StepperControlProps> = ({handleClick, currentStep}) => {
 
   return (
-    <div className='flex justify-around mt-4 mb-8'>
+    <div className='flex justify-around'>
         <button type='button' className={`btnRight ${currentStep === 1 ? "opacity-50 cursor-not-allowed" : ""}`} onClick={()=> handleClick('back')}>Back</button>
         <button type='button' className='btnLeft' onClick={()=> handleClick("next")}>
           {currentStep === 4 ? "Finish" : "Next"}

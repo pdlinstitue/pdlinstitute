@@ -22,6 +22,8 @@ interface UserDataProps {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string | undefined;
+  sdkRefName: string;
+  sdkRefCont: string;
   sdkWhtNbrCntCode: string;
   sdkWhtNbr: string;
   sdkPhoneCntCode: string;
@@ -57,6 +59,8 @@ const Register = () => {
     sdkGender: "",
     sdkMarStts: "",
     sdkSpouce: "",
+    sdkRefName: "",
+    sdkRefCont: "",
     sdkWhtNbrCntCode: "+91",
     sdkWhtNbr: "",
     sdkPhoneCntCode: "+91",
@@ -122,33 +126,33 @@ const Register = () => {
       }else if ( !userData || !("sdkMarStts" in userData) || userData.sdkMarStts === null || userData.sdkMarStts.trim() === ""){
         setErrorMessage("Marital status is required.");
         return false;
+      } else if (!userData || !("sdkRefName" in userData) || userData.sdkRefName === null || userData.sdkRefName.trim() === ""){
+        setErrorMessage("Referer name is required.");
+        return false;
+      } else if (!userData || !("sdkRefCont" in userData) || userData.sdkRefCont === null || userData.sdkRefCont.trim() === ""){
+        setErrorMessage("Referer contact is required.");
+        return false;
       }
     }else if(step === 2){   
       if(!userData || !("sdkCountry" in userData) || userData.sdkCountry === null || userData.sdkCountry.trim() === ""){
         setErrorMessage("Country is required.");
         return false;
-      }
-      if(!userData || !("sdkState" in userData) || userData.sdkState === null || userData.sdkState.trim() === ""){
+      } else if(!userData || !("sdkState" in userData) || userData.sdkState === null || userData.sdkState.trim() === ""){
         setErrorMessage("State is required.");
         return false;
-      }
-      if(!userData || !("sdkCity" in userData) || userData.sdkCity === null || userData.sdkCity.trim() === ""){
+      } else if(!userData || !("sdkCity" in userData) || userData.sdkCity === null || userData.sdkCity.trim() === ""){
         setErrorMessage("City is required.");
         return false;
-      }
-      if(!userData || !("sdkParAdds" in userData) || userData.sdkParAdds === null || userData.sdkParAdds.trim() === ""){
+      } else if(!userData || !("sdkParAdds" in userData) || userData.sdkParAdds === null || userData.sdkParAdds.trim() === ""){
         setErrorMessage("Permanent address is must.");
         return false;
-      }
-      if(!userData || !("sdkComAdds" in userData) || userData.sdkComAdds === null || userData.sdkComAdds.trim() === ""){
+      } else if(!userData || !("sdkComAdds" in userData) || userData.sdkComAdds === null || userData.sdkComAdds.trim() === ""){
         setErrorMessage("Communication address is must.");
         return false;
-      }
-      if(!userData || !("sdkPinCode" in userData) || userData.sdkPinCode === null){
+      } else if(!userData || !("sdkPinCode" in userData) || userData.sdkPinCode === null){
         setErrorMessage("Pincode for permanent address is must.");
         return false;
-      }
-      if(!userData || !("sdkComPinCode" in userData) || userData.sdkComPinCode === null){
+      } else if(!userData || !("sdkComPinCode" in userData) || userData.sdkComPinCode === null){
         setErrorMessage("Pincode for communication address is must");
         return false;
       }
@@ -156,42 +160,35 @@ const Register = () => {
       if(!userData || !("sdkWhtNbrCntCode" in userData) || userData.sdkWhtNbrCntCode === null || userData.sdkWhtNbrCntCode.trim() === ""){
         setErrorMessage("Whatsapp number country code is required.");
         return false;
-      }
+      } 
       if(!userData || !("sdkWhtNbr" in userData) || userData.sdkWhtNbr === null || userData.sdkWhtNbr.trim() === ""){
         setErrorMessage("Whatsapp number is required.");
         return false;
-      }
-
+      } 
       if(!userData || !("sdkPhoneCntCode" in userData) || userData.sdkPhoneCntCode === null || userData.sdkPhoneCntCode.trim() === ""){
         setErrorMessage("Phone number country code is required.");
         return false;
-      }
-
+      } 
       if(!userData || !("sdkPhone" in userData) || userData.sdkPhone === null || userData.sdkPhone.trim() === ""){
         setErrorMessage("Phone number is required.");
         return false;
-      }
-
+      } 
       if(!userData || !("isPhoneValid" in userData) || userData.isPhoneValid === null || userData.isPhoneValid === false){
         setErrorMessage("Phone already exists.");
         return false;
-      }
-
+      } 
       if(!userData || !("sdkEmail" in userData) || userData.sdkEmail === null || userData.sdkEmail.trim() === ""){
         setErrorMessage("Email is required.");
         return false;
-      }
-      
+      } 
       if(!userData || !("isEmailValid" in userData) || userData.isEmailValid === null || userData.isEmailValid === false){
         setErrorMessage("Email already exists.");
         return false;
-      }
-
+      } 
       if(!userData || !("sdkPhoneOtp" in userData) || userData.sdkPhoneOtp === null || userData.sdkPhoneOtp.trim() === ""){
         setErrorMessage("Phone Otp is required.");
         return false;
       }
-
       // if(!userData || !("sdkEmailOtp" in userData) || userData.sdkEmailOtp === null || userData.sdkEmailOtp.trim() === ""){
       //   setErrorMessage("Email Otp is required.");
       //   return false;
@@ -244,6 +241,8 @@ const Register = () => {
               sdkGender: userData.sdkGender,
               sdkMarStts: userData.sdkMarStts,
               sdkSpouce: userData.sdkSpouce,
+              sdkRefName: userData.sdkRefName,
+              sdkRefCont: userData.sdkRefCont,
               sdkPhone: userData.sdkPhoneCntCode+userData.sdkPhone,
               sdkWhtNbr: userData.sdkWhtNbrCntCode+userData.sdkWhtNbr,
               sdkEmail: userData.sdkEmail,
@@ -284,8 +283,8 @@ const Register = () => {
             steps={steps}
             currentStep={currentStep}
           />
-          <div className='mb-6 mt-10'>
-                      <StepperContext.Provider value={{ userData, setUserData, finalData, setFinalData, setErrorMessage }}>
+          <div className='mb-2 mt-6'>
+            <StepperContext.Provider value={{ userData, setUserData, finalData, setFinalData, setErrorMessage }}>
               {displayStep(currentStep)}
             </StepperContext.Provider>
           </div>               

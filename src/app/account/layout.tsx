@@ -1,7 +1,8 @@
 "use client";
-import React from 'react';
-import SideBar from '../components/SideBar';
-import InnerHead from '../components/header/InnerHead';
+import React from "react";
+import SideBar from "../components/SideBar";
+import MobileSideBar from "../components/MobileSideBar";
+import InnerHead from "../components/header/InnerHead";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,17 +10,23 @@ interface LayoutProps {
 
 const InnerLayout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div>
-      <div className="flex flex-col md:flex-row h-screen">
-        <div className="order-2 md:order-1 w-auto">
-          <SideBar />
-        </div>
-        <div className="order-1 md:order-2 w-full">
-          <InnerHead />
-          <main className="max-h-[620px] p-6 overflow-auto">
-            {children}
-          </main>
-        </div>
+    <div className="h-screen flex flex-col md:flex-row">
+      {/* Mobile Sidebar (shown on small screens only) */}
+      <div className="fixed bottom-0 left-0 w-full md:hidden z-50">
+        <MobileSideBar />
+      </div>
+
+      {/* Desktop Sidebar (shown on medium+ screens only) */}
+      <div className="hidden md:block">
+        <SideBar />
+      </div>
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col">
+        <InnerHead />
+        <main className="flex-1 p-6 overflow-auto max-h-[620px]">
+          {children}
+        </main>
       </div>
     </div>
   );

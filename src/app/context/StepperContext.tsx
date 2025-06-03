@@ -7,6 +7,8 @@ interface UserDataProps {
   sdkGender: string, 
   sdkMarStts: string, 
   sdkSpouce: string | undefined, 
+  sdkRefName: string;
+  sdkRefCont: string;
   sdkCountry:string,
   sdkState:string,
   sdkCity:string,

@@ -23,24 +23,24 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
-    const res = await fetch(`${baseUrl}/api/role-permissions/${roleType}`);
-    const data = await res.json();
-    const allowedUrls: string[] = data.allowedUrls || [];
+    // const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+    // const res = await fetch(`${baseUrl}/api/role-permissions/${roleType}`);
+    // const data = await res.json();
+    // const allowedUrls: string[] = data.allowedUrls || [];
 
-    const matchesAllowedUrl = allowedUrls.some((pattern) => {
-      const regex = new RegExp(
-        "^" + pattern.replace(/\[.*?\]/g, "[^/]+").replace(/\//g, "\\/") + "$"
-      );
-      return regex.test(pathname);
-    });
+    // const matchesAllowedUrl = allowedUrls.some((pattern) => {
+    //   const regex = new RegExp(
+    //     "^" + pattern.replace(/\[.*?\]/g, "[^/]+").replace(/\//g, "\\/") + "$"
+    //   );
+    //   return regex.test(pathname);
+    // });
 
-    // If the current path is not allowed for the user's role, redirect
-    if (!matchesAllowedUrl) {
-      return NextResponse.redirect(
-        new URL("/account/unauthorized", request.url)
-      );
-    }
+    // // If the current path is not allowed for the user's role, redirect
+    // if (!matchesAllowedUrl) {
+    //   return NextResponse.redirect(
+    //     new URL("/account/unauthorized", request.url)
+    //   );
+    // }
 
     return NextResponse.next();
   } catch (error) {

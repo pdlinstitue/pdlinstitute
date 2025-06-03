@@ -14,6 +14,8 @@ type SdkType = {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string;
+  sdkRefName: string;
+  sdkRefCont: string;
   sdkPhone: string;
   sdkWhtNbr: string;
   sdkEmail: string;
@@ -58,6 +60,8 @@ export async function POST(req: NextRequest) {
       sdkGender,
       sdkMarStts,
       sdkSpouce,
+      sdkRefName,
+      sdkRefCont,
       sdkPhone,
       sdkWhtNbr,
       sdkEmail,
@@ -124,6 +128,8 @@ export async function POST(req: NextRequest) {
       sdkGender,
       sdkMarStts,
       sdkSpouce,
+      sdkRefName,
+      sdkRefCont,
       sdkPhone,
       sdkWhtNbr,
       sdkEmail,
