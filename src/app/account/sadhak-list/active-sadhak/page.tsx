@@ -210,7 +210,7 @@ const ActiveSadhakList: React.FC = () => {
   useEffect(() => {
     async function fetchSadhakData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/users/list`, {
+        const res = await fetch(`${BASE_API_URL}/api/users/list?usrRole=${Cookies.get("loggedInUserRole")}`, {
           method: "GET", // Explicitly specify the HTTP method
           cache: "no-store",
         });

@@ -28,7 +28,7 @@ export async function GET(
       modules.forEach((mod: any) => {
         mod.modActions?.forEach((action: any) => {
           if (perm.modAtnIds.includes(action._id)) {
-            allowedUrls.push(action.url);
+            allowedUrls.push(action.url.trim());
           }
         });
       });

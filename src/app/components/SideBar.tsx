@@ -131,17 +131,17 @@ const SideBar: React.FC = () => {
               return (
                 <Link
                   key={item._id}
-                  href={item.menuUrl}
+                  href={item.menuUrl.trim()}
                   className={`group flex gap-2 p-2 rounded-sm ${
-                    pathName === item.menuUrl
+                    pathName === item.menuUrl.trim()
                       ? "bg-white text-black"
                       : "text-white bg-orange-500 hover:bg-white hover:text-black"
                   }`}
                 >
                   {renderIcon(item.menuIcon)}
                   <p
-                    className={`font-semibold ${
-                      pathName !== item.menuUrl && "group-hover:text-black"
+                    className={`hidden md:block font-semibold   ${
+                      pathName !== item.menuUrl.trim() && "group-hover:text-black"
                     }`}
                   >
                     {item.menuName.toUpperCase()}
@@ -183,7 +183,7 @@ const SideBar: React.FC = () => {
                     className="flex flex-col w-full px-[35px]"
                   >
                     <Link
-                      href={item.menuUrl}
+                      href={item.menuUrl.trim()}
                       className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm"
                     >
                       - {item.menuName.toUpperCase()}

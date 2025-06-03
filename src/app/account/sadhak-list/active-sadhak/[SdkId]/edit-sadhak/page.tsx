@@ -200,7 +200,14 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
       try {
         const res = await fetch(`${BASE_API_URL}/api/role-list`);
         const roleData = await res.json();
-        setRoleList(roleData?.rolList);
+        let roleList =
+          Cookies.get("loggedInUserRole") === "Admin"
+            ? roleData?.rolList?.filter(
+                (a: any) =>
+                  a.roleType !== "Super-Admin" && a.roleType !== "Admin"
+              )
+            : roleData?.rolList;
+        setRoleList(roleList);
       } catch (error) {
         console.error("Error fetching role data:", error);
       } finally {

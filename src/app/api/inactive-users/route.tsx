@@ -22,11 +22,22 @@ type SdkType = {
     sdkRole:string,
 }
 
-export async function GET () {
+export async function GET (req: NextRequest) {
   try 
   {
+    const { searchParams } = new URL(req.url);
+    const usrRole = searchParams.get("usrRole");
+
     await dbConnect();
-    const InActiveSdkList:SdkType[] = await Users.find({isActive: false});
+    let InActiveSdkList:SdkType[] = await Users.find({isActive: false});
+
+    if (usrRole && usrRole === "Admin") {
+      // Filter out Admin and Super-Admin roles for Admin users
+      InActiveSdkList = InActiveSdkList.filter(
+        (sdk: SdkType) => sdk.sdkRole !== "Admin" && sdk.sdkRole !== "Super-Admin"
+      );
+    }
+
     return NextResponse.json({ InActiveSdkList, success: true }, {status:200});
 
   } catch (error:any) {
