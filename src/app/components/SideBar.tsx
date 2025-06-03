@@ -216,7 +216,7 @@ const SideBar: React.FC = () => {
                   />
                 </button>
               </div>
-              {Cookies.get("loggedInUserRole") !== "Admin" &&
+              {Cookies.get("loggedInUserRole") !== userData.sdkRole &&
                 userData.isAdmin == "Yes" &&
                 selectedParentId === "admin-volunter" && (
                   <div
@@ -225,11 +225,11 @@ const SideBar: React.FC = () => {
                   >
                     <button
                       onClick={() =>
-                        handleViewChange("Admin", "/account/admin-dashboard")
+                        handleViewChange(userData.sdkRole, "/account/admin-dashboard")
                       }
                       className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"
                     >
-                      - ADMIN
+                      - {userData.sdkRole.toUpperCase()}
                     </button>
                   </div>
                 )}
@@ -250,7 +250,7 @@ const SideBar: React.FC = () => {
                   </div>
                 )}
 
-              {Cookies.get("loggedInUserRole") !== "Volunter" &&
+              {Cookies.get("loggedInUserRole") !== "Volunteer" &&
                 userData.isVolunter == "Yes" &&
                 selectedParentId === "admin-volunter" && (
                   <div
@@ -260,8 +260,8 @@ const SideBar: React.FC = () => {
                     <button
                       onClick={() =>
                         handleViewChange(
-                          "Volunter",
-                          "/account/volunter-dashboard"
+                          "Volunteer",
+                          "/account/sadhak-dashboard"
                         )
                       }
                       className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"

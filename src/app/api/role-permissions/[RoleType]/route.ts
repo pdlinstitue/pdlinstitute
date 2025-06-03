@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../../dbConnect";
 import Permissions from "../../../../../modals/Permissions";
 import Roles from "../../../../../modals/Roles";
+import Modules from "../../../../../modals/Modules";
 
 export async function GET(
   req: NextRequest,
@@ -17,36 +18,20 @@ export async function GET(
       rolId: role[0]._id,
       isActive: true,
       isDeleted: false,
-    }).populate("atnId");
+    });
 
     const allowedUrls: string[] = [];
 
-    permissions.forEach((perm: any) => {
-      const action = perm.atnId;
-      if (!action || !action.isActive || action.isDeleted) return;
+    const modules = await Modules.find();
 
-      if (perm.isListEnabled && action.listUrl)
-        allowedUrls.push(action.listUrl);
-      if (perm.isAddEnabled && action.addUrl) 
-        allowedUrls.push(action.addUrl);
-      if (perm.isEditEnabled && action.editUrl)
-        allowedUrls.push(action.editUrl);
-      if (perm.isEnbEnabled && action.enableUrl)
-        allowedUrls.push(action.enableUrl);
-      if (perm.isDisEnabled && action.disableUrl)
-        allowedUrls.push(action.disableUrl);
-      if (perm.isDelEnabled && action.deleteUrl)
-        allowedUrls.push(action.deleteUrl);
-      if (perm.isMarkEnabled && action.markUrl)
-        allowedUrls.push(action.markUrl);
-      if (perm.isCompEnabled && action.compUrl)
-        allowedUrls.push(action.compUrl);
-      if (perm.isApvEnrEnabled && action.apvEnrUrl)
-        allowedUrls.push(action.apvEnrUrl);
-      if (perm.isMnlEnrEnabled && action.mnlEnrUrl)
-        allowedUrls.push(action.mnlEnrUrl);
-      if (perm.isAvpDocEnabled && action.avpDocUrl)
-        allowedUrls.push(action.avpDocUrl);
+    permissions.forEach((perm: any) => {
+      modules.forEach((mod: any) => {
+        mod.modActions?.forEach((action: any) => {
+          if (perm.modAtnIds.includes(action._id)) {
+            allowedUrls.push(action.url);
+          }
+        });
+      });
     });
 
     return NextResponse.json({ allowedUrls });

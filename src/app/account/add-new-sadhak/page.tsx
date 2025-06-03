@@ -160,7 +160,7 @@ const AddNewSadhak: React.FC = () => {
       try {
         if (sdkData.sdkCountry) {
           const res = await fetch(
-            `${BASE_API_URL}/api/states?country_id=${sdkData.sdkCountry}`
+            `${BASE_API_URL}/api/states?country_name=${sdkData.sdkCountry}`
           );
           const stateData = await res.json();
           setStateList(stateData.sttList);
@@ -179,7 +179,7 @@ const AddNewSadhak: React.FC = () => {
       try {
         if (sdkData.sdkState) {
           const res = await fetch(
-            `${BASE_API_URL}/api/cities?state_id=${sdkData.sdkState}`
+            `${BASE_API_URL}/api/cities?state_name=${sdkData.sdkState}`
           );
           const cityData = await res.json();
           setCityList(cityData.cityList);
@@ -634,7 +634,7 @@ const AddNewSadhak: React.FC = () => {
               <option className="text-center"> --- Select --- </option>
               {countryList?.map((ctr: any) => {
                 return (
-                  <option key={ctr.country_id} value={ctr.country_id}>
+                  <option key={ctr.country_id} value={ctr.country_name}>
                     {ctr.country_name}
                   </option>
                 );
@@ -652,7 +652,7 @@ const AddNewSadhak: React.FC = () => {
               <option className="text-center"> --- Select --- </option>
               {stateList?.map((stt: any) => {
                 return (
-                  <option key={stt.state_id} value={stt.state_id}>
+                  <option key={stt.state_id} value={stt.state_name}>
                     {stt.state_name}
                   </option>
                 );
@@ -672,7 +672,7 @@ const AddNewSadhak: React.FC = () => {
               <option className="text-center"> --- Select --- </option>
               {cityList?.map((cty: any) => {
                 return (
-                  <option key={cty.city_id} value={cty.city_id}>
+                  <option key={cty.city_id} value={cty.city_name}>
                     {cty.city_name}
                   </option>
                 );
