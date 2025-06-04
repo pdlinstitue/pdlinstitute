@@ -11,6 +11,7 @@ import { RxCross2 } from 'react-icons/rx';
 import Loading from '../../Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
 import { format } from 'date-fns';
+import Cookies from "js-cookie";
 
 interface InActiveSadhakListProps {
   sdkRegNo:string,
@@ -102,7 +103,7 @@ const InActiveSadhakList : React.FC = () => {
     useEffect(() => {
       async function fetchSadhakData() {
         try {
-          const res = await fetch(`${BASE_API_URL}/api/inactive-users`, {
+          const res = await fetch(`${BASE_API_URL}/api/inactive-users?usrRole=${Cookies.get("loggedInUserRole")}`, {
             method: "GET", // Explicitly specify the HTTP method
             cache: "no-store",
           });

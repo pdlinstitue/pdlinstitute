@@ -6,6 +6,7 @@ import { BASE_API_URL } from "@/app/utils/constant";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import Loading from "../Loading";
+import { Result } from "postcss";
 
 interface AddNewSadhakProps {
   sdkFstName: string;
@@ -112,8 +113,15 @@ const AddNewSadhak: React.FC = () => {
     async function fetchRoleList() {
       try {
         const res = await fetch(`${BASE_API_URL}/api/role-list`);
-        const roleData = await res.json();
-        setRoleList(roleData?.rolList);
+        const roleData = await res.json();        
+        let roleList =
+          Cookies.get("loggedInUserRole") === "Admin"
+            ? roleData?.rolList?.filter(
+                (a: any) =>
+                  a.roleType !== "Super-Admin" && a.roleType !== "Admin"
+              )
+            : roleData?.rolList;
+        setRoleList(roleList);
       } catch (error) {
         console.error("Error fetching role data:", error);
       } finally {
