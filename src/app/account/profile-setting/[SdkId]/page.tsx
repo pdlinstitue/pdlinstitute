@@ -181,7 +181,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
       try {
         if (sdkData.sdkCountry) {
           const res = await fetch(
-            `${BASE_API_URL}/api/states?country_id=${sdkData.sdkCountry}`
+            `${BASE_API_URL}/api/states?country_name=${sdkData.sdkCountry}`
           );
           const stateData = await res.json();
           setStateList(stateData?.sttList);
@@ -200,7 +200,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
       try {
         if (sdkData.sdkState) {
           const res = await fetch(
-            `${BASE_API_URL}/api/cities?state_id=${sdkData.sdkState}`
+            `${BASE_API_URL}/api/cities?state_name=${sdkData.sdkState}`
           );
           const cityData = await res.json();
           setCityList(cityData?.cityList);
@@ -395,6 +395,8 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               sdkMarStts: sdkData.sdkMarStts,
               sdkSpouce: sdkData.sdkSpouce,
               sdkCountry: sdkData.sdkCountry,
+              sdkState: sdkData.sdkState,
+              sdkCity: sdkData.sdkCity,
               sdkPhone: sdkData.sdkPhone,
               sdkWhtNbr: sdkData.sdkWhtNbr,
               sdkEmail: sdkData.sdkEmail,
@@ -435,9 +437,9 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
   return (
     <div>
       <form className="formStyle w-full" onSubmit={handleSubmit}>
-        <div className="flex gap-8 w-auto">
+        <div className="md:flex gap-8 w-auto">
           <div className="flex flex-col gap-1 max-w-[400px] h-auto">
-            <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+            <div className="max-w-[400px] h-[345px] border-[1.5px] bg-gray-100">
               {sdkData.sdkImg ? (
                 <Image
                   src={`/api/profile-upload?name=${sdkData.sdkImg}`}
@@ -456,13 +458,14 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
                 />
               ) : null}
             </div>
-            <div className="flex items-center gap-1">
+            <div className="md:flex items-center gap-1 mb-3 md:mb-0">
               <input
                 type="file"
                 accept="image/*"
-                className="inputBox w-full h-[45px]"
+                className="inputBox w-full h-[45px] mb-3 md:mb-0"
                 onChange={handleFileChange}
-              ></input>
+              >
+              </input>
               <button
                 type="button"
                 className="btnLeft"
@@ -474,7 +477,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
                 <label className="text-lg">First Name:</label>
                 <input
@@ -506,7 +509,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
                 <label className="text-lg">Father Name:</label>
                 <input
@@ -544,7 +547,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="flex flex-col gap-2">
                 <label className="text-lg">Phone:</label>
                 <input
@@ -578,7 +581,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Gender:</label>
             <select
@@ -604,7 +607,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Marital Status:</label>
             <select
@@ -630,7 +633,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Country:</label>
             <select
@@ -642,7 +645,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               <option className="text-center"> --- Select --- </option>
               {countryList?.map((ctr: any) => {
                 return (
-                  <option key={ctr.country_id} value={ctr.country_id}>
+                  <option key={ctr.country_id} value={ctr.country_name}>
                     {ctr.country_name}
                   </option>
                 );
@@ -660,7 +663,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               <option className="text-center"> --- Select --- </option>
               {stateList?.map((stt: any) => {
                 return (
-                  <option key={stt.state_id} value={stt.state_id}>
+                  <option key={stt.state_id} value={stt.state_name}>
                     {stt.state_name}
                   </option>
                 );
@@ -668,7 +671,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">City:</label>
             <select
@@ -680,7 +683,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               <option className="text-center"> --- Select --- </option>
               {cityList?.map((cty: any) => {
                 return (
-                  <option key={cty.city_id} value={cty.city_id}>
+                  <option key={cty.city_id} value={cty.city_name}>
                     {cty.city_name}
                   </option>
                 );
@@ -707,7 +710,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Permanent Address:</label>
             <textarea

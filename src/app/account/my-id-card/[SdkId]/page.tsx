@@ -2,11 +2,10 @@
 import { BASE_API_URL } from '@/app/utils/constant';
 import { useRouter } from 'next/navigation';
 import React, { use, useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
 import Image from 'next/image';
 import Cookies from 'js-cookie';
 import Loading from '../../Loading';
-import { format, parse } from 'date-fns';
+import { format } from 'date-fns';
 import { FaUserCircle } from 'react-icons/fa';
 
 interface IDCardParams {
@@ -29,6 +28,7 @@ interface MyIDCardProps {
 }
 
 const MyIDCard: React.FC<IDCardParams> = ({ params }) => {
+
   const router = useRouter();
   const { SdkId } = use(params);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -78,9 +78,7 @@ const MyIDCard: React.FC<IDCardParams> = ({ params }) => {
       try {
         const res = await fetch(`${BASE_API_URL}/api/users/${Cookies.get("loggedInUserId")}/view-sadhak`);
         const userData = await res.json();
-  
         const sdkData = userData.sdkById;
-  
         const formattedDate = sdkData?.sdkBthDate
           ? format(new Date(sdkData.sdkBthDate), 'dd, MMM, yyyy').toUpperCase()
           : '';
@@ -115,11 +113,11 @@ const MyIDCard: React.FC<IDCardParams> = ({ params }) => {
             PDL INSTITUTE
           </h1>
         </div>
-        <div className='grid grid-cols-2 gap-1'>
-          <div className='flex justify-center items-center  bg-gray-100 rounded-lg'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
+          <div className='flex justify-center items-center  bg-gray-100 rounded-lg p-4'>
             {
-              myIDCard.sdkImg ? (<Image src={`/api/profile-upload?name=${myIDCard.sdkImg}`} className='rounded-full' width={200} height={200} alt='sdkImg'/>)
-              : <FaUserCircle className="text-gray-400 w-[200px] h-[200px] cursor-pointer" />
+              myIDCard.sdkImg ? (<Image src={`/api/profile-upload?name=${myIDCard.sdkImg}`} className='rounded-full' width={160} height={160} alt='sdkImg'/>)
+              : <FaUserCircle className="text-gray-400 w-[160px] h-[160px] cursor-pointer" />
             }
           </div>
           <div className='flex flex-col gap-1 bg-gray-100 rounded-lg p-3'>
