@@ -30,9 +30,9 @@ const CreatePass : React.FC = () => {
           <label>Confirm Password:*</label>
           <input type='password' name='sdkConfPwd' placeholder='Min 8 characters' value={userData.sdkConfPwd} onChange={handleChange} className='inputBox' />
         </div>
-        <div className='flex gap-2 items-center justify-center p-4 bg-gray-100 rounded-lg mt-4'>
-          <Link href="https://chat.whatsapp.com/KHb4NUXolhb52QfLp0YXcE" target='_blank'><FaWhatsapp size={24}/></Link>
-          <p className='italic text-md'>Join support group assistance.</p>
+        <div className='flex gap-1 items-center justify-center p-2 bg-gray-100 rounded-lg'>
+          <Link href="https://chat.whatsapp.com/KHb4NUXolhb52QfLp0YXcE" target='_blank' className="text-green-600"><FaWhatsapp size={24}/></Link>
+          <p className='italic text-sm'>Join support group for assistance.</p>
         </div>
       </div>
     </div>

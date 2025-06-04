@@ -31,6 +31,7 @@ interface AddNewSadhakProps {
   sdkImg: string;
   sdkRole: string;
   isVolunteer: string;
+  isAdmin:string;
   sdkPwd: string;
   sdkConfPwd: string;
   createdBy: string;
@@ -93,6 +94,7 @@ const AddNewSadhak: React.FC = () => {
     sdkImg: "",
     sdkRole: "",
     isVolunteer: "",
+    isAdmin: "",
     sdkPwd: "",
     sdkConfPwd: "",
     createdBy: "",
@@ -413,6 +415,7 @@ const AddNewSadhak: React.FC = () => {
             sdkImg: image,
             sdkRole: sdkData.sdkRole,
             isVolunteer: sdkData.isVolunteer,
+            isAdmin: sdkData.isAdmin,
             sdkPwd: sdkData.sdkPwd,
             sdkConfPwd: sdkData.sdkConfPwd,
             createdBy: loggedInUser.result?._id
@@ -448,10 +451,18 @@ const AddNewSadhak: React.FC = () => {
   return (
     <div>
       <form className="formStyle w-full" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-6">
-          <div className="flex flex-col gap-1">
-            <div className="w-full h-auto border-[1.5px] bg-gray-100">
-              <Image src={preview ? preview : "/images/uploadImage.jpg"} alt="sadhak" width={600} height={350} />
+        <div className="flex gap-8 w-auto">
+          <div className="flex flex-col gap-1 max-w-[400px] h-auto">
+            <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+              {preview ? (
+                <Image
+                  src={preview}
+                  alt="Profile Preview"
+                  width={400}
+                  height={345}
+                  className="w-full h-full object-cover"
+                />
+              ) : null}
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -459,7 +470,8 @@ const AddNewSadhak: React.FC = () => {
                 accept="image/*"
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
-              ></input>
+              >
+              </input>
               <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
                 {isUploading ? "Uploading..." : "Upload"}
               </button>
@@ -722,7 +734,7 @@ const AddNewSadhak: React.FC = () => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Do you have any medical issues?</label>
             <div className="flex gap-4 mt-3">
@@ -750,6 +762,37 @@ const AddNewSadhak: React.FC = () => {
               </label>
             </div>
           </div>
+          {
+            loggedInUser.result.usrRole === "Super-Admin" && (
+              <div className="flex flex-col gap-2">
+            <label className="text-lg">Is Admin?</label>
+            <div className="flex gap-4 mt-3">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isAdmin"
+                  value="Yes"
+                  checked={sdkData.isAdmin === "Yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Yes
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isAdmin"
+                  value="No"
+                  checked={sdkData.isAdmin === "No"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                No
+              </label>
+            </div>
+          </div>
+            )
+          }
           <div className="flex flex-col gap-2">
             <label className="text-lg">Is Volunteer?</label>
             <div className="flex gap-4 mt-3">

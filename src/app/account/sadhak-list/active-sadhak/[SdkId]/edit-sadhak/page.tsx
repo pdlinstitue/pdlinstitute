@@ -35,7 +35,8 @@ interface EditSadhakProps {
   sdkParAdds: string;
   sdkImg: string;
   sdkRole: string;
-  isVolunteer:string,
+  isVolunteer: string;
+  isAdmin: string;
   updatedBy: string;
 }
 
@@ -55,12 +56,11 @@ interface cityListProps {
 }
 
 interface RoleListProps {
-  _id:string;
-  roleType:string;
+  _id: string;
+  roleType: string;
 }
 
 const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
-
   const router = useRouter();
   const { SdkId } = use(params);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -69,7 +69,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [image, setImage] = useState<File | string | null>(null);
-  const [preview, setPreview] = useState<string>('');
+  const [preview, setPreview] = useState<string>("");
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
@@ -96,23 +96,24 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     sdkParAdds: "",
     sdkImg: "",
     sdkRole: "",
-    isVolunteer:"",
+    isVolunteer: "",
+    isAdmin: "",
     updatedBy: "",
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
+      _id: "",
+      usrName: "",
+      usrRole: "",
     },
   });
-   
+
   useEffect(() => {
     try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
       setLoggedInUser({
         result: {
           _id: userId,
@@ -121,25 +122,28 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         },
       });
     } catch (error) {
-        console.error("Error fetching loggedInUserData.");
+      console.error("Error fetching loggedInUserData.");
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-  async function fetchSdkById() {
-    try {
-      const res = await fetch(`${BASE_API_URL}/api/users/${SdkId}/view-sadhak`, { cache: "no-store" });
-      const sadhakData = await res.json();
-      setSdkData(sadhakData.sdkById);
-    } catch (error) {
+    async function fetchSdkById() {
+      try {
+        const res = await fetch(
+          `${BASE_API_URL}/api/users/${SdkId}/view-sadhak`,
+          { cache: "no-store" }
+        );
+        const sadhakData = await res.json();
+        setSdkData(sadhakData.sdkById);
+      } catch (error) {
         console.error("Error fetching sadhak data:", error);
-    } finally {
+      } finally {
         setIsLoading(false);
+      }
     }
-  }
-  fetchSdkById();
+    fetchSdkById();
   }, []);
 
   useEffect(() => {
@@ -149,7 +153,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         const countryData = await res.json();
         setCountryList(countryData.ctrList);
       } catch (error) {
-          console.error("Error fetching country data:", error);
+        console.error("Error fetching country data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -207,39 +211,40 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         setIsLoading(false);
       }
     }
-  fetchRoleList();
-  },[])
+    fetchRoleList();
+  }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ): void => {
     const { name, value } = e.target;
-    setSdkData((prevData) => (
-      { ...prevData, [name]: value }
-    ));
+    setSdkData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleFileChange = (e:any) => {
+  const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
-        setImage(file);
-        setPreview(URL.createObjectURL(file));
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   const handleUpload = async () => {
-
     if (!image) {
-        toast.error("Please select an image!");
-        return;
+      toast.error("Please select an image!");
+      return;
     }
-  
+
     setIsUploading(true);
     // Validate image type
     const img = new window.Image();
     if (image instanceof File) {
-        img.src = URL.createObjectURL(image);
+      img.src = URL.createObjectURL(image);
     } else {
-        toast.error("Invalid image format!");
-        return;
+      toast.error("Invalid image format!");
+      return;
     }
 
     // Validate image resolution
@@ -248,27 +253,26 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     formData.append("profileImageFileName", sdkData.sdkImg);
 
     try {
-        const res = await fetch("/api/profile-upload", {
-            method: "POST",
-            body: formData,
-        });
+      const res = await fetch("/api/profile-upload", {
+        method: "POST",
+        body: formData,
+      });
 
-        const data = await res.json();
-        if (data.success) {
-            toast.success("Image uploaded successfully!");            
-            setImage(data.imageUrl);
-        } else {
-            throw new Error(data.error || "Upload failed");
-        }
-      } catch (error:any) {
-          toast.error(error.message);
-      } finally {
-        setIsUploading(false);
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Image uploaded successfully!");
+        setImage(data.imageUrl);
+      } else {
+        throw new Error(data.error || "Upload failed");
       }
-    };
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-
     e.preventDefault();
     setIsSaving(true);
 
@@ -382,9 +386,10 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
       ) {
         setErrorMessage("Please check medical issue.");
       } else if (
-        sdkData && "isMedIssue" in sdkData &&
+        sdkData &&
+        "isMedIssue" in sdkData &&
         sdkData.isMedIssue === "Yes" &&
-        ( !sdkData ||
+        (!sdkData ||
           !("sdkMedIssue" in sdkData) ||
           sdkData.sdkMedIssue === null ||
           sdkData.sdkMedIssue?.trim() === "")
@@ -409,6 +414,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkMarStts: sdkData.sdkMarStts,
               sdkSpouce: sdkData.sdkSpouce,
               sdkCountry: sdkData.sdkCountry,
+              sdkState: sdkData.sdkState,
+              sdkCity: sdkData.sdkCity,
               sdkPhone: sdkData.sdkPhone,
               sdkWhtNbr: sdkData.sdkWhtNbr,
               sdkEmail: sdkData.sdkEmail,
@@ -416,7 +423,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkParAdds: sdkData.sdkParAdds,
               sdkImg: image,
               sdkRole: sdkData.sdkRole,
-              isVolunteer:sdkData.isVolunteer,
+              isVolunteer: sdkData.isVolunteer,
+              isAdmin: sdkData.isAdmin,
               updatedBy: loggedInUser.result?._id,
             }),
           }
@@ -433,11 +441,11 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         }
       }
     } catch (error) {
-        toast.error("Error updating sadhak profile.");
-      } finally {
-        setIsSaving(false);
-      }
-    };
+      toast.error("Error updating sadhak profile.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -450,23 +458,40 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
   return (
     <div>
       <form className="formStyle w-full" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-6">
-          <div className="flex flex-col gap-1">
-          <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-            <img
-              src={ sdkData.sdkImg ? sdkData.sdkImg : preview || "/images/uploadImage.jpg"}
-              alt="Preview"
-              className="w-full h-full object-contain"
-            />
-          </div>
+        <div className="flex gap-8 w-auto">
+          <div className="flex flex-col gap-1 max-w-[400px] h-auto">
+            <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+              {sdkData.sdkImg ? (
+                <Image
+                  src={`/api/profile-upload?name=${sdkData.sdkImg}`}
+                  alt="Profile Preview"
+                  width={400}
+                  height={345}
+                  className="w-full h-full object-cover"
+                />
+              ) : preview ? (
+                <Image
+                  src={preview}
+                  alt="Profile Preview"
+                  width={400}
+                  height={345}
+                  className="w-full h-full object-cover"
+                />
+              ) : null}
+            </div>
             <div className="flex items-center gap-1">
               <input
                 type="file"
                 accept="image/*"
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
-              />
-              <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+              ></input>
+              <button
+                type="button"
+                className="btnLeft"
+                onClick={handleUpload}
+                disabled={isUploading}
+              >
                 {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>
@@ -688,13 +713,13 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               onChange={handleChange}
             >
               <option className="text-center"> --- Select Role --- </option>
-              {
-                roleList?.map((item:any)=>{
-                  return (
-                    <option key={item._id} value={item.roleType}>{item.roleType}</option>
-                  )
-                })
-              }
+              {roleList?.map((item: any) => {
+                return (
+                  <option key={item._id} value={item.roleType}>
+                    {item.roleType}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>
@@ -720,7 +745,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Do you have any medical issues?</label>
             <div className="flex gap-4 mt-3">
@@ -748,6 +773,35 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               </label>
             </div>
           </div>
+          {loggedInUser.result.usrRole === "Super-Admin" && (
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Is Admin?</label>
+              <div className="flex gap-4 mt-3">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="isAdmin"
+                    value="Yes"
+                    checked={sdkData.isAdmin === "Yes"}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  Yes
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="isAdmin"
+                    value="No"
+                    checked={sdkData.isAdmin === "No"}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  No
+                </label>
+              </div>
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <label className="text-lg">Is Volunteer?</label>
             <div className="flex gap-4 mt-3">
@@ -776,21 +830,21 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </div>
           </div>
         </div>
-        {
-          sdkData.isMedIssue === "Yes" && (
-            <div className="flex flex-col gap-2">
-              <label className="text-lg">Medical Issues:</label>
-              <textarea
-                rows={3}
-                className="inputBox"
-                name="sdkMedIssue"
-                value={sdkData.sdkMedIssue}
-                onChange={handleChange}
-              />
-            </div>
-          )
-        }
-        {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
+        {sdkData.isMedIssue === "Yes" && (
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Medical Issues:</label>
+            <textarea
+              rows={3}
+              className="inputBox"
+              name="sdkMedIssue"
+              value={sdkData.sdkMedIssue}
+              onChange={handleChange}
+            />
+          </div>
+        )}
+        {errorMessage && (
+          <p className="text-sm italic text-red-600">{errorMessage}</p>
+        )}
         <div className="grid grid-cols-2 gap-1">
           <button type="submit" className="btnLeft" disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}

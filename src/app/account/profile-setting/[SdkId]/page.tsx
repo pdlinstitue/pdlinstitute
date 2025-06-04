@@ -1,6 +1,7 @@
 "use client";
 import React, { FormEvent, use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Loading from "../../Loading";
 import { BASE_API_URL } from "@/app/utils/constant";
 import toast from "react-hot-toast";
@@ -53,12 +54,11 @@ interface cityListProps {
 }
 
 interface RoleListProps {
-  _id:string;
-  roleType:string;
+  _id: string;
+  roleType: string;
 }
 
 const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
-
   const router = useRouter();
   const { SdkId } = use(params);
   const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
@@ -66,7 +66,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [image, setImage] = useState<File | string | null>(null);
-  const [preview, setPreview] = useState<string>('');
+  const [preview, setPreview] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
@@ -97,7 +97,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
     updatedBy: "",
   });
 
-  const handleMedIssue = (medIssue:string) => {
+  const handleMedIssue = (medIssue: string) => {
     setSdkData((prev) => ({ ...prev, isMedIssue: medIssue }));
   };
 
@@ -113,22 +113,22 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         setIsLoading(false);
       }
     }
-  fetchRoleList();
-  },[])
-  
+    fetchRoleList();
+  }, []);
+
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
+      _id: "",
+      usrName: "",
+      usrRole: "",
     },
   });
-   
+
   useEffect(() => {
     try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
+      const userId = Cookies.get("loggedInUserId") || "";
+      const userName = Cookies.get("loggedInUserName") || "";
+      const userRole = Cookies.get("loggedInUserRole") || "";
       setLoggedInUser({
         result: {
           _id: userId,
@@ -137,7 +137,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
         },
       });
     } catch (error) {
-        console.error("Error fetching loggedInUserData.");
+      console.error("Error fetching loggedInUserData.");
     } finally {
       setIsLoading(false);
     }
@@ -214,35 +214,38 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
     fetchCityList();
   }, [sdkData.sdkState]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ): void => {
     const { name, value } = e.target;
     setSdkData((prevData) => ({ ...prevData, [name]: value }));
   };
-  
-  const handleFileChange = (e:any) => {
+
+  const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
-        setImage(file);
-        setPreview(URL.createObjectURL(file));
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   const handleUpload = async () => {
-
     if (!image) {
-        toast.error("Please select an image!");
-        return;
+      toast.error("Please select an image!");
+      return;
     }
 
     setIsUploading(true);
-  
+
     // Validate image type
     const img = new window.Image();
     if (image instanceof File) {
-        img.src = URL.createObjectURL(image);
+      img.src = URL.createObjectURL(image);
     } else {
-        toast.error("Invalid image format!");
-        return;
+      toast.error("Invalid image format!");
+      return;
     }
 
     const formData = new FormData();
@@ -250,30 +253,29 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
     formData.append("profileImageFileName", sdkData.sdkImg);
 
     try {
-        const res = await fetch("/api/profile-upload", {
-            method: "POST",
-            body: formData,
-        });
+      const res = await fetch("/api/profile-upload", {
+        method: "POST",
+        body: formData,
+      });
 
-        const data = await res.json();
-        if (data.success) {
-            toast.success("Image uploaded successfully!");            
-            setImage(data.imageUrl);
-        } else {
-            throw new Error(data.error || "Upload failed");
-        }
-    } catch (error:any) {
-        toast.error(error.message);
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Image uploaded successfully!");
+        setImage(data.imageUrl);
+      } else {
+        throw new Error(data.error || "Upload failed");
+      }
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
-        setIsUploading(false);
+      setIsUploading(false);
     }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    
     e.preventDefault();
     setIsSaving(true);
-  
+
     try {
       if (
         !sdkData ||
@@ -375,7 +377,8 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
       ) {
         setErrorMessage("Please describe medical issue.");
       } else {
-        const response = await fetch(`${BASE_API_URL}/api/users/${SdkId}/edit-sadhak`,
+        const response = await fetch(
+          `${BASE_API_URL}/api/users/${SdkId}/edit-sadhak`,
           {
             method: "PUT",
             body: JSON.stringify({
@@ -413,13 +416,13 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
           toast.success(post.msg);
           router.back();
         }
-      } 
+      }
     } catch (error) {
       toast.error("Error updating profile.");
     } finally {
-        setIsSaving(false);
-      }
-    };  
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -432,28 +435,43 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
   return (
     <div>
       <form className="formStyle w-full" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-6">
-        <div className="flex flex-col gap-1">
-          <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-            {preview || sdkData.sdkImg ? (
-            <img
-                src={preview || `/api/profile-upload?name=${sdkData.sdkImg}`}
-                alt="Profile_Image"
-                className="w-full h-full object-contain"
-            />
-            ) : null}
-          </div>
-          <div className="flex items-center gap-1">
-            <input
-              type="file"
-              accept="image/*"
-              className="inputBox w-full h-[45px]"
-              onChange={handleFileChange}
-            />
-            <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
-              {isUploading ? "Uploading..." : "Upload"}
-            </button>
-          </div>
+        <div className="flex gap-8 w-auto">
+          <div className="flex flex-col gap-1 max-w-[400px] h-auto">
+            <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+              {sdkData.sdkImg ? (
+                <Image
+                  src={`/api/profile-upload?name=${sdkData.sdkImg}`}
+                  alt="Profile Preview"
+                  width={400}
+                  height={345}
+                  className="w-full h-full object-cover"
+                />
+              ) : preview ? (
+                <Image
+                  src={preview}
+                  alt="Profile Preview"
+                  width={400}
+                  height={345}
+                  className="w-full h-full object-cover"
+                />
+              ) : null}
+            </div>
+            <div className="flex items-center gap-1">
+              <input
+                type="file"
+                accept="image/*"
+                className="inputBox w-full h-[45px]"
+                onChange={handleFileChange}
+              ></input>
+              <button
+                type="button"
+                className="btnLeft"
+                onClick={handleUpload}
+                disabled={isUploading}
+              >
+                {isUploading ? "Uploading..." : "Upload"}
+              </button>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <div className="grid grid-cols-3 gap-2">
@@ -679,13 +697,13 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               onChange={handleChange}
             >
               <option className="text-center"> --- Select Role --- </option>
-              {
-                roleList?.map((item:any)=>{
-                  return (
-                    <option key={item._id} value={item._id}>{item.roleType}</option>
-                  )
-                })
-              }
+              {roleList?.map((item: any) => {
+                return (
+                  <option key={item._id} value={item._id}>
+                    {item.roleType}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>
@@ -719,7 +737,7 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
                 type="radio"
                 name="isMedIssue"
                 checked={sdkData.isMedIssue === "Yes"}
-                onChange={()=>handleMedIssue("Yes")}
+                onChange={() => handleMedIssue("Yes")}
                 className="mr-2"
               />
               Yes
@@ -729,28 +747,28 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
                 type="radio"
                 name="isMedIssue"
                 checked={sdkData.isMedIssue === "No"}
-                onChange={()=>handleMedIssue("No")}
+                onChange={() => handleMedIssue("No")}
                 className="mr-2"
               />
               No
             </label>
           </div>
         </div>
-        {
-          sdkData.isMedIssue === "Yes" && (
-            <div className="flex flex-col gap-2">
-              <label className="text-lg">Medical Issues:</label>
-              <textarea
-                rows={3}
-                className="inputBox"
-                name="sdkMedIssue"
-                value={sdkData.sdkMedIssue}
-                onChange={handleChange}
-              />
-            </div>
-          )
-        }
-        {errorMessage && (<p className="text-sm italic text-red-600">{errorMessage}</p>)}
+        {sdkData.isMedIssue === "Yes" && (
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Medical Issues:</label>
+            <textarea
+              rows={3}
+              className="inputBox"
+              name="sdkMedIssue"
+              value={sdkData.sdkMedIssue}
+              onChange={handleChange}
+            />
+          </div>
+        )}
+        {errorMessage && (
+          <p className="text-sm italic text-red-600">{errorMessage}</p>
+        )}
         <div className="grid grid-cols-2 gap-1">
           <button type="submit" className="btnLeft" disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}

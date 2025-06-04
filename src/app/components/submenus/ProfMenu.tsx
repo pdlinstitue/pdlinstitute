@@ -93,25 +93,25 @@ const ProfMenu = () => {
           userProfile.sdkImg ? (<Image src={`/api/profile-upload?name=${userProfile.sdkImg}`} className='rounded-full' width={50} height={50} alt='sdkImg'/>)
           : <FaUserCircle className="text-gray-400 w-[50px] h-[50px] cursor-pointer" />
         }
-        <div className="absolute border-[1.5px] border-orange-700 divide-y z-50 group-hover:flex right-0 top-14 hidden w-[230px] flex-col transition-all px-3 py-3  bg-white rounded-md shadow-xl">
+        <div className="absolute border-[1.5px] border-orange-700 divide-y z-50 group-hover:flex right-0 top-12 hidden w-[230px] flex-col transition-all px-2 py-2  bg-white rounded-md shadow-xl">
             <Link href={`/account/profile-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2  hover:bg-orange-500">
               <RiProfileLine size={24} />
-              <span >Profile Setting</span>
+              <span className='text-md'>Profile Setting</span>
             </Link>
             <Link href={`/account/account-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4  py-2 hover:bg-orange-500">
               <MdSettingsBrightness size={24} />
-              <span >Account Setting</span>
+              <span className='text-md'>Account Setting</span>
             </Link>
             <Link href={`/account/change-password/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
               <PiFolderLockFill size={26} />
-              <span >Change Password</span>
+              <span className='text-md'>Change Password</span>
             </Link>
             <Link href={`/account/my-id-card/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-5 py-2  hover:bg-orange-500">
               <FaIdCardClip size={22} />
-              <span >My ID Card</span>
+              <span className='text-md'>My ID Card</span>
             </Link>
             <button type='button' 
-              className="flex text-black hover:text-white gap-2 px-5 py-2 hover:bg-orange-500"
+              className="flex text-md text-black hover:text-white gap-2 px-5 py-2 hover:bg-orange-500"
               onClick={handleLogOut}>
               <MdLogout size={24} />
               Logout
