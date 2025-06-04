@@ -121,7 +121,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
                   <p>You can choose your preferred time.</p>
               </div>
             </div>      
-            <div className="grid grid-cols-3 gap-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
               <div className="flex flex-col gap-1">
                   <label className="font-bold">MONTH</label>
                   <input type="month" name='prosMonth' value={enrData.prosMonth} onChange={handleChange} className="inputBox" required/>
@@ -141,7 +141,7 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-1">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
               <div className="flex flex-col gap-1">
                   <label className="font-bold">OPTIONAL MONTH</label>
                   <input type="month" name='prosOptMonth' value={enrData.prosOptMonth} onChange={handleChange} className="inputBox" />

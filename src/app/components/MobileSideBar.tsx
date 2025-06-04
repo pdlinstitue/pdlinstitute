@@ -1,5 +1,5 @@
 "use client";
-
+import Loading from "../account/Loading";
 import React, { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
@@ -22,8 +22,8 @@ const MobileSideBar: React.FC = () => {
   const pathName = usePathname();
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [dashboardUrl, setDashboardUrl] = useState(""); 
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
-
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
   useEffect(() => {
@@ -37,6 +37,17 @@ const MobileSideBar: React.FC = () => {
     };
     fetchMenu();
   }, []);
+ 
+  useEffect(() => {
+    const userRole = Cookies.get("loggedInUserRole");
+    if (userRole === "Super-Admin" || userRole === "Admin" || userRole === "View-Admin") {
+      setDashboardUrl("/account/admin-dashboard");
+    } else {
+      setDashboardUrl("/account/sadhak-dashboard");
+    }
+  }, []);
+
+
 
   const renderIcon = (iconName: string) => {
     const allIcons = {
@@ -155,7 +166,6 @@ const MobileSideBar: React.FC = () => {
                 </Link>
               );
             }
-
             return null;
           })}
         </div>
@@ -163,9 +173,9 @@ const MobileSideBar: React.FC = () => {
 
       {/* Bottom Bar */}
       <div className="fixed bottom-0 left-0 w-full bg-orange-600 text-white p-4 flex justify-between items-center z-50">
-        <div className="flex items-center gap-2">
+        <Link href={dashboardUrl} className="flex items-center gap-2">
           <MdDashboard size={24} />
-        </div>
+        </Link>
         <button type="button" onClick={toggleMenu}>
           {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
         </button>

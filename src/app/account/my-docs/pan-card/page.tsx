@@ -8,6 +8,7 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import { BiEditAlt } from 'react-icons/bi';
 import { format } from 'date-fns';
 import Cookies from 'js-cookie';
+import { MdCloudUpload } from 'react-icons/md';
 
 interface DocTypeProps  {
     _id?: string;
@@ -158,8 +159,8 @@ const MyPanCard : React.FC = () => {
         <div className='flex mb-2 items-center justify-between'>
           <div className='flex gap-2 items-center'>
           {data?.length === 0 && (
-            <button type='button' onClick={()=> router.push("/account/add-new-pan")} title="Upload Pan" className="btnLeft">
-              Upload Pan
+            <button type='button' title="Upload Pan" onClick={()=> router.push("/account/add-new-pan")} className="btnLeft">
+              <MdCloudUpload size={24}/>
             </button>)
           }
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>

@@ -120,7 +120,7 @@ const CompletedCourse: React.FC <MyCourseDataProps> = ({myCoData}) => {
                   ? "Re-enrolled"
                   : "Request to Re-enroll"}
               </button>
-              <div className="grid grid-cols-2 gap-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                 <button
                   type="button"
                   className="btnLeft"

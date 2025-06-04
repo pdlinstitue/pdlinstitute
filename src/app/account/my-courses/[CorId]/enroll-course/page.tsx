@@ -354,14 +354,15 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
         <Loading />
       </div>
     );
-  }
+  };
+
   return (
     <div>
       <div>
         {!batchList ? (
           <NoBatch CourseId={CorId} />
         ) : (          
-          <form className="formStyle w-[600px] mx-auto my-24" onSubmit={handleSubmit}>
+          <form className="formStyle max-w-[600px] mx-auto my-24" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <h1 className="text-2xl font-bold text-center text-orange-600 italic">
                 Enroll Batch
@@ -469,7 +470,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
               )}
             </div>
             {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
               <button type="submit" className="btnLeft" disabled={isSaving}>
                 {isSaving ? "Submitting..." : "Submit"}
               </button>

@@ -8,6 +8,7 @@ import { BASE_API_URL } from '@/app/utils/constant';
 import { BiEditAlt } from 'react-icons/bi';
 import { format } from 'date-fns';
 import Cookies from 'js-cookie';
+import { MdCloudUpload } from 'react-icons/md';
 
 interface DocTypeProps  {
     _id?: string;
@@ -129,7 +130,7 @@ const MyAdsCard : React.FC = () => {
       {
         const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.result._id}`, { cache: "no-store" });
         const docData = await res.json();
-        const updatedDocList = docData.panList.map((item:any) => { 
+        const updatedDocList = docData?.adsList?.map((item:any) => { 
           return { ...item, 
             sdkFstName: item.createdBy.sdkFstName ? item.createdBy.sdkFstName : 'N/A',
             sdkPhone: item.createdBy.sdkPhone ? item.createdBy.sdkPhone : 'N/A',
@@ -159,7 +160,7 @@ const MyAdsCard : React.FC = () => {
           <div className='flex gap-2 items-center'>
           {data?.length === 0 && (
             <button type='button' onClick={()=> router.push("/account/add-new-ads")} title="Upload Adds" className="btnLeft">
-              Upload Adds
+              <MdCloudUpload size={24}/>
             </button>)
           }
             <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>

@@ -205,10 +205,10 @@ const AddNewPan: React.FC = () => {
           }
           <div className="flex flex-col gap-2">
             <label className="text-lg">Pan Image:</label>
-            <div className="flex gap-1">
+            <div className="md:flex gap-1">
               <input
                 type="file"
-                className="inputBox w-full"
+                className="inputBox w-full  mb-3 md:mb-0"
                 name="sdkPan"
                 onChange={handleFileChange}
               />
@@ -218,7 +218,7 @@ const AddNewPan: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="flex gap-2 w-full mt-3">
+        <div className="flex gap-1 w-full mt-3">
           <button type="submit" className="btnLeft w-full" disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}
           </button>

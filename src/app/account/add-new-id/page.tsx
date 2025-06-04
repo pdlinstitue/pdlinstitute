@@ -160,9 +160,9 @@ const AddNewID: React.FC = () => {
   }
 
   return (
-    <div className="flex justify-center items-center my-8">
+    <div className="flex justify-center items-center my-8 w-auto">
       <form className="formStyle w-[600px]" onSubmit={handleSubmit}>
-        <div className="grid grid-rows-4 gap-2">
+        <div className="flex flex-col gap-2 w-full">
           <div className="flex flex-col gap-2">
             <label className="text-lg">ID Number:</label>
             <input
@@ -206,10 +206,10 @@ const AddNewID: React.FC = () => {
           }
           <div className="flex flex-col gap-2">
             <label className="text-lg">ID Image:</label>
-            <div className="flex gap-1">
+            <div className="md:flex gap-1">
               <input
                 type="file"
-                className="inputBox w-full"
+                className="inputBox w-full mb-3 md:mb-0"
                 name="sdkIdProof"
                 onChange={handleFileChange}
               />
@@ -219,7 +219,7 @@ const AddNewID: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="flex gap-2 w-full mt-3">
+        <div className="flex gap-1 w-full mt-3">
           <button type="submit" className="btnLeft w-full" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : "Save"}
           </button>
