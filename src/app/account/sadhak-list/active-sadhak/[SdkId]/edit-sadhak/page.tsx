@@ -428,7 +428,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkEmail: sdkData.sdkEmail,
               sdkComAdds: sdkData.sdkComAdds,
               sdkParAdds: sdkData.sdkParAdds,
-              sdkImg: image,
+              sdkImg: sdkData.sdkImg,
               sdkRole: sdkData.sdkRole,
               isVolunteer: sdkData.isVolunteer,
               isAdmin: sdkData.isAdmin,

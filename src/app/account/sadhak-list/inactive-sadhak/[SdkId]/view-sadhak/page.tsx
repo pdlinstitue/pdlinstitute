@@ -206,7 +206,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-6">
           <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
             <Image
-              src={sdkData.sdkImg || "/images/uploadImage.jpg"}
+              src={`/api/profile-upload?name=${sdkData.sdkImg}`}
               alt="sadhak"
               width={600}
               height={350}

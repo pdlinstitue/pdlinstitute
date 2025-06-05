@@ -252,7 +252,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
               prodType: "Courses",
               coCat: data.coCat,
               coElg: data.coElg,
-              coImg: image,
+              coImg: data.coImg,
               coElgType: data.coElgType,
               coType: data.coType,
               coWhatGrp: data.coWhatGrp,
