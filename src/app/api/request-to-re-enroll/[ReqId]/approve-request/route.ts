@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import Reenrollments from "../../../../../../modals/Reenrollments";
 import dbConnect from "../../../../../../dbConnect";
 import mongoose from "mongoose";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type ReenrollmentsType = {
     reqStatus: string;
@@ -12,6 +13,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ ReqId
 
   try 
   {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { ReqId } = await params;
     const { reqStatus, updatedBy }: ReenrollmentsType = await req.json();

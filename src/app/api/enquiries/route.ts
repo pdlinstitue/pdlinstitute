@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Enquiries from "../../../../modals/Enquiries";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type EqrType = {
     eqrName:string,
@@ -14,6 +15,7 @@ export async function GET() {
 
     try {
 
+        await verifyApiToken(); 
         await dbConnect();
         const eqrList = await Enquiries.find({ isActive: true })
         .sort({createdAt:-1});
@@ -29,6 +31,7 @@ export async function GET() {
 }
 
 export async function POST(req:NextRequest) {
+
     try {
 
         await dbConnect();

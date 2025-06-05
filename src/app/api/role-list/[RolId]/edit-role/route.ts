@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Roles from "../../../../../../modals/Roles";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type RolType = {
   _id?: string;
@@ -11,6 +12,8 @@ type RolType = {
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ RolId: string }> }) {
 
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { RolId } = await params;
     const { roleType, updatedBy }: RolType = await req.json();
@@ -20,16 +23,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ RolI
     }
 
     const normalizedRoleType = roleType.trim().toLowerCase();
-
-    // if (normalizedRoleType === "admin") {
-    //   return NextResponse.json(
-    //     { success: false, msg: "You are unauthorized to create Admin role" },
-    //     { status: 403 }
-    //   );
-    // }
-
-    // Fetch the existing role
     const existingRole = await Roles.findById(RolId);
+    
     if (!existingRole) {
       return NextResponse.json({success:false, msg: "Role not found." }, { status: 404 });
     }

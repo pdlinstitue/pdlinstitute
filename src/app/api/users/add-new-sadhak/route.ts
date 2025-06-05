@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '../../../../../dbConnect';
 import Users from '../../../../../modals/Users';
 import { NextRequest, NextResponse } from "next/server";
+import { verifyApiToken } from '@/app/utils/auth';
 
 type SdkType = {
     sdkFstName: string
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
   
   try {
 
+    await verifyApiToken();
     await dbConnect();
     const 
     { 

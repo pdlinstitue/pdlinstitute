@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import Enrollments from "../../../../modals/Enrollments";
 import dbConnect from "../../../../dbConnect";
 import Practices from "../../../../modals/Practices";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function GET(req: NextRequest){
 
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const sdkId = req.nextUrl.searchParams.get("sdkId");
 

@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../../dbConnect";
 import Classes from "../../../../../../../modals/Classes";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 type ClsType = {
@@ -11,6 +12,8 @@ type ClsType = {
 export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ ClsId: string, DayId: string }> }) {
 
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { ClsId, DayId } = await params;
     const { disabledBy }: ClsType = await req.json();

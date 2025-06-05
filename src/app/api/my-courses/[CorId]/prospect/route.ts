@@ -2,6 +2,7 @@ import Enrollments from "../../../../../../modals/Enrollments";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Prospects from "../../../../../../modals/Prospects";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 type ProsType = {
@@ -19,6 +20,7 @@ export async function GET(req:NextRequest){
 
   try {
 
+    await verifyApiToken(); 
     await dbConnect();
     const prosList:ProsType[] = await Enrollments.find().populate('corId', 'coName');
 
@@ -42,6 +44,7 @@ export async function POST(req: NextRequest) {
   
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const { prosMonth, prosShift, prosWeek, prosOptMonth, prosOptShift, prosOptWeek, corId, createdBy }: ProsType = await req.json();
   

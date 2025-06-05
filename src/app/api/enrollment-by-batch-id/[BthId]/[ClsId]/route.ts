@@ -4,8 +4,10 @@ import Enrollments from "../../../../../../modals/Enrollments";
 import Attendance from "../../../../../../modals/Attendance";
 import Classes from "../../../../../../modals/Classes";
 import mongoose from "mongoose";
+import { verifyApiToken } from "@/app/utils/auth";
 
 function addMinutesToTime(timeStr: string, minutesToAdd: number): string {
+
     const [hours, minutes] = timeStr.split(":").map(Number);
     const date = new Date();
     date.setHours(hours, minutes + minutesToAdd, 0, 0);
@@ -36,6 +38,8 @@ const convertDateTime = (dateStr: string, timeStr: string) => {
 export async function GET(req: NextRequest, { params }: { params: Promise<{ BthId: string, ClsId: string }> }) {
 
     try {
+
+        await verifyApiToken(); 
         await dbConnect();
         const { BthId, ClsId } = await params;
         // Convert params to ObjectId if necessary

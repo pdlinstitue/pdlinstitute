@@ -2,6 +2,7 @@ import Courses from "../../../../modals/Courses";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Categories from "../../../../modals/Categories";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type CoType = {
     coName: string, 
@@ -28,6 +29,7 @@ export async function GET(req:NextRequest){
 
     try {
 
+      await verifyApiToken(); 
       await dbConnect();
       const coList:CoType[] = await Courses.find({isActive: true})
       .populate('coCat', 'catName')
@@ -64,6 +66,7 @@ export async function POST(req: NextRequest) {
   
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const { coName, coNick, gglFmLink, coShort, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, createdBy }: CoType = await req.json();
   

@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Enrollments from "../../../../../../modals/Enrollments";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type EnrType = {
   enrIncompRemarks: string;
@@ -12,6 +13,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ EnrId
 
   try 
   {
+
+    await verifyApiToken();  
     await dbConnect();
     const { EnrId } = await params;
     const { enrIncompRemarks, isCompleted, updatedBy} : EnrType = await req.json();

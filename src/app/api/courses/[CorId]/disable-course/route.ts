@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Courses from "../../../../../../modals/Courses";
 import Batches from "../../../../../../modals/Batches";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 type CoType = {
@@ -13,6 +14,8 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Cor
   
   try 
   {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { CorId } = await params;
     const { disabledBy }: CoType = await req.json();

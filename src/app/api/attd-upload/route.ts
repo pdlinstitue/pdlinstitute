@@ -4,9 +4,11 @@ import sharp from "sharp";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { UPLOAD_PATH } from "@/app/utils/constant";
+import { verifyApiToken } from "@/app/utils/auth";
 
 export async function GET(req: NextRequest) {
 
+    await verifyApiToken(); 
     const { searchParams } = new URL(req.url);
     const name = searchParams.get("name");
   
@@ -30,8 +32,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
 
+    await verifyApiToken();
+    const formData = await req.formData();
     const files: File[] = formData.getAll("attdImage").filter(item => item instanceof File) as File[];
 
     if (files.length === 0) {

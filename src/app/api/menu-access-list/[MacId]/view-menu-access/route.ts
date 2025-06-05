@@ -1,12 +1,14 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Menuaccess from "../../../../../../modals/Menuaccess";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ MacId: string }>}){
 
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const { MacId } = await params;
       const menuAccById = await Menuaccess.findById(MacId);

@@ -1,6 +1,7 @@
 import Categories from "../../../../modals/Categories";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type CatType = {
     _id?: string;
@@ -12,6 +13,7 @@ export async function GET(req:NextRequest){
 
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const catList: CatType[] = await Categories.find({isActive: true})
       .populate('createdBy', 'sdkFstName')
@@ -32,6 +34,7 @@ export async function GET(req:NextRequest){
   
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const { catName, createdBy }: CatType = await req.json();
   

@@ -3,6 +3,7 @@ import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 import mongoose from "mongoose";
 import Enrollments from "../../../../../../modals/Enrollments";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type BatchType = {
   bthName:string, 
@@ -25,6 +26,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ CorI
 
   try {
 
+    await verifyApiToken(); 
     await dbConnect();
     const sdkId = req.nextUrl.searchParams.get("sdkId");
     const isReEnroll = req.nextUrl.searchParams.get("isReEnroll");

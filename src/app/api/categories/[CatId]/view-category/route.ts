@@ -1,12 +1,14 @@
 import { NextResponse, NextRequest } from "next/server";
 import Categories from "../../../../../../modals/Categories";
 import dbConnect from "../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ CatId: string }>}){
 
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const { CatId } = await params;
       const catById = await Categories.findById(CatId);

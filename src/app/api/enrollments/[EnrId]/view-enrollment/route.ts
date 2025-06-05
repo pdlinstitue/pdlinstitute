@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Enrollments from "../../../../../../modals/Enrollments";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type EnrType = {
   enrRemarks: string;
@@ -12,6 +13,8 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ EnrId
 
     try 
     {  
+
+      await verifyApiToken(); 
       await dbConnect();
       const { EnrId } = await params;
       const enrById = await Enrollments.findById(EnrId);
@@ -31,6 +34,8 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Enr
 
   try 
   {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { EnrId } = await params;
     const { enrRemarks, isApproved, updatedBy} : EnrType = await req.json();

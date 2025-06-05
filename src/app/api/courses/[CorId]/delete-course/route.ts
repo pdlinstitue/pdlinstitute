@@ -2,12 +2,14 @@ import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Courses from "../../../../../../modals/Courses";
 import Batches from "../../../../../../modals/Batches";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }) {
 
  try 
   {
+    await verifyApiToken(); 
     await dbConnect();
     const { CorId } = await params;
 

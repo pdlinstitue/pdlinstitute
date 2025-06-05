@@ -3,14 +3,17 @@ import Users from "../../../../modals/Users";
 import dbConnect from "../../../../dbConnect";
 import sendEmail from "@/app/utils/email";
 import crypto from 'crypto';
+import { verifyApiToken } from "@/app/utils/auth";
 
  
 export const PUT = async (request:NextRequest) => {
 
     try {
-        const {sdkEmail} = await request.json();
-        await dbConnect();
 
+        await verifyApiToken();
+        await dbConnect();
+        
+        const {sdkEmail} = await request.json();
         const user = await Users.findOne({sdkEmail});
 
         if(!user){

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Screenshots from "../../../../modals/Screenshots";
 import mongoose from "mongoose";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 type ScreenshotsType = {
@@ -14,6 +15,8 @@ type ScreenshotsType = {
 
 export async function GET(request: NextRequest) {
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
 
     const bthId = request.nextUrl.searchParams.get("bthId");
@@ -48,6 +51,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
 
+        await verifyApiToken(); 
         await dbConnect();
         const { bthId, clsId, attdSreenShots, uploadedBy } : ScreenshotsType = await request.json();
 

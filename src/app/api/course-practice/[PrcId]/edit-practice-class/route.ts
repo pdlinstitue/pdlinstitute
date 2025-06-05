@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Practices from "../../../../../../modals/Practices";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type PrcType = {
   prcName:string,
@@ -18,6 +19,7 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ PrcId
 
   try 
   {
+    await verifyApiToken(); 
     await dbConnect();
     const { PrcId } = await params;
 

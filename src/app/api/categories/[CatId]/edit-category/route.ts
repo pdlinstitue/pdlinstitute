@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Categories from "../../../../../../modals/Categories";
 import dbConnect from "../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type CatType = {
   _id?: string;
@@ -12,6 +13,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CatId
 
   try 
   {
+    
+    await verifyApiToken();
     await dbConnect();
     const { CatId } = await params;
     const { catName, updatedBy }: CatType = await req.json();

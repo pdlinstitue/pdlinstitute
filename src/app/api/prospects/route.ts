@@ -1,6 +1,7 @@
 import Prospects from "../../../../modals/Prospects";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type ProsType = {
     _id:string,
@@ -19,6 +20,7 @@ export async function GET(req:NextRequest){
 
     try {
   
+      await verifyApiToken();
       await dbConnect();
       const prosList:ProsType[] = await Prospects.find({isActive:true})
       .populate('corId', 'coNick')

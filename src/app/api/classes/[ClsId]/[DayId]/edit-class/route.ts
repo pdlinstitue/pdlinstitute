@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Classes from "../../../../../../../modals/Classes";
 import dbConnect from "../../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type ClsItem = {
   clsDay: string;
@@ -15,6 +16,8 @@ type ClsItem = {
 export async function PUT(req: NextRequest,{ params }: { params: Promise<{ ClsId: string, DayId: string }> }) {
 
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { ClsId, DayId } = await params;
     const { clsDay, clsStartAt, clsEndAt, clsDate, clsLink, clsAssignments, updatedBy }: ClsItem = await req.json();

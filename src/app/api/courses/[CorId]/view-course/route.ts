@@ -2,12 +2,15 @@ import { NextResponse, NextRequest } from "next/server";
 import Courses from "../../../../../../modals/Courses";
 import dbConnect from "../../../../../../dbConnect";
 import Categories from "../../../../../../modals/Categories";
+import { verifyApiToken } from "@/app/utils/auth";
  
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }) {
 
   try 
   {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { CorId } = await params;
     const corById = await Courses.findById(CorId);

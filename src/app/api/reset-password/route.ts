@@ -3,14 +3,16 @@ import Users from "../../../../modals/Users";
 import dbConnect from "../../../../dbConnect";
 import crypto from 'crypto';
 import bcrypt from "bcryptjs";
+import { verifyApiToken } from "@/app/utils/auth";
 
 export const PUT = async (request:NextRequest) =>{
 
 try 
-    {
-        const {token, sdkPwd, confPwd} = await request.json();
 
+    { 
+        await verifyApiToken();
         await dbConnect();
+        const {token, sdkPwd, confPwd} = await request.json();
         const resetLink = crypto.createHash('sha256').update(token).digest('hex');
         const user = await Users.findOne({pwdResetToken:resetLink, pwdResetTokenExpires: {$gt: Date.now()}});
         //If the user exists with the given resetLink and the link has not expired.

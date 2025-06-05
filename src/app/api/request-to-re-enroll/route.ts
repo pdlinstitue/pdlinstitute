@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Reenrollments from "../../../../modals/Reenrollments";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type ReenrollmentsType = {
   corId: string;
@@ -12,6 +13,7 @@ export async function GET(req:NextRequest){
 
   try {
     
+    await verifyApiToken(); 
     await dbConnect();
     const reqList:ReenrollmentsType[] = await Reenrollments.find({isActive:true})
     .populate('corId', 'coNick')

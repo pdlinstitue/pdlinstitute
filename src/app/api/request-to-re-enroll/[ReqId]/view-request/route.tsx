@@ -1,12 +1,14 @@
 import { NextResponse, NextRequest } from "next/server";
 import Reenrollments from "../../../../../../modals/Reenrollments";
 import dbConnect from "../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ ReqId: string }>}){
 
     try {
   
+      await verifyApiToken();
       await dbConnect();
       const { ReqId } = await params;
       const reqById = await Reenrollments.findById(ReqId);

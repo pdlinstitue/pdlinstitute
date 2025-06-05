@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Documents from "../../../../../../modals/Documents";
 import dbConnect from "../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type DocType = {
     _id?: string;
@@ -20,6 +21,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ DocId
 
   try 
   {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { DocId } = await params;
 

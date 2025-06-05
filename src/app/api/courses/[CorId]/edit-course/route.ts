@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Courses from "../../../../../../modals/Courses";
 import dbConnect from "../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 type CoType = {
@@ -28,6 +29,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CorId
 
   try 
   {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { CorId } = await params;
     const corById = await Courses.findById(CorId);

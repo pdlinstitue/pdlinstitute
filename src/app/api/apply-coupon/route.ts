@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Coupons from "../../../../modals/Coupons";
 import Enrollments from "../../../../modals/Enrollments";
 import moment from "moment";
+import { verifyApiToken } from "@/app/utils/auth";
+import dbConnect from "../../../../dbConnect";
 
 type CouponType = {
     cpnName: string;
@@ -14,6 +16,9 @@ export  async function POST (req:NextRequest) {
 
     try {
 
+        await verifyApiToken(); 
+        await dbConnect();
+        
         const { cpnName, appliedBy, corId } : CouponType = await req.json();
         const coupon = await Coupons.findOne({ cpnName });
 

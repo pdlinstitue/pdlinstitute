@@ -1,11 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import Users from "../../../../../../modals/Users";
 import dbConnect from "../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function DELETE(req: NextRequest, {params}:{params: Promise<{SdkId: string}>}) {
 
     try {
+        await verifyApiToken();
         await dbConnect();  
         const {SdkId} = await params;    
 

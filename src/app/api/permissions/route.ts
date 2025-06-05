@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Permissions from "../../../../modals/Permissions";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type PermitType = {
   rolId: string;
@@ -12,6 +13,8 @@ type PermitType = {
 
 export async function GET(req: NextRequest) {
   try {
+
+    await verifyApiToken();
     const { searchParams } = new URL(req.url);    
     const rolId = searchParams.get("rolId");
     const modId = searchParams.get("modId");
@@ -40,6 +43,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+
+    await verifyApiToken();
     await dbConnect();
 
     const {      

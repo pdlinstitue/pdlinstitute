@@ -2,20 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import Coupons from "../../../../modals/Coupons";
 import dbConnect from "../../../../dbConnect";
 import Users from "../../../../modals/Users";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function GET(req: NextRequest) {
     
     try {
+
+        await verifyApiToken(); 
         await dbConnect();
         const sdkId = req.nextUrl.searchParams.get("sdkId");
 
         if (!sdkId) {
             return new NextResponse(JSON.stringify({ success: false, msg: "No Sadhak Found" }), { status: 404 });
         }
-
-        // Convert sdkId to an array if multiple IDs are comma-separated
-        //const sdkIdArray = sdkId.split(",");
 
         // Fetch all active coupons available for everyone
         const cpnListForAll = await Coupons.find({ isActive: true, cpnFor: "All" })

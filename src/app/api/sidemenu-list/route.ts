@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Sidemenues from "../../../../modals/Sidemenues";
 import mongoose from "mongoose";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type SideMenuType = {
   _id?: string;
@@ -19,8 +20,9 @@ type SideMenuType = {
 
 export async function GET(req: NextRequest) {
   try {
-    await dbConnect();
 
+    await verifyApiToken();
+    await dbConnect();
     const menuList = await Sidemenues.find({ isActive: true })
       .populate("createdBy", "sdkFstName")
       .populate("updatedBy", "sdkFstName")
@@ -59,6 +61,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+
+    await verifyApiToken();
     await dbConnect();
 
     const {

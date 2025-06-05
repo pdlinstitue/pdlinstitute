@@ -3,17 +3,17 @@ import dbConnect from "../../../../../dbConnect";
 import Permissions from "../../../../../modals/Permissions";
 import Roles from "../../../../../modals/Roles";
 import Modules from "../../../../../modals/Modules";
+import { verifyApiToken } from "@/app/utils/auth";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ RoleType: string }> }
-) {
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ RoleType: string }> }) {
+  
+  await verifyApiToken();
   await dbConnect();
   const { RoleType } = await params;
 
   try {
-    const role = await Roles.find({ roleType: RoleType, isActive: true });
 
+    const role = await Roles.find({ roleType: RoleType, isActive: true });
     const permissions = await Permissions.find({
       rolId: role[0]._id,
       isActive: true,

@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import Menuaccess from "../../../../modals/Menuaccess";
 import dbConnect from "../../../../dbConnect";
 import Roles from "../../../../modals/Roles";
+import { verifyApiToken } from "@/app/utils/auth";
 
-export async function GET(
-  req: NextRequest) {
+export async function GET(req: NextRequest) {
+
   try {
+
+    await verifyApiToken();
     await dbConnect();
 
     const userRoleName = req.nextUrl.searchParams.get("userRole");

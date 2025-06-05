@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Attendance from "../../../../../../../modals/Attendance";
 import dbConnect from "../../../../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type AttdType = {
   status: string;
@@ -8,11 +9,10 @@ type AttdType = {
   markedBy: string;
 };
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ BthId: string; ClsId: string; SdkId: string }> }
-) {
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ BthId: string; ClsId: string; SdkId: string }> }) {
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { BthId, ClsId, SdkId } = await params;
 
@@ -42,11 +42,10 @@ export async function GET(
   }
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ BthId: string; ClsId: string; SdkId: string }> }
-) {
+export async function POST(req: NextRequest,{ params }: { params: Promise<{ BthId: string; ClsId: string; SdkId: string }> }) {
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
     const { BthId, ClsId, SdkId } = await params;
     const { status, absRemarks, markedBy }: AttdType = await req.json();

@@ -4,9 +4,13 @@ import Classes from "../../../../modals/Classes";
 import Enrollments from "../../../../modals/Enrollments";
 import Attendance from "../../../../modals/Attendance";
 import mongoose from "mongoose";
+import { verifyApiToken } from "@/app/utils/auth";
+
 
 export async function GET(req: NextRequest) {
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
 
     const corId = req.nextUrl.searchParams.get("corId");
@@ -114,7 +118,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  
   try {
+
+    await verifyApiToken(); 
     await dbConnect();
 
     const { clsName, bthId, corId } = await req.json();

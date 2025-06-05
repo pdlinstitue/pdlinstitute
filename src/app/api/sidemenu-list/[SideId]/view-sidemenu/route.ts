@@ -1,12 +1,14 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Sidemenues from "../../../../../../modals/Sidemenues";
+import { verifyApiToken } from "@/app/utils/auth";
 
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ SideId: string }>}){
 
     try {
   
+      await verifyApiToken();
       await dbConnect();
       const { SideId } = await params;
       const sideMenuById = await Sidemenues.findById(SideId);

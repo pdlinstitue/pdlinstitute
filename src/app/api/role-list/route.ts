@@ -1,6 +1,7 @@
 import Roles from "../../../../modals/Roles";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
+import { verifyApiToken } from "@/app/utils/auth";
 
 type RolType = {
     _id?: string;
@@ -12,6 +13,7 @@ export async function GET(req:NextRequest){
 
     try {
   
+      await verifyApiToken(); 
       await dbConnect();
       const rolList: RolType[] = await Roles.find({isActive: true})
       .populate('createdBy', 'sdkFstName')
@@ -27,16 +29,11 @@ export async function GET(req:NextRequest){
   export async function POST(req: NextRequest) {
 
     try {
+
+      await verifyApiToken();
       await dbConnect();
       const { roleType, createdBy }: RolType = await req.json();
       const normalizedRoleType = roleType.trim().toLowerCase();
-  
-      // if (normalizedRoleType === "admin") {
-      //   return NextResponse.json(
-      //     { success: false, msg: "You are unauthorized to create Admin role" },
-      //     { status: 403 }
-      //   );
-      // }
   
       const isRoleTypeExists = await Roles.findOne({
         roleType: { $regex: new RegExp(`^${normalizedRoleType}$`, 'i') },

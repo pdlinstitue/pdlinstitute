@@ -1,11 +1,11 @@
 import Users from "../../../../modals/Users";
 import dbConnect from "../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
-import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const POST = async (request: NextRequest) => {
+  
   try {
     const { sdkCred, sdkPwd } = await request.json();
     await dbConnect();
@@ -52,9 +52,15 @@ export const POST = async (request: NextRequest) => {
      //  }, { status: 200 });
      //}    
 
-    const secretKey = crypto.randomBytes(32).toString('hex');
-    const expiresIn = process.env.LOGIN_EXPIRES ? parseInt(process.env.LOGIN_EXPIRES) : 600;
-    const token = jwt.sign({ id: user._id }, secretKey, { expiresIn });
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT_SECRET is not defined in environment');
+
+    const expiresInEnv = process.env.LOGIN_EXPIRES;
+    const expiresIn = expiresInEnv && !isNaN(Number(expiresInEnv))
+      ? parseInt(expiresInEnv)
+      : 10800; // default to 3 hours
+
+    const token = jwt.sign({ id: user._id }, secret, { expiresIn });
     user.sdkPwd = null;
 
     const res = NextResponse.json({
