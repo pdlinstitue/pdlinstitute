@@ -278,7 +278,11 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
       const data = await res.json();
       if (data.success) {
         toast.success("Image uploaded successfully!");
-        setImage(data.imageUrl || "");
+        setImage(data.imageUrl);
+        setSdkData((prevData) => ({
+          ...prevData,
+          sdkImg: data.imageUrl,
+        }));
       } else {
         throw new Error(data.error || "Upload failed");
       }

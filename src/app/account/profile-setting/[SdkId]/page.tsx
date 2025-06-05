@@ -271,6 +271,10 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
       if (data.success) {
         toast.success("Image uploaded successfully!");
         setImage(data.imageUrl);
+        setSdkData((prevData) => ({
+          ...prevData,
+          sdkImg: data.imageUrl,
+        }));
       } else {
         throw new Error(data.error || "Upload failed");
       }

@@ -61,39 +61,24 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const batchClassCounts: Record<string, number> = {};
-    const batchClassIds: Record<string, mongoose.Types.ObjectId[]> = {};
-
-    const classes = await Classes.find({ bthId: { $exists: true } }).lean();
-
-    classes.forEach((cls) => {
-      const batchId = cls.bthId.toString();
-      if (!batchClassCounts[batchId]) {
-        batchClassCounts[batchId] = 0;
-        batchClassIds[batchId] = [];
-      }
-
-      if (cls.clsName && Array.isArray(cls.clsName)) {
-        batchClassCounts[batchId] += cls.clsName.length; // Count total classes
-        batchClassIds[batchId].push(...cls.clsName.map((c: any) => c._id)); // Store all class IDs
-      }
-    });
-
     // Compute ttlJoiners & batchAttendance in one loop
     const enrListWithStats = await Promise.all(
       enrList.map(async (enr) => {
         // Count total joiners
         const ttlJoiners = await Enrollments.countDocuments({
-          corId: enr?.corId,
-          bthId: enr?.bthId,
+          corId: enr?.corId?._id,
+          bthId: enr?.bthId?._id,
         });
 
         // Compute batch-wise attendance
-        const totalClasses = batchClassCounts[enr?.bthId?._id] || 0;
-        const classIds = batchClassIds[enr?.bthId?._id] || [];
+        const classByBatch: any = await Classes.findOne({
+          bthId: enr?.bthId?._id,
+        }).lean();
+        const totalClasses = classByBatch?.clsName?.length || 0;
+        const classIds = classByBatch?.clsName?.map((a: any) => a._id) || [];
 
         const attendedClasses = await Attendance.countDocuments({
-          bthId: enr?.bthId,
+          //bthId: enr?.bthId,
           clsId: { $in: classIds },
           sdkId: enr?.sdkId?._id,
           status: "Present",

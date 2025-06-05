@@ -158,6 +158,10 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         if (data.success) {
           toast.success("Image uploaded successfully!");            
           setImage(data.imageUrl);
+          setData((prev) => ({
+            ...prev,
+            coImg: data.imageUrl,
+          }));
         } else {
           throw new Error(data.error || "Upload failed");
         }
