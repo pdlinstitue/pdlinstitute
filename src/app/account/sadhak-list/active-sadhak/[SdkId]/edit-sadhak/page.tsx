@@ -16,6 +16,8 @@ interface EditSadhakProps {
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
+  sdkEdc: string;
+  sdkOcp: string;
   sdkFthName: string;
   sdkMthName: string;
   sdkAbout: string;
@@ -25,6 +27,8 @@ interface EditSadhakProps {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string;
+  sdkRefName: string;
+  sdkRefCont: string;
   sdkCountry: string;
   sdkState: string;
   sdkCity: string;
@@ -61,6 +65,7 @@ interface RoleListProps {
 }
 
 const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
+
   const router = useRouter();
   const { SdkId } = use(params);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -77,6 +82,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     sdkFstName: "",
     sdkMdlName: "",
     sdkLstName: "",
+    sdkEdc: "",
+    sdkOcp: "",
     sdkFthName: "",
     sdkMthName: "",
     sdkAbout: "",
@@ -86,6 +93,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     sdkGender: "",
     sdkMarStts: "",
     sdkSpouce: "",
+    sdkRefName: "",
+    sdkRefCont: "",
     sdkPhone: "",
     sdkWhtNbr: "",
     sdkEmail: "",
@@ -239,6 +248,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
   };
 
   const handleUpload = async () => {
+
     if (!image) {
       toast.error("Please select an image!");
       return;
@@ -257,7 +267,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     // Validate image resolution
     const formData = new FormData();
     formData.append("profileImage", image);
-    formData.append("profileImageFileName", sdkData.sdkImg);
+    formData.append("profileImageFileName", sdkData?.sdkImg);
 
     try {
       const res = await fetch("/api/profile-upload", {
@@ -268,7 +278,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
       const data = await res.json();
       if (data.success) {
         toast.success("Image uploaded successfully!");
-        setImage(data.imageUrl);
+        setImage(data.imageUrl || "");
       } else {
         throw new Error(data.error || "Upload failed");
       }
@@ -329,6 +339,20 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
           sdkData.sdkSpouce?.trim() === "")
       ) {
         setErrorMessage("Spouce name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkRefName" in sdkData) ||
+        sdkData.sdkRefName === null ||
+        sdkData.sdkRefName.trim() === ""
+      ) {
+        setErrorMessage("Referer name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkRefCont" in sdkData) ||
+        sdkData.sdkRefCont === null ||
+        sdkData.sdkRefCont.trim() === ""
+      ) {
+        setErrorMessage("Referer phone is required.");
       } else if (
         !sdkData ||
         !("sdkCountry" in sdkData) ||
@@ -411,6 +435,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkFstName: sdkData.sdkFstName,
               sdkMdlName: sdkData.sdkMdlName,
               sdkLstName: sdkData.sdkLstName,
+              sdkEdc: sdkData.sdkEdc,
+              sdkOcp: sdkData.sdkOcp,
               sdkFthName: sdkData.sdkFthName,
               sdkMthName: sdkData.sdkMthName,
               sdkAbout: sdkData.sdkAbout,
@@ -420,6 +446,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkGender: sdkData.sdkGender,
               sdkMarStts: sdkData.sdkMarStts,
               sdkSpouce: sdkData.sdkSpouce,
+              sdkRefName: sdkData.sdkRefName,
+              sdkRefCont: sdkData.sdkRefCont,
               sdkCountry: sdkData.sdkCountry,
               sdkState: sdkData.sdkState,
               sdkCity: sdkData.sdkCity,
@@ -465,12 +493,12 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
   return (
     <div>
       <form className="formStyle w-full" onSubmit={handleSubmit}>
-        <div className="flex gap-8 w-auto">
+        <div className="md:flex gap-8 w-auto">
           <div className="flex flex-col gap-1 max-w-[400px] h-auto">
-            <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+            <div className="max-w-[400px] h-[345px] border-[1.5px] bg-gray-100">
               {sdkData.sdkImg ? (
                 <Image
-                  src={`/api/profile-upload?name=${sdkData.sdkImg}`}
+                  src={`/api/profile-upload?name=${sdkData?.sdkImg}`}
                   alt="Profile Preview"
                   width={400}
                   height={345}
@@ -504,7 +532,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
                 <label className="text-lg">First Name:</label>
                 <input
@@ -536,7 +564,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
                 <label className="text-lg">Father's Name:</label>
                 <input
@@ -568,7 +596,27 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Education:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkEdc"
+                  value={sdkData.sdkEdc}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Occupation:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkOcp"
+                  value={sdkData.sdkOcp}
+                  onChange={handleChange}
+                />
+              </div>
               <div className="flex flex-col gap-2">
                 <label className="text-lg">Phone:</label>
                 <input
@@ -602,7 +650,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Gender:</label>
             <select
@@ -628,7 +676,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Marital Status:</label>
             <select
@@ -654,7 +702,29 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Name:</label>
+            <input
+              className="inputBox"
+              name="sdkRefName"
+              value={sdkData.sdkRefName}
+              onChange={handleChange}
+            >
+            </input>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Phone:</label>
+            <input
+              type="number"
+              className="inputBox"
+              name="sdkRefCont"
+              value={sdkData.sdkRefCont}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Country:</label>
             <select
@@ -692,7 +762,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">City:</label>
             <select
@@ -730,7 +800,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Permanent Address:</label>
             <textarea
@@ -752,7 +822,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Do you have any medical issues?</label>
             <div className="flex gap-4 mt-3">

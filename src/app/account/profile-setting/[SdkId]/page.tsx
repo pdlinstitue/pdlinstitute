@@ -16,6 +16,8 @@ interface IProfileSetting {
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
+  sdkEdc:string;
+  sdkOcp:string;
   sdkFthName: string;
   sdkMthName: string;
   sdkAbout: string;
@@ -25,6 +27,8 @@ interface IProfileSetting {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string;
+  sdkRefName:string;
+  sdkRefCont:string;
   sdkCountry: string;
   sdkState: string;
   sdkCity: string;
@@ -59,6 +63,7 @@ interface RoleListProps {
 }
 
 const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
+
   const router = useRouter();
   const { SdkId } = use(params);
   const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
@@ -75,6 +80,10 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
     sdkFstName: "",
     sdkMdlName: "",
     sdkLstName: "",
+    sdkEdc:"",
+    sdkOcp:"",
+    sdkRefName:"",
+    sdkRefCont:"",
     sdkFthName: "",
     sdkMthName: "",
     sdkAbout: "",
@@ -316,6 +325,20 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
       ) {
         setErrorMessage("Spouce name is required.");
       } else if (
+        !sdkData ||
+        !("sdkRefName" in sdkData) ||
+        sdkData.sdkRefName === null ||
+        sdkData.sdkRefName.trim() === ""
+      ) {
+        setErrorMessage("Referer name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkRefCont" in sdkData) ||
+        sdkData.sdkRefCont === null ||
+        sdkData.sdkRefCont.trim() === ""
+      ) {
+        setErrorMessage("Referer phone is required.");
+      } else if (
         !("sdkCountry" in sdkData) ||
         sdkData.sdkCountry === null ||
         sdkData.sdkCountry.trim() === ""
@@ -385,6 +408,8 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               sdkFstName: sdkData.sdkFstName,
               sdkMdlName: sdkData.sdkMdlName,
               sdkLstName: sdkData.sdkLstName,
+              sdkEdc:sdkData.sdkEdc,
+              sdkOcp:sdkData.sdkOcp,
               sdkFthName: sdkData.sdkFthName,
               sdkMthName: sdkData.sdkMthName,
               sdkAbout: sdkData.sdkAbout,
@@ -395,6 +420,8 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               sdkMarStts: sdkData.sdkMarStts,
               sdkSpouce: sdkData.sdkSpouce,
               sdkCountry: sdkData.sdkCountry,
+              sdkRefName:sdkData.sdkRefName,
+              sdkRefCont:sdkData.sdkRefCont,
               sdkState: sdkData.sdkState,
               sdkCity: sdkData.sdkCity,
               sdkPhone: sdkData.sdkPhone,
@@ -547,7 +574,27 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Education:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkEdc"
+                  value={sdkData.sdkEdc}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Occupation:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkOcp"
+                  value={sdkData.sdkOcp}
+                  onChange={handleChange}
+                />
+              </div>
               <div className="flex flex-col gap-2">
                 <label className="text-lg">Phone:</label>
                 <input
@@ -629,6 +676,28 @@ const ProfileSetting: React.FC<IProfileParams> = ({ params }) => {
               className="inputBox"
               name="sdkSpouce"
               value={sdkData.sdkSpouce}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Name:</label>
+            <input
+              className="inputBox"
+              name="sdkRefName"
+              value={sdkData.sdkRefName}
+              onChange={handleChange}
+            >
+            </input>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Phone:</label>
+            <input
+              type="number"
+              className="inputBox"
+              name="sdkRefCont"
+              value={sdkData.sdkRefCont}
               onChange={handleChange}
             />
           </div>

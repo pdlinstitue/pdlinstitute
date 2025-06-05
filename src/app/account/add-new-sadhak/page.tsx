@@ -14,6 +14,8 @@ interface AddNewSadhakProps {
   sdkLstName: string;
   sdkFthName: string;
   sdkMthName: string;
+  sdkEdc: string;
+  sdkOcp: string;
   sdkAbout: string;
   isMedIssue: string;
   sdkMedIssue: string;
@@ -21,6 +23,8 @@ interface AddNewSadhakProps {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string;
+  sdkRefName: string;
+  sdkRefCont: string;
   sdkCountry: string;
   sdkState: string;
   sdkCity: string;
@@ -77,6 +81,8 @@ const AddNewSadhak: React.FC = () => {
     sdkLstName: "",
     sdkFthName: "",
     sdkMthName: "",
+    sdkEdc: "",
+    sdkOcp: "",
     sdkAbout: "",
     isMedIssue: "",
     sdkMedIssue: "",
@@ -84,6 +90,8 @@ const AddNewSadhak: React.FC = () => {
     sdkGender: "",
     sdkMarStts: "",
     sdkSpouce: "",
+    sdkRefName: "",
+    sdkRefCont: "",
     sdkPhone: "",
     sdkWhtNbr: "",
     sdkEmail: "",
@@ -325,6 +333,20 @@ const AddNewSadhak: React.FC = () => {
         setErrorMessage("Spouce name is required.");
       } else if (
         !sdkData ||
+        !("sdkRefName" in sdkData) ||
+        sdkData.sdkRefName === null ||
+        sdkData.sdkRefName.trim() === ""
+      ) {
+        setErrorMessage("Referer name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkRefCont" in sdkData) ||
+        sdkData.sdkRefCont === null ||
+        sdkData.sdkRefCont.trim() === ""
+      ) {
+        setErrorMessage("Referer phone is required.");
+      } else if (
+        !sdkData ||
         !("sdkCountry" in sdkData) ||
         sdkData.sdkCountry === null ||
         sdkData.sdkCountry.trim() === ""
@@ -403,6 +425,8 @@ const AddNewSadhak: React.FC = () => {
             sdkFstName: sdkData.sdkFstName,
             sdkMdlName: sdkData.sdkMdlName,
             sdkLstName: sdkData.sdkLstName,
+            sdkEdc: sdkData.sdkEdc,
+            sdkOcp: sdkData.sdkOcp,
             sdkFthName: sdkData.sdkFthName,
             sdkMthName: sdkData.sdkMthName,
             sdkAbout: sdkData.sdkAbout,
@@ -556,7 +580,27 @@ const AddNewSadhak: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Education:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkEdc"
+                  value={sdkData.sdkEdc}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Occupation:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkOcp"
+                  value={sdkData.sdkOcp}
+                  onChange={handleChange}
+                />
+              </div>
               <div className="flex flex-col gap-2">
                 <label className="text-lg">Phone:</label>
                 <input
@@ -638,6 +682,28 @@ const AddNewSadhak: React.FC = () => {
               className="inputBox"
               name="sdkSpouce"
               value={sdkData.sdkSpouce}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Name:</label>
+            <input
+              className="inputBox"
+              name="sdkRefName"
+              value={sdkData.sdkRefName}
+              onChange={handleChange}
+            >
+            </input>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Phone:</label>
+            <input
+              type="number"
+              className="inputBox"
+              name="sdkRefCont"
+              value={sdkData.sdkRefCont}
               onChange={handleChange}
             />
           </div>
