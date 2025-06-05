@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     const attendanceCounts = await Attendance.aggregate([
       {
         $group: {
-          _id: { bthId: "$bthId", clsId: "$clsId" },
+          _id: { clsId: "$clsId" },
           presentCount: {
             $sum: { $cond: [{ $eq: ["$status", "Present"] }, 1, 0] },
           },
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
     // Create a map for attendance counts
     const attendanceMap = new Map();
     attendanceCounts?.forEach(({ _id, presentCount, absentCount }) => {
-      const key = `${_id.bthId}_${_id.clsId}`;
+      const key = `${_id.clsId}`;
       attendanceMap.set(key, { presentCount, absentCount });
     });
 
@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
                   (duration === "upcoming" && session.clsDate >= tomorrow)))
             ) // Use filter instead of find()
             .map((session: any) => {
-              const attendanceKey = `${cls.bthId?._id}_${session._id}`;
+              const attendanceKey = `${session._id}`;
               const { presentCount = 0, absentCount = 0 } =
                 attendanceMap.get(attendanceKey) || {};
               return { ...session.toObject(), presentCount, absentCount };

@@ -66,7 +66,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ BthI
         const enrichedEnrollments = await Promise.all(
             enrByBatchId.map(async (enrollment) => {
                 const attendanceRecord = await Attendance.findOne({
-                    bthId: batchId,
+                    //bthId: batchId,
                     clsId: classId,
                     sdkId: enrollment.sdkId._id,
                 });
