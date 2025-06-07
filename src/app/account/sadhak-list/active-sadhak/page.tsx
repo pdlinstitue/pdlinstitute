@@ -23,7 +23,7 @@ import { TbPasswordFingerprint } from "react-icons/tb";
 import { BASE_API_URL } from "@/app/utils/constant";
 import { format } from "date-fns";
 import Cookies from "js-cookie";
-import { fetchSadhakData } from "@/app/services/users";
+
 interface SadhakListProps {
   sdkFstName: string;
   sdkMdlName: string;
@@ -208,19 +208,28 @@ const ActiveSadhakList: React.FC = () => {
   };
 
   useEffect(() => {
-  async function getSadhakData() {
-    try {
-      const role = Cookies.get("loggedInUserRole") || "";
-      const sadhakData = await fetchSadhakData(role);
-      setActiveSdk(sadhakData.activeSdkList);
-    } catch (error) {
-      console.error("Error fetching sadhak data:", error);
-    } finally {
-      setIsLoading(false);
+    async function fetchSadhakData() {
+      try {
+        const res = await fetch(
+          `${BASE_API_URL}/api/users/list?usrRole=${Cookies.get(
+            "loggedInUserRole"
+          )}`,
+          {
+            method: "GET", // Explicitly specify the HTTP method
+            cache: "no-store",
+          }
+        );
+
+        const sadhakData = await res.json();
+        setActiveSdk(sadhakData.activeSdkList);
+      } catch (error) {
+        console.error("Error fetching sadhak data:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
-  getSadhakData();
-}, []);
+    fetchSadhakData();
+  }, []);
 
   const [loggedInUser, setLoggedInUser] = useState({
     result: {
