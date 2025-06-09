@@ -94,9 +94,17 @@ const EditCoupon: React.FC<ICpnParams> = ({ params }) => {
 
   const handleCouponFor = (cpnMadeFor: string) => {
     if (cpnMadeFor === "All") {
+      setData((prev: any) => ({
+        ...prev,
+        cpnFor: "All",
+      }));
       setCouponFor("All");
     } else {
       setCouponFor("Specific");
+      setData((prev: any) => ({
+        ...prev,
+        cpnFor: "Specific",
+      }));
     }
   };
 
@@ -129,6 +137,8 @@ const EditCoupon: React.FC<ICpnParams> = ({ params }) => {
         );
         const couponData = await res.json();
         setData(couponData.cpnById);
+        setCouponFor(couponData.cpnById.cpnFor);
+        setManageBox(couponData.cpnById.cpnSdk || []);
       } catch (error) {
         console.error("Error fetching course data:", error);
       } finally {
