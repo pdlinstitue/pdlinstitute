@@ -282,7 +282,7 @@ const resetOtpData = () =>{
             />
           </div> */}
         </div>
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-1 mt-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-1 mt-4 mb-2'>
           <button type='button' className='btnLeft w-full' onClick={handleSendOtp}>Send OTP</button>
           <button type='button' className='btnRight w-full' onClick={handleVerifyOtp}>Verify</button>
         </div>

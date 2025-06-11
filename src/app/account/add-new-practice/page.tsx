@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Cookies from "js-cookie";
 import Loading from "../Loading";
+import Select from "react-select";
 
 interface AddNewPracticeProps {
   prcName: string;
@@ -20,9 +21,9 @@ interface AddNewPracticeProps {
 }
 
 interface CourseListProps {
-  _id:string,
-  coName:string,
-  coNick:string
+  _id: string;
+  coName: string;
+  coNick: string;
 }
 
 const AddNewPractice = () => {
@@ -31,8 +32,8 @@ const AddNewPractice = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [image , setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>('');
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [pracDays, setPracDays] = useState<string[] | null>([]);
   const [courseList, setCourseList] = useState<CourseListProps[] | null>([]);
@@ -47,6 +48,7 @@ const AddNewPractice = () => {
     prcImg: "",
     createdBy: "",
   });
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
   const practiceDays: string[] = [
     "Sun",
     "Mon",
@@ -86,17 +88,19 @@ const AddNewPractice = () => {
   useEffect(() => {
     async function fetchCourseData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/courses`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/courses`, {
+          cache: "no-store",
+        });
         const coData = await res.json();
         setCourseList(coData.coList);
       } catch (error) {
-          console.error("Error fetching course data:", error);
+        console.error("Error fetching course data:", error);
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       }
     }
     fetchCourseData();
-    }, []);
+  }, []);
 
   const handleChange = (e: any) => {
     const name = e.target.name;
@@ -118,7 +122,6 @@ const AddNewPractice = () => {
   };
 
   const handleUpload = async () => {
-
     if (!image) {
       toast.error("Please select an image!");
       return;
@@ -127,10 +130,10 @@ const AddNewPractice = () => {
     setIsUploading(true);
     const img = new window.Image();
     if (image instanceof File) {
-        img.src = URL.createObjectURL(image);
+      img.src = URL.createObjectURL(image);
     } else {
-        toast.error("Invalid image format!");
-        return;
+      toast.error("Invalid image format!");
+      return;
     }
 
     const formData = new FormData();
@@ -148,7 +151,7 @@ const AddNewPractice = () => {
       } else {
         throw new Error(data.error || "Upload failed");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       toast.error(error.message);
     } finally {
       setIsUploading(false);
@@ -212,11 +215,11 @@ const AddNewPractice = () => {
         }
       }
     } catch (error) {
-        toast.error("Error creating practice class.");
-      } finally {
-        setIsSaving(false);
-      }
-    };
+      toast.error("Error creating practice class.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -227,119 +230,175 @@ const AddNewPractice = () => {
   }
 
   return (
-    <div className="flex justify-center items-center my-4 ">
-      <form onSubmit={handleSubmit} className="formStyle w-[500px]">    
-        <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-          <img
-            src={preview ? preview : "/images/uploadImage.jpg"}
-            alt="CourseImage"
-            className="w-full h-full object-contain"
-          />
-        </div>    
-        <div className="flex flex-col gap-2">
-          <label className="text-lg">Image:</label>
-          <input
-              type="file"
-              className="inputBox w-full"
-              name="prcImg"
-              onChange={handleFileChange}
-          />
-          <button type="button" className="btnRight" onClick={handleUpload} disabled={isUploading}>
-            {isUploading ? "Uploading..." : "Upload"}
-          </button>
-        </div>
-        <div className="flex flex-col gap-2 w-full">
-          <label>Class Name:</label>
-          <select
-            className="inputBox"
-            name="prcName"
-            value={data.prcName}
-            onChange={handleChange}
-          >
-            <option className="text-center">--- Select ---</option>
-            {
-              courseList?.map((crs:any)=>{
-                return (
-                  <option key={crs._id} value={crs._id}>{crs.coName}</option>
-                )
-              })
-            }
-          </select>
-        </div>
-        <div className="grid grid-cols-3 gap-1 w-full">
-          <div className="flex flex-col gap-2 w-full">
-            <label>Starts At:</label>
-            <input
-              type="time"
-              className="inputBox"
-              name="prcStartsAt"
-              value={data.prcStartsAt}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2 w-full">
-            <label>Ends At:</label>
-            <input
-              type="time"
-              className="inputBox"
-              name="prcEndsAt"
-              value={data.prcEndsAt}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="flex flex-col gap-2 w-full">
-            <label>Language:</label>
-            <select
-              className="inputBox h-[46px]"
-              name="prcLang"
-              value={data.prcLang}
-              onChange={handleChange}
-            >
-              <option>--- Select ---</option>
-              <option value="Hindi">Hindi</option>
-              <option value="English">English</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2 w-full mb-2">
-          <label>Practice Days:</label>
-          <div className="grid grid-cols-7 gap-1 w-full">
-            {practiceDays?.map((day, index) => (
-              <div key={index} className="flex items-center gap-2 w-full">
-                <input
-                  type="checkbox"
-                  name="prcDays"
-                  value={day}
-                  // checked={data.prcDays.includes(day)}
-                  onChange={(e: any) => handleCheckboxChange(e, day)}
+    <div className="flex justify-center items-center py-6">
+      <form onSubmit={handleSubmit} className="formStyle w-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-9">
+          <div className="flex flex-col gap-2">
+            <div className="w-full h-[296px] border-[1.5px] bg-gray-100">
+              {preview ? (
+                <Image
+                  src={preview}
+                  alt="Course Cover"
+                  width={450}
+                  height={296}
+                  className="w-full h-full object-cover"
                 />
-                <label>{day}</label>
+              ) : null}
+            </div>
+            <div className="flex flex-col gap-2">
+              <input
+                type="file"
+                className="inputBox w-full"
+                name="prcImg"
+                onChange={handleFileChange}
+              />
+              <button
+                type="button"
+                className="btnRight"
+                onClick={handleUpload}
+                disabled={isUploading}
+              >
+                {isUploading ? "Uploading..." : "Upload"}
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-full">
+              <label>Class Name:</label>
+              <Select
+                className="w-full text-center"
+                placeholder="--- Select Course ---"
+                options={courseList?.map((course) => ({
+                  label: course.coName,
+                  value: course._id,
+                }))}
+                value={
+                  courseList?.find((c) => c._id === selectedCourse)
+                    ? {
+                        label: courseList.find((c) => c._id === selectedCourse)!
+                          .coName,
+                        value: selectedCourse,
+                      }
+                    : null
+                }
+                onChange={(option) => {
+                  setSelectedCourse(option?.value || "");
+                }}
+                isSearchable
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    padding: "4px",
+                    minHeight: "46px",
+                    width: "100%", // ⬅ Full width
+                    boxShadow: "none", // ⬅ No box shadow regardless of focus
+                    border: "1px solid #ea580c", // ⬅ Explicit border styling
+                    backgroundColor: state.isFocused ? "#FFEBCC" : "white",
+                    "&:hover": {
+                      borderColor: "#ea580c", // ⬅ Keep consistent hover color
+                    },
+                  }),
+
+                  menu: (provided) => ({
+                    ...provided,
+                    maxHeight: 200,
+                    overflowY: "auto",
+                    zIndex: 5,
+                  }),
+                  valueContainer: (provided) => ({
+                    ...provided,
+                    paddingTop: "4px",
+                    paddingBottom: "4px",
+                  }),
+                  input: (provided) => ({
+                    ...provided,
+                    margin: 0,
+                    padding: 0,
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: "#666",
+                  }),
+                }}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-1 w-full">
+              <div className="flex flex-col gap-2 w-full">
+                <label>Starts At:</label>
+                <input
+                  type="time"
+                  className="inputBox"
+                  name="prcStartsAt"
+                  value={data.prcStartsAt}
+                  onChange={handleChange}
+                />
               </div>
-            ))}
+              <div className="flex flex-col gap-2 w-full">
+                <label>Ends At:</label>
+                <input
+                  type="time"
+                  className="inputBox"
+                  name="prcEndsAt"
+                  value={data.prcEndsAt}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex flex-col gap-2 w-full">
+                <label>Language:</label>
+                <select
+                  className="inputBox h-[46px]"
+                  name="prcLang"
+                  value={data.prcLang}
+                  onChange={handleChange}
+                >
+                  <option>--- Select ---</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="English">English</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 w-full mb-2">
+              <label>Practice Days:</label>
+              <div className="grid grid-cols-7 gap-1 w-full">
+                {practiceDays?.map((day, index) => (
+                  <div key={index} className="flex items-center gap-2 w-full">
+                    <input
+                      type="checkbox"
+                      name="prcDays"
+                      value={day}
+                      // checked={data.prcDays.includes(day)}
+                      onChange={(e: any) => handleCheckboxChange(e, day)}
+                    />
+                    <label>{day}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+              <label>WhatsApp Group Link:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="prcWhatLink"
+                value={data.prcWhatLink}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+              <label>Meeting Link:</label>
+              <input
+                type="text"
+                className="inputBox"
+                name="prcLink"
+                value={data.prcLink}
+                onChange={handleChange}
+              />
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 w-full">
-          <label>WhatsApp Group Link:</label>
-          <input
-            type="text"
-            className="inputBox"
-            name="prcWhatLink"
-            value={data.prcWhatLink}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="flex flex-col gap-2 w-full">
-          <label>Meeting Link:</label>
-          <input
-            type="text"
-            className="inputBox"
-            name="prcLink"
-            value={data.prcLink}
-            onChange={handleChange}
-          />
-        </div>
+
         {errorMessage && <p className="text-xs text-red-600">{errorMessage}</p>}
-        <div className="flex gap-1 w-full mt-4">
+        <div className="flex gap-1 w-full">
           <button type="submit" className="btnLeft w-full" disabled={isSaving}>
             {isSaving ? "Saving..." : "Save"}
           </button>

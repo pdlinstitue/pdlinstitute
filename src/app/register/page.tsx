@@ -277,7 +277,7 @@ const Register = () => {
   return (
     <div>
       <NavMenu/>
-      <div className='flex justify-center items-center my-20'>
+      <div className='flex justify-center items-center my-20 p-9 w-auto'>
         <div className='formStyle w-auto'>
           <Stepper 
             steps={steps}

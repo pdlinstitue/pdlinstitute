@@ -265,12 +265,16 @@ const AddNewCourse: React.FC = () => {
       <form onSubmit={handleSubmit} className="formStyle w-full h-auto">
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
-            <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-              <img
-                src={preview || "/images/uploadImage.jpg"}
-                alt="Preview"
-                className="w-full h-full object-contain"
-              />
+            <div className="w-[600px] h-[360px] border-[1.5px] bg-gray-100">
+              {preview ? (
+                <Image
+                  src={preview}
+                  alt="Course Cover"
+                  width={600}
+                  height={360}
+                  className="w-full h-full object-cover"
+                />
+              ) : null}
             </div>
             <div className="flex items-center gap-1">
               <input

@@ -20,7 +20,7 @@ const PersonalDetails : React.FC = () => {
   }
     
     return (
-    <div className='max-w-[600px] '>
+    <div className='max-w-[600px]'>
       <div className='flex flex-col gap-2'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-1'>
           <div className='flex flex-col gap-2'>
@@ -51,7 +51,7 @@ const PersonalDetails : React.FC = () => {
             </select>
           </div>
         </div>
-        <div className='grid grid-cols-3 gap-1'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-1'>
           <div className='flex flex-col gap-2'>
             <label>Marital Status:<span className='text-red-500'>*</span></label>
             <select name='sdkMarStts' value={userData.sdkMarStts} onChange={handleChange} className='inputBox h-[45px] '>

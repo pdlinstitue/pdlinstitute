@@ -129,11 +129,8 @@ const MyCoupons : React.FC = () => {
 
   return (
     <div>
-      <div>
-        <div className='flex mb-2 items-center justify-between'>
-          <Link href="/account/add-new-coupon" className='btnLeft'><RiCoupon3Line size={24}/></Link>
-          <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
-        </div>
+      <div className='my-4'>
+        <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className='overflow-auto max-h-[412px]'>
         <DataTable  table={table}/>
