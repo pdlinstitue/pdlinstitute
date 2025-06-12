@@ -68,12 +68,12 @@ const ProfMenu = () => {
     fetchUserProfileById();
   }, []);
 
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
     Cookies.remove("loggedInUserId");
     Cookies.remove("loggedInUserName");
     Cookies.remove("loggedInUserRole");
-    Cookies.remove("token");
-    toast.success('Logged out successfully');
+    await fetch('/api/auth/logout', { method: 'POST' });
+    toast.success('Loggedout successfully.');
     router.push('/login');
   }
 

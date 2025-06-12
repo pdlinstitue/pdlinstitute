@@ -1,5 +1,4 @@
 "use client";
-import { NextPage } from 'next';
 import React from 'react';
 import Container from '../components/Container';
 import Link from 'next/link';
@@ -17,7 +16,7 @@ interface LoginType {
 }
 
 
-const LoginPage : NextPage = () => {
+const LoginPage : React.FC = () => {
 
     const router = useRouter();
     const [navigate, setNavigate] = useState<string | null>(null); 
@@ -46,6 +45,7 @@ const LoginPage : NextPage = () => {
     }
     
     const handleSubmit = async (e: React.FormEvent) => {
+
       e.preventDefault();
       setErrorMessage(''); // Clear the previous error
   
@@ -55,7 +55,7 @@ const LoginPage : NextPage = () => {
           setErrorMessage('Please enter password.');
       } else {        
         try {
-            const result = await fetch(`${BASE_API_URL}/api/login`, {
+            const result = await fetch(`${BASE_API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -72,15 +72,14 @@ const LoginPage : NextPage = () => {
              //  } else if (post.success === false) {
              //    toast.error(post.msg);
              //} else {
-                if (post.success === false) {
-                       toast.error(post.msg);
-                    } else{
+            if (post.success === false) {
+                toast.error(post.msg);
+            } else{
                 Cookies.set("loggedInUserId", post.result.id);
                 Cookies.set("loggedInUserName", post.result.usrName);
                 Cookies.set("loggedInUserRole", post.result.usrRole);
-                Cookies.set("token", post.result.usrToken);
                 toast.success("Logged in successfully.");
-                
+
                 // Redirect conditionally based on user role
                 if (post.result.isAdmin === "Yes") {
                     router.push("/account/admin-dashboard");
@@ -89,9 +88,9 @@ const LoginPage : NextPage = () => {
                 }
             }
               //}
-          } catch (error) {
+            } catch (error) {
               toast.error('Error while logging in.');
-          }
+            }
         }
       };
 
