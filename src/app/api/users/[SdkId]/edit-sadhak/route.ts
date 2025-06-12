@@ -19,6 +19,8 @@ type SdkType = {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string;
+  sdkRefName:string;
+  sdkRefCont:string;
   sdkPhone: string;
   sdkWhtNbr: string;
   sdkEmail: string;
@@ -54,6 +56,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ SdkId
       sdkGender,
       sdkMarStts,
       sdkSpouce,
+      sdkRefName,
+      sdkRefCont,
       sdkPhone,
       sdkWhtNbr,
       sdkEmail,
@@ -103,6 +107,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ SdkId
         sdkGender,
         sdkMarStts,
         sdkSpouce,
+        sdkRefName,
+        sdkRefCont,
         sdkPhone,
         sdkWhtNbr,
         sdkEmail,

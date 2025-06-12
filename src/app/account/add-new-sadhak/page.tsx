@@ -6,8 +6,7 @@ import { BASE_API_URL } from "@/app/utils/constant";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import Loading from "../Loading";
-import { Result } from "postcss";
-
+ 
 interface AddNewSadhakProps {
   sdkFstName: string;
   sdkMdlName: string;
@@ -436,6 +435,8 @@ const AddNewSadhak: React.FC = () => {
             sdkGender: sdkData.sdkGender,
             sdkMarStts: sdkData.sdkMarStts,
             sdkSpouce: sdkData.sdkSpouce,
+            sdkRefName:sdkData.sdkRefName,
+            sdkRefCont:sdkData.sdkRefCont,
             sdkCountry: sdkData.sdkCountry,
             sdkState: sdkData.sdkState,
             sdkCity: sdkData.sdkCity,
