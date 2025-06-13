@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Loading from "../Loading";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
+import Select from "react-select";
 import { BASE_API_URL } from "@/app/utils/constant";
 
 type ClassItem = {
@@ -22,12 +23,11 @@ interface AddNewClassProps {
 }
 
 const AddNewClass: React.FC = () => {
-
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [course, setCourse] = useState<string[] | null>([]);
+  const [course, setCourse] = useState<any[] | null>([]);
   const [clsBatch, setClsBatch] = useState<string[] | null>([]);
   const [courseById, setCourseById] = useState({ coName: "", durDays: 0 });
   const [classArray, setClassArray] = useState<ClassItem[]>([]);
@@ -131,13 +131,15 @@ const AddNewClass: React.FC = () => {
         });
         const batchData = await res.json();
         const bthByCorId = batchData.bthList.filter(
-          (b: any) => b.corId._id === data.corId && new Date(b.bthStart).getDate() >= new Date().getDate()
+          (b: any) =>
+            b.corId._id === data.corId &&
+            new Date(b.bthStart).getDate() >= new Date().getDate()
         );
         setClsBatch(bthByCorId);
       } catch (error) {
-          console.error("Error fetching batch data:", error);
+        console.error("Error fetching batch data:", error);
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       }
     }
     fetchBatchesByCorId();
@@ -177,11 +179,10 @@ const AddNewClass: React.FC = () => {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-
     e.preventDefault();
     setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
-    
+
     try {
       if (!data.corId.trim()) {
         setErrorMessage("Please select course.");
@@ -190,15 +191,15 @@ const AddNewClass: React.FC = () => {
       } else {
         const response = await fetch(`${BASE_API_URL}/api/classes`, {
           method: "POST",
-          body: JSON.stringify({ 
-            corId: data.corId, 
-            bthId: data.bthId, 
-            clsName: classArray 
+          body: JSON.stringify({
+            corId: data.corId,
+            bthId: data.bthId,
+            clsName: classArray,
           }),
-        });      
-  
+        });
+
         const post = await response.json();
-  
+
         if (post.success === false) {
           toast.error(post.msg);
         } else {
@@ -207,11 +208,11 @@ const AddNewClass: React.FC = () => {
         }
       }
     } catch (error) {
-        toast.error("Error creating classes.");
-      } finally {
-        setIsSaving(false);
-      }
-    };
+      toast.error("Error creating classes.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -229,23 +230,86 @@ const AddNewClass: React.FC = () => {
       >
         <div className="flex flex-col gap-2">
           <label>Course:</label>
-          <select
-            className="inputBox"
-            name="corId"
-            value={data.corId}
-            onChange={handleChange}
-          >
-            <option className="text-center" value="">
-              --- Select Course ---
-            </option>
-            {course?.map((item: any) => {
-              return (
-                <option key={item._id} value={item._id}>
-                  {item.coName}
-                </option>
-              );
-            })}
-          </select>
+          <Select
+            className="w-full text-center"
+            placeholder="--- Select Course ---"
+            options={course?.map((cor: any) => ({
+              label: cor.coName,
+              value: cor._id,
+            }))}
+            value={
+              course?.find((c: any) => c._id === data.corId)
+                ? {
+                    label: course.find((c: any) => c._id === data.corId)!
+                      .coName,
+                    value: data.corId,
+                  }
+                : null
+            }
+            onChange={(option: any) => {
+              setData((prev) => ({
+                ...prev,
+                corId: option?.value || "",
+              }));
+            }}
+            isSearchable
+            styles={{
+              control: (provided, state) => ({
+                ...provided,
+                padding: "4px",
+                minHeight: "46px",
+                backgroundColor: state.isFocused ? "#FFEBCC" : "white",
+                borderColor: "#fed7aa",
+                boxShadow: state.isFocused ? "0 0 0 1.5px #fed7aa" : "none",
+                "&:hover": {
+                  borderColor: "#fed7aa",
+                },
+              }),
+              menu: (provided) => ({
+                ...provided,
+                maxHeight: 200,
+                overflowY: "auto",
+                zIndex: 5,
+              }),
+              valueContainer: (provided) => ({
+                ...provided,
+                paddingTop: "4px",
+                paddingBottom: "4px",
+              }),
+              input: (provided) => ({
+                ...provided,
+                margin: 0,
+                padding: 0,
+                color: "#000",
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: "#666",
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isFocused ? "#fed7aa" : "white",
+                color: "#000",
+                "&:active": {
+                  backgroundColor: "#fed7aa",
+                },
+              }),
+              singleValue: (provided) => ({
+                ...provided,
+                color: "#000",
+              }),
+              indicatorSeparator: () => ({
+                display: "none",
+              }),
+              dropdownIndicator: (provided, state) => ({
+                ...provided,
+                color: "#ea580c",
+                "&:hover": {
+                  color: "#ea580c",
+                },
+              }),
+            }}
+          />
         </div>
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
