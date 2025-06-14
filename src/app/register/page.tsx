@@ -18,7 +18,7 @@ interface UserDataProps {
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
-  sdkBthDate: string;
+  sdkBthDate: Date;
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string | undefined;
@@ -55,7 +55,7 @@ const Register = () => {
     sdkFstName: "",
     sdkMdlName:"",
     sdkLstName: "",
-    sdkBthDate: "",
+    sdkBthDate: new Date(),
     sdkGender: "",
     sdkMarStts: "",
     sdkSpouce: "",
@@ -117,7 +117,7 @@ const Register = () => {
       } else if ( !userData || !("sdkLstName" in userData) || userData.sdkLstName === null || userData.sdkLstName.trim() === ""){
         setErrorMessage("Last name is required.");
         return false;
-      } else if ( !userData || !("sdkBthDate" in userData) || userData.sdkBthDate === null || userData.sdkBthDate.trim() === ""){
+      } else if ( !userData || !("sdkBthDate" in userData) || userData.sdkBthDate === null || userData.sdkBthDate?.toString().trim() === ""){
         setErrorMessage("DOB name is required.");
         return false;
       }else if ( !userData || !("sdkGender" in userData) || userData.sdkGender === null || userData.sdkGender.trim() === ""){

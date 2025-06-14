@@ -3,6 +3,9 @@ import { useContext } from 'react';
 import { StepperContext } from '@/app/context/StepperContext';
 import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 const PersonalDetails : React.FC = () => {
 
@@ -18,6 +21,13 @@ const PersonalDetails : React.FC = () => {
     const {name, value} = e.target;
     setUserData({...userData, [name]: value});
   }
+
+  const handleDateChange = (date: Date | null) => {    
+    //const formatted = date ? format(date, 'dd/MM/yyyy') : '';
+    if (date) {
+      setUserData({ ...userData, sdkBthDate: date });
+    }
+  };
     
     return (
     <div className='max-w-[600px]'>
@@ -38,8 +48,14 @@ const PersonalDetails : React.FC = () => {
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
           <div className='flex flex-col gap-2'>
-            <label>Birth Date:<span className='text-red-500'>*</span></label>
-            <input type='date' name='sdkBthDate' value={userData.sdkBthDate} onChange={handleChange} className='inputBox' />
+            <DatePicker
+              selected={userData.sdkBthDate}
+              onChange={handleDateChange}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="dd/mm/yyyy"
+              isClearable
+              className="inputBox w-full "
+            />
           </div>
           <div className='flex flex-col gap-2'>
             <label>Gender:<span className='text-red-500'>*</span></label>

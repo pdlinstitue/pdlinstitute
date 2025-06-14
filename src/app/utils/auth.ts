@@ -11,6 +11,7 @@ function safeVerify(token: string, secret: string) {
 }
 
 export async function verifyApiToken(req?: NextRequest) {
+  
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   const secret = process.env.JWT_SECRET!;

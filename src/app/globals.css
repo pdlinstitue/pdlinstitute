@@ -51,11 +51,11 @@
   background-color: #F0F3F4;
 }
 
-.inputBox{
+.inputBox {
   padding: 9px 16px;
   border: 1.5px solid #d1d5db;
   border-radius: 4px;
- }
+}
 
 .inputBox:focus {
   outline: 1.5px solid #FFA500;
@@ -67,6 +67,21 @@
   background-color: #FFEBCC;
   border: 1.5px solid #FFEBCC;
   border-radius: 4px;
+}
+
+.react-datepicker__close-icon {
+  background-color: #c2410c !important; /* Tailwind's bg-orange-700 */
+  border-radius: 50px; /* rounded-md */
+  width: 10px;
+  height: 10px;
+  padding: 4px;
+  color: white;
+}
+.react-datepicker__close-icon::after {
+  background-color: transparent !important; /* remove default bg */
+  color: white; /* or use #fff for better visibility */
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .formStyle {

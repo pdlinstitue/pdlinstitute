@@ -31,7 +31,7 @@ type SdkType = {
 export async function GET(req: NextRequest) {
   try {
     
-    await verifyApiToken();
+    //await verifyApiToken();
     const { searchParams } = new URL(req.url);
     const usrRole = searchParams.get("usrRole");
 
@@ -46,7 +46,6 @@ export async function GET(req: NextRequest) {
           sdk.sdkRole !== "Admin" && sdk.sdkRole !== "Super-Admin"
       );
     }
-
     return NextResponse.json({ activeSdkList, success: true }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(

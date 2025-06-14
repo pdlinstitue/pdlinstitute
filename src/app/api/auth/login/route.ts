@@ -70,6 +70,13 @@ export const POST = async (request: NextRequest) => {
       }
     }, { status: 200 });
 
+    const loggedInUserInfo = {
+      id: user._id,
+      usrName: user.sdkFstName,
+      usrRole: user.sdkRole,
+      isAdmin:user.isAdmin
+    };
+
     // Set HttpOnly cookies
     res.cookies.set("token", accessToken, {
       httpOnly: true,
@@ -85,6 +92,14 @@ export const POST = async (request: NextRequest) => {
       sameSite: 'strict',
       path: '/',
       maxAge: refreshExpiresIn,
+    });
+
+    res.cookies.set("loggedInUser", JSON.stringify(loggedInUserInfo), {
+      httpOnly: false, // client-side readable
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: refreshExpiresIn, // or any duration you want
     });
 
     return res;
