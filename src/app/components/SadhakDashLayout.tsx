@@ -58,7 +58,7 @@ const SadhakDashLayout : React.FC = () => {
       try {
         const response = await fetch(`${BASE_API_URL}/api/my-courses?sdkid=${loggedInUser.id}`);
         const data = await response.json();
-        const updatedCoList = data.coList.map((item:any) => { 
+        const updatedCoList = data?.coList?.map((item:any) => { 
             return { ...item, coCat: item.coCat.catName };
         });
         setMyCoData(updatedCoList);
