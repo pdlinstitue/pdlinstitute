@@ -2,14 +2,8 @@ import Link from 'next/link';
 import { RxAvatar } from 'react-icons/rx';
 
 
-
-
-
 const LogMenu = () => {
   
-
-  
-
   return (
     <div className="flex p-4 items-center w-auto">
       <div className="relative group transition-all"> 

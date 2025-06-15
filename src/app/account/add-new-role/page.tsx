@@ -22,27 +22,26 @@ const AddNewRole: React.FC = () => {
     createdBy: "",
   });
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-      console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +65,7 @@ const AddNewRole: React.FC = () => {
           method: "POST",
           body: JSON.stringify({
             roleType: data.roleType,
-            createdBy: loggedInUser.result?._id,
+            createdBy: loggedInUser.id,
           }),
         });
 

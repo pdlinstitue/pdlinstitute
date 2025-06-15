@@ -29,27 +29,26 @@ const MyAdsCard : React.FC = () => {
   const [adsData, setAdsData] = useState<DocTypeProps[] | null>([]);
   const data = React.useMemo(() => adsData ?? [], [adsData]);
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
-   
+
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-        console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +127,7 @@ const MyAdsCard : React.FC = () => {
     async function fetchAdsData() {
     try 
       {
-        const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.result._id}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.id}`, { cache: "no-store" });
         const docData = await res.json();
         const updatedDocList = docData?.adsList?.map((item:any) => { 
           return { ...item, 
@@ -145,7 +144,7 @@ const MyAdsCard : React.FC = () => {
       }
     }
     fetchAdsData();
-    }, []);
+    }, [loggedInUser.id]);
 
     if(isLoading){
       return <div>

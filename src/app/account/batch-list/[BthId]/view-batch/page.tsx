@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "@/app/account/Loading";
 import Cookies from "js-cookie";
-import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { parseISO } from "date-fns/parseISO";
 
@@ -60,32 +59,6 @@ const ViewBatch: React.FC <IBthParam>= ({params}) => {
     bthBank: "",
     bthQr: "",
   });
-  const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
-    },
-  });
-   
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-        console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   const handleChange = (e: any) => {
     const name = e.target.name;

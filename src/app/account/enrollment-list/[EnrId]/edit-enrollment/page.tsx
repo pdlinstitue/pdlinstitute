@@ -2,7 +2,6 @@
 import React, { FormEvent, use, useEffect, useState } from 'react';
 import Loading from '@/app/account/Loading';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { BASE_API_URL } from '@/app/utils/constant';
 import toast from 'react-hot-toast';
 import Cookies from 'js-cookie';
@@ -28,31 +27,30 @@ const EditEnrollment : React.FC<IEnrParams> = ({params}) => {
     const [enrData, setEnrData] = useState<EditEnrollmentProps>({isCompleted:'', enrIncompRemarks:'', updatedBy:''});
     const [status, setStatus] = useState('');
     const [loggedInUser, setLoggedInUser] = useState({
-        result: {
-          _id: '',
-          usrName: '',
-          usrRole: '',
-        },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
-       
-      useEffect(() => {
-        try {
-          const userId = Cookies.get("loggedInUserId") || '';
-          const userName = Cookies.get("loggedInUserName") || '';
-          const userRole = Cookies.get("loggedInUserRole") || '';
-          setLoggedInUser({
-            result: {
-              _id: userId,
-              usrName: userName,
-              usrRole: userRole,
-            },
-          });
-        } catch (error) {
-            console.error("Error fetching loggedInUserData.");
-        } finally {
-          setIsLoading(false);
-        }
-      }, []);
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
     useEffect(() => {
         const fetchEnrollmentData = async () => {
@@ -89,7 +87,7 @@ const EditEnrollment : React.FC<IEnrParams> = ({params}) => {
                 body: JSON.stringify({ 
                     isCompleted:status, 
                     enrIncompRemarks: enrData.enrIncompRemarks,
-                    updatedBy:loggedInUser.result._id
+                    updatedBy:loggedInUser.id
                 }),
             });
             const post = await response.json();

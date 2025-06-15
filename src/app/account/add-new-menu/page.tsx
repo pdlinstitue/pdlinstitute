@@ -22,6 +22,7 @@ interface SideMenuListProps {
 }
 
 const CreateSideMenu: React.FC = () => {
+
   const router = useRouter();
   const [sideMenuList, setSideMenuList] = useState<SideMenuListProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,31 +40,30 @@ const CreateSideMenu: React.FC = () => {
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
-  });
+        id: "",
+        usrName: "",
+        usrRole: "",
+        isAdmin: "",
+    });
 
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    useEffect(() => {
+      try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+          const parsed = JSON.parse(cookie);
+          setLoggedInUser({
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "", 
+          });
+      }
+      } catch (error) {
+        console.error("Error parsing loggedInUser cookie:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
 
   const handleChange = (e: any) => {
     const name = e.target.name;
@@ -109,11 +109,12 @@ const CreateSideMenu: React.FC = () => {
           isParent: selectedType === "parent",
           isChild: selectedType === "child",
           parentId: data.parentId,
-          createdBy: loggedInUser.result._id,
+          createdBy: loggedInUser.id,
         }),
       });
 
       const post = await response.json();
+
       if (post.success === false) {
         toast.error(post.msg);
       } else {

@@ -29,13 +29,31 @@ const ViewPanCard : React.FC<IDocParams> = ({params}) => {
     const [panData, setPanData] = useState<ViewPanCardProps>({sdkPan:"", sdkPanNbr:"", sdkRemarks:"", updatedBy:""});
     const [status, setStatus] = useState('');
 
-    const loggedInUser = {
-        result:{
-          _id:Cookies.get("loggedInUserId"), 
-          usrName:Cookies.get("loggedInUserName"),
-          usrRole:Cookies.get("loggedInUserRole"),
-        }
-    };
+    const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
     useEffect(() => {
         const fetchPanData = async () => {
@@ -73,7 +91,7 @@ const ViewPanCard : React.FC<IDocParams> = ({params}) => {
                     sdkRemarks: panData.sdkRemarks,
                     sdkPanNbr: panData.sdkPanNbr,
                     sdkAprDate: new Date(),
-                    updatedBy:loggedInUser.result._id
+                    updatedBy:loggedInUser.id
                 }),
             });
             

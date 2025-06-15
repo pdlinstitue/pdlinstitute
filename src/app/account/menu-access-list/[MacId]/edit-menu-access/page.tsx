@@ -18,6 +18,7 @@ interface IMenuAccessParams {
 }
 
 const EditMenuAccess: React.FC<IMenuAccessParams> = ({ params }) => {
+
   const { MacId } = use(params);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,27 +37,26 @@ const EditMenuAccess: React.FC<IMenuAccessParams> = ({ params }) => {
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
   useEffect(() => {
-    try {
-      const userId = Cookies.get('loggedInUserId') || '';
-      const userName = Cookies.get('loggedInUserName') || '';
-      const userRole = Cookies.get('loggedInUserRole') || '';
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-      console.error('Error fetching loggedInUserData.');
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -114,7 +114,7 @@ const EditMenuAccess: React.FC<IMenuAccessParams> = ({ params }) => {
           setData({
             menuId: menuAccById.menuAccById.menuId,
             roleId: menuAccById.menuAccById.roleId,
-            updatedBy: loggedInUser.result._id,
+            updatedBy: loggedInUser.id,
           });
         }
       } catch (error) {
@@ -146,7 +146,7 @@ const EditMenuAccess: React.FC<IMenuAccessParams> = ({ params }) => {
         body: JSON.stringify({
           menuId: data.menuId,
           roleId: data.roleId,
-          createdBy: loggedInUser.result._id,
+          createdBy: loggedInUser.id,
         }),
       });
 

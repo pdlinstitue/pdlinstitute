@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Loading from '../../Loading';
 import { BASE_API_URL } from '@/app/utils/constant';
 import Cookies from 'js-cookie';
@@ -26,18 +26,36 @@ const MyCourses : React.FC = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [myCoData, setMyCoData] = React.useState<MyCoursesProps[] | null>([]);
 
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
-    }
-  }; 
+  const [loggedInUser, setLoggedInUser] = useState({
+      id: "",
+      usrName: "",
+      usrRole: "",
+      isAdmin: "",
+    });
+  
+    useEffect(() => {
+    try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+          const parsed = JSON.parse(cookie);
+          setLoggedInUser({
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "", 
+        });
+      }
+      } catch (error) {
+        console.error("Error parsing loggedInUser cookie:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
 
   useEffect(()=>{
     async function fetchMyCourseData() {
       try {
-        const response = await fetch(`${BASE_API_URL}/api/my-courses?sdkid=${loggedInUser.result._id}`);
+        const response = await fetch(`${BASE_API_URL}/api/my-courses?sdkid=${loggedInUser.id}`);
         const data = await response.json();
         const updatedCoList = data.coList.map((item:any) => { 
             return { ...item, coCat: item.coCat.catName };
@@ -50,7 +68,7 @@ const MyCourses : React.FC = () => {
       }
     }
     fetchMyCourseData();
-  },[])
+  },[loggedInUser.id])
 
   if(isLoading){
     return <div>

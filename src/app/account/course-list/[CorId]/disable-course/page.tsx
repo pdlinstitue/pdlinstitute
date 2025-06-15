@@ -25,31 +25,30 @@ const DisableCourse : React.FC <ICorParams>= ({params}) => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [courseName, setCourseName] = useState<CorNameProps>({coNick:''});
     const [loggedInUser, setLoggedInUser] = useState({
-        result: {
-          _id: '',
-          usrName: '',
-          usrRole: '',
-        },
-      });
-       
-    useEffect(() => {
-    try {
-        const userId = Cookies.get("loggedInUserId") || '';
-        const userName = Cookies.get("loggedInUserName") || '';
-        const userRole = Cookies.get("loggedInUserRole") || '';
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
         setLoggedInUser({
-            result: {
-                _id: userId,
-                usrName: userName,
-                usrRole: userRole,
-            },
-         });
-        } catch (error) {
-            console.error("Error fetching loggedInUserData.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []); 
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
   
     useEffect(() => { 
     async function fetchCourseById() { 
@@ -74,7 +73,7 @@ const DisableCourse : React.FC <ICorParams>= ({params}) => {
             const response = await fetch(`${BASE_API_URL}/api/courses/${CorId}/disable-course`, {
                 method: 'PATCH',
                 body: JSON.stringify({
-                    disabledBy:loggedInUser.result._id
+                    disabledBy:loggedInUser.id
                 })
             });
 

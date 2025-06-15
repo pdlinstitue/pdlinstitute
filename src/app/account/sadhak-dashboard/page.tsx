@@ -17,27 +17,26 @@ const SadhakDashBoard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sdkData, setSdkData] = useState<SadhakDataProps>({sdkRegNo:""});
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-      console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +45,7 @@ const SadhakDashBoard: React.FC = () => {
   useEffect(() => {
     async function fetchCatData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/users/${Cookies.get("loggedInUserId")}/view-sadhak`);
+        const res = await fetch(`${BASE_API_URL}/api/users/${loggedInUser.id}/view-sadhak`);
         const sadhakData = await res.json();
         setSdkData(sadhakData.sdkById);
       } catch (error) {
@@ -56,7 +55,7 @@ const SadhakDashBoard: React.FC = () => {
       }
     }
   fetchCatData();
-  }, []);
+  }, [loggedInUser.id]);
 
   if(isLoading){
     return<div>

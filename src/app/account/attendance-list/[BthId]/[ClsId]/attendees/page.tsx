@@ -44,13 +44,6 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enrollData, setEnrollData] = useState<ClassAttendeesProps[]>([]);
   const [rowSelection, setRowSelection] = useState({});
-  const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
-  });
 
   const getLocalDateTime = () => {
     const now = new Date();
@@ -69,20 +62,27 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
     return () => clearInterval(interval); // cleanup
   }, []);
 
+  const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-      console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -121,7 +121,7 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
         cell: ({ row }: { row: any }) => (
           <Checkbox
             checked={row.getIsSelected()}
-            onChange={(e) => {
+            onChange={(e:any) => {
               row.toggleSelected(e.target.checked);
             }}
           />
@@ -248,7 +248,7 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
             sdkIds: selectedData.map((row) => row.sdkId), // ✅ Send correct data
             status: "Present",
             absRemarks: "",
-            markedBy: loggedInUser.result._id,
+            markedBy: loggedInUser.id,
           }),
         }
       );
@@ -304,7 +304,7 @@ const ClassAttendees: React.FC<IAtdParams> = ({ params }) => {
   return (
     <div>
       <div className="flex mb-2 items-center justify-between">
-        {loggedInUser?.result?.usrRole !== "View-Admin" && (
+        {loggedInUser?.usrRole !== "View-Admin" && (
           <button type="button" className="btnLeft" onClick={markAsPresent}>
             Mark Multiple
           </button>

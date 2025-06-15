@@ -13,11 +13,12 @@ interface NewModuleProps {
 }
 
 const AddNewModule: React.FC = () => {
+
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string>("");
-
+  const [currentAction, setCurrentAction] = useState({ name: "", url: "" });
   const [data, setData] = useState<NewModuleProps>({
     modName: "",
     modActions: [],
@@ -25,19 +26,29 @@ const AddNewModule: React.FC = () => {
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: { _id: "", usrName: "", usrRole: "" },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
-  const [currentAction, setCurrentAction] = useState({ name: "", url: "" });
-
   useEffect(() => {
-    const userId = Cookies.get("loggedInUserId") || "";
-    const userName = Cookies.get("loggedInUserName") || "";
-    const userRole = Cookies.get("loggedInUserRole") || "";
-    setLoggedInUser({
-      result: { _id: userId, usrName: userName, usrRole: userRole },
-    });
-    setIsLoading(false);
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -84,7 +95,7 @@ const AddNewModule: React.FC = () => {
         method: "POST",
         body: JSON.stringify({
           ...data,
-          createdBy: loggedInUser.result._id,
+          createdBy: loggedInUser.id,
         }),
       });
 

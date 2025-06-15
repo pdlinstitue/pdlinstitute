@@ -275,27 +275,26 @@ const CompleteCourse: React.FC = () => {
   }
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-      console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -314,7 +313,7 @@ const CompleteCourse: React.FC = () => {
       <div>
         <div className="flex mb-2 items-center justify-between">
           <div className="flex gap-1 items-center w-auto">
-            {loggedInUser.result.usrRole !== "View-Admin" && (
+            {loggedInUser.usrRole !== "View-Admin" && (
               <button
                 type="button"
                 className="btnLeft"
@@ -324,16 +323,6 @@ const CompleteCourse: React.FC = () => {
                 {isSaving ? "Completing" : "Complete"}
               </button>
             )}
-            <select
-              className="inputBox w-[120px] h-11"
-              name="duration"
-              value={selectedDuration}
-              onChange={handleDurationChange}
-            >
-              <option value="current">Current</option>
-              <option value="previous">Previous</option>
-              <option value="upcoming">Upcoming</option>
-            </select>
             <Select
               className="w-[260px]"
               placeholder="--- Select Course ---"

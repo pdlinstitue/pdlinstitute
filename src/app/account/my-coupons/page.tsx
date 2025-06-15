@@ -1,12 +1,8 @@
 "use client";
 import DataTable from '@/app/components/table/DataTable';
-import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
+import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import Loading from '../Loading';
-import { RiCoupon3Line } from "react-icons/ri";
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FiEye } from 'react-icons/fi';
 import Cookies from 'js-cookie';
 import { BASE_API_URL } from '@/app/utils/constant';
 import { format } from 'date-fns';
@@ -25,7 +21,6 @@ interface CouponlistProps {
 
 const MyCoupons : React.FC = () => {
 
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\'th\', yyyy')};
   const [couponData, setCouponData] = useState<CouponlistProps[] | null>([]);
@@ -52,36 +47,35 @@ const MyCoupons : React.FC = () => {
     };
 
     const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-        _id: '',
-        usrName: '',
-        usrRole: '',
-    },
+      id: "",
+      usrName: "",
+      usrRole: "",
+      isAdmin: "",
     });
-       
-    useEffect(() => {
-        try {
-            const userId = Cookies.get("loggedInUserId") || '';
-            const userName = Cookies.get("loggedInUserName") || '';
-            const userRole = Cookies.get("loggedInUserRole") || '';
-            setLoggedInUser({
-            result: {
-                _id: userId,
-                usrName: userName,
-                usrRole: userRole,
-            },
-            });
-        } catch (error) {
-            console.error("Error fetching loggedInUserData.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
     useEffect(() => {
     async function fetchCouponData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/my-coupons?sdkId=${Cookies.get("loggedInUserId")}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/my-coupons?sdkId=${loggedInUser.id}`, { cache: "no-store" });
         const cpnData = await res.json();
         const updatedCpnData = cpnData?.cpnList?.map((item:any) => { 
           return { ...item, cpnCourse: item.cpnCourse.coNick };
@@ -94,7 +88,7 @@ const MyCoupons : React.FC = () => {
       }
     }
     fetchCouponData();
-    }, []);
+    }, [loggedInUser.id]);
   
     const table = useReactTable(
       {

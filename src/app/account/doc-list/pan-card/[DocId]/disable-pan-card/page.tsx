@@ -26,13 +26,31 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [panNumber, setPanNumber] = useState<PanNumberProps>({sdkPanNbr:'', disabledBy:''});
   
-    const loggedInUser = {
-        result:{
-          _id:Cookies.get("loggedInUserId"), 
-          usrName:Cookies.get("loggedInUserName"),
-          usrRole:Cookies.get("loggedInUserRole"),
-        }
-    };
+    const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
     useEffect(() => { 
     async function fetchPanById() { 
@@ -57,7 +75,7 @@ const DisablePan : React.FC <IDocParams>= ({params}) => {
             const response = await fetch(`${BASE_API_URL}/api/documents/${DocId}/disable-doc`, {
                 method: 'PATCH',
                 body: JSON.stringify({
-                    disabledBy:loggedInUser.result._id
+                    disabledBy:loggedInUser.id
                 })
             });
 

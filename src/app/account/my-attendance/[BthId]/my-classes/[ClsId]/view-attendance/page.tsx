@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
@@ -11,6 +10,7 @@ interface IAtdParams {
 }
 
 const ViewAttdImages: React.FC<IAtdParams> = ({ params }) => {
+  
   const { BthId, ClsId } = use(params);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);

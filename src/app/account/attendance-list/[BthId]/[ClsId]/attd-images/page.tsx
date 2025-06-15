@@ -18,6 +18,7 @@ interface AttdImagesProps {
 }
 
 const AttdImages: React.FC<IAtdParams> = ({ params }) => {
+  
   const { BthId, ClsId } = use(params);
   const router = useRouter();
   const [isUploading, setIsUploading] = useState<boolean>(false);

@@ -16,7 +16,6 @@ interface ProspectsListProps {
 
 const ProspectsList : React.FC = () => {
 
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [prosData, setProsData] = useState<ProspectsListProps[] | null>([]);
   const data = React.useMemo(() => prosData ?? [], [prosData]);

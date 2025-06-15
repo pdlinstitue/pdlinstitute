@@ -25,14 +25,37 @@ const DoneCourses : React.FC = () => {
   
   const [myCoData, setMyCoData] = useState<DoneCoursesProps[] | null>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
       async function fetchMyCourseData() {
         try {
           const response = await fetch(
-            `${BASE_API_URL}/api/done-courses?sdkid=${Cookies.get(
-              "loggedInUserId"
-            )}`
+            `${BASE_API_URL}/api/done-courses?sdkid=${loggedInUser.id}`
           );
           const data = await response.json();
           const updatedCoList = data.coList.map((item: any) => {
@@ -46,7 +69,7 @@ const DoneCourses : React.FC = () => {
         }
       }
       fetchMyCourseData();
-    }, []);
+    }, [loggedInUser.id]);
 
   return (
     <div>

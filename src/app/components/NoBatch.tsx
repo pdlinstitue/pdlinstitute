@@ -31,27 +31,26 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enrData, setEnrData] = useState<NoBatchProps>({prosMonth:'', prosShift:'', corId:'', prosWeek:0, prosOptMonth:'', prosOptShift:'', prosOptWeek:0, createdBy:'', sdkId:''});
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
-   
+
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-        console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -82,8 +81,8 @@ const NoBatch : React.FC<INoBatchParams> = ({CourseId}) => {
             prosOptShift: enrData.prosOptShift,
             prosOptWeek:enrData.prosOptWeek,
             corId: CourseId,
-            sdkId:loggedInUser.result._id,
-            createdBy: loggedInUser.result._id,
+            sdkId:loggedInUser.id,
+            createdBy: loggedInUser.id,
           }),
         });
     

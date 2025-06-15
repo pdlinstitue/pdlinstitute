@@ -36,31 +36,30 @@ const ChangePassword : React.FC<IChangePwdParams>= ({params}) => {
   };
 
   const [loggedInUser, setLoggedInUser] = useState({
-      result: {
-        _id: '',
-        usrName: '',
-        usrRole: '',
-      },
-    });
-     
-    useEffect(() => {
-      try {
-        const userId = Cookies.get("loggedInUserId") || '';
-        const userName = Cookies.get("loggedInUserName") || '';
-        const userRole = Cookies.get("loggedInUserRole") || '';
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
         setLoggedInUser({
-          result: {
-            _id: userId,
-            usrName: userName,
-            usrRole: userRole,
-          },
-        });
-      } catch (error) {
-          console.error("Error fetching loggedInUserData.");
-      } finally {
-        setIsLoading(false);
-      }
-    }, []);
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -81,7 +80,7 @@ const ChangePassword : React.FC<IChangePwdParams>= ({params}) => {
             sdkPwd: changePwd.sdkPwd,
             sdkNewPwd: changePwd.sdkNewPwd,
             sdkConfPwd: changePwd.sdkConfPwd,
-            updatedBy: loggedInUser.result._id
+            updatedBy: loggedInUser.id
         }),
       });
 
@@ -90,7 +89,7 @@ const ChangePassword : React.FC<IChangePwdParams>= ({params}) => {
           toast.error(post.msg);
       } else {
         toast.success(post.msg);
-        if(loggedInUser.result.usrRole === "Admin" || loggedInUser.result.usrRole === "View-Admin"){
+        if(loggedInUser.usrRole === "Admin" || loggedInUser.usrRole === "View-Admin"){
           router.push("/account/admin-dashboard");
         } else {
           router.push("/account/sadhak-dashboard");
@@ -138,7 +137,7 @@ const ChangePassword : React.FC<IChangePwdParams>= ({params}) => {
                   type="button"
                   className="btnRight"
                   onClick={() => {
-                    if (loggedInUser.result.usrRole === "Sadhak") {
+                    if (loggedInUser.usrRole === "Sadhak") {
                       router.push("/account/sadhak-dashboard");
                     } else {
                       router.push("/account/admin-dashboard");

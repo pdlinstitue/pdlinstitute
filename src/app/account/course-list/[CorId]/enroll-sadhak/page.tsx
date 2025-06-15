@@ -40,13 +40,31 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
   const [bthData, setBthData] = useState<{ [key: string]: string }>({id: '', bthBank:'', bthQr:''});
   const [batchList, setBatchList] = useState<BatchListProps[] | null>([]);
 
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
     }
-  }; 
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleChange = (e:any) => {
     const name = e.target.name;
@@ -127,7 +145,7 @@ const EnrollSadhak : React.FC<IEnrollCourseParams> = ({params}) => {
             corId: CorId,
             sdkId: enrData.sdkId,
             isApproved: "Approved",
-            createdBy: loggedInUser.result?._id,
+            createdBy: loggedInUser.id,
           }),
         });
     

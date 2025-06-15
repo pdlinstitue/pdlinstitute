@@ -17,6 +17,7 @@ interface IModuleParams {
 }
 
 const ViewModule: React.FC<IModuleParams> = ({ params }) => { 
+  
   const router = useRouter(); 
   const { ModId } = use(params);
   const [isLoading, setIsLoading] = useState(true);    

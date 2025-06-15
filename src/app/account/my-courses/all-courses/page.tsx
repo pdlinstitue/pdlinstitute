@@ -23,11 +23,6 @@ interface AllCourseListProps {
   usrId: string
 }
 
-interface CategoryProps {
-  _id:string,
-  catName:string
-}
-
 const AllCourseList : React.FC = () => {
 
     const router = useRouter();
@@ -52,7 +47,6 @@ const AllCourseList : React.FC = () => {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
-    const [pageSize, setPageSize] = React.useState(25);
 
     const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
       return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 

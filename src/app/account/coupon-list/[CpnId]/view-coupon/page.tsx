@@ -3,7 +3,6 @@ import Loading from "@/app/account/Loading";
 import React, { FormEvent, use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
-import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 
 interface CourseDataProps {

@@ -75,12 +75,30 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
   
   const [batchList, setBatchList] = useState<BatchListProps[] | null>([]);
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const isReEnroll=searchParams.get("isReEnroll");
 
@@ -149,7 +167,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
           },
           body: JSON.stringify({
             cpnName: enrData.cpnName,
-            appliedBy: loggedInUser.result?._id,
+            appliedBy: loggedInUser.id,
             corId: CorId,
           }),
         });
@@ -182,25 +200,6 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       setPaythrough("CCA");
     }
   };
-
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
     async function fetchBatchesByCoId() {
@@ -283,8 +282,8 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
           cpnName: enrData.cpnName,
           bthId: enrData.bthId,
           corId: CorId,
-          sdkId: loggedInUser.result._id,
-          createdBy: loggedInUser.result._id,
+          sdkId: loggedInUser.id,
+          createdBy: loggedInUser.id,
           isReEnroll:isReEnroll
         }),
       });

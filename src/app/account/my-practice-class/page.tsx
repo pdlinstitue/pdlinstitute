@@ -35,36 +35,35 @@ const MyPracticeClass: React.FC = () => {
     }, []);
 
     const [loggedInUser, setLoggedInUser] = useState({
-        result: {
-            _id: '',
-            usrName: '',
-            usrRole: '',
-        },
-    });
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
 
-    useEffect(() => {
-        try {
-            const userId = Cookies.get("loggedInUserId") || '';
-            const userName = Cookies.get("loggedInUserName") || '';
-            const userRole = Cookies.get("loggedInUserRole") || '';
-            setLoggedInUser({
-                result: {
-                    _id: userId,
-                    usrName: userName,
-                    usrRole: userRole,
-                },
-            });
-        } catch (error) {
-            console.error("Error fetching loggedInUserData.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
     useEffect(() => {
         async function fetchPracticeData() {
             try {
-                const res = await fetch(`${BASE_API_URL}/api/my-practice-class?sdkId=${Cookies.get("loggedInUserId")}`, { cache: "no-store" });
+                const res = await fetch(`${BASE_API_URL}/api/my-practice-class?sdkId=${loggedInUser.id}`, { cache: "no-store" });
                 const practiceData = await res.json();
                 if (practiceData.success) {
                     const updatedPrcList = practiceData?.prcList?.map((item: any) => {
@@ -82,7 +81,7 @@ const MyPracticeClass: React.FC = () => {
             }
         }
         fetchPracticeData();
-    }, []);
+    }, [loggedInUser.id]);
 
     const data = React.useMemo(() => prcData, [prcData]);
 

@@ -109,12 +109,30 @@ const AddNewSadhak: React.FC = () => {
   });
   
   const [loggedInUser, setLoggedInUser] = useState({
-      result: {
-        _id: '',
-        usrName: '',
-        usrRole: '',
-      },
-    });
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchRoleList() {
@@ -137,25 +155,6 @@ const AddNewSadhak: React.FC = () => {
    }
   fetchRoleList();
   },[])
-
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-        console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
     async function fetchCountryList() {
@@ -451,7 +450,7 @@ const AddNewSadhak: React.FC = () => {
             isAdmin: sdkData.isAdmin,
             sdkPwd: sdkData.sdkPwd,
             sdkConfPwd: sdkData.sdkConfPwd,
-            createdBy: loggedInUser.result?._id
+            createdBy: loggedInUser.id
           }),
         }
       );
@@ -838,8 +837,8 @@ const AddNewSadhak: React.FC = () => {
             </div>
           </div>
           {
-            loggedInUser.result.usrRole === "Super-Admin" && (
-              <div className="flex flex-col gap-2">
+            loggedInUser.usrRole === "Super-Admin" && (
+          <div className="flex flex-col gap-2">
             <label className="text-lg">Is Admin?</label>
             <div className="flex gap-4 mt-3">
               <label className="flex items-center">

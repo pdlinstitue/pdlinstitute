@@ -28,7 +28,6 @@ const ViewClass: React.FC<IClsParams> = ({ params }) => {
   const router = useRouter();
   const { ClsId, DayId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
-  const [assignList, setAssignList] = useState([]);
   const [corId, setCorId] = useState<string | undefined>();
   const [data, setData] = useState<ClassItem | null>({
     clsDay: "",

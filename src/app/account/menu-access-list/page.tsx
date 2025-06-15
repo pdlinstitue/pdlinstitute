@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Loading from '../Loading';
 import Link from 'next/link';
-import { FiEye } from 'react-icons/fi';
 import { BiEditAlt } from 'react-icons/bi';
 import mongoose from 'mongoose';
 

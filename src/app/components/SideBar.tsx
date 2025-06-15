@@ -17,16 +17,43 @@ import * as PiIcons from "react-icons/pi";
 import * as FaIcons from "react-icons/fa";
 
 const SideBar: React.FC = () => {
-  const pathName = usePathname();
 
+  const pathName = usePathname();
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [userData, setUserData] = useState<any>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
 
+  const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+  
   useEffect(() => {
     const fetchMenuByRole = async () => {
       try {
-        const role = Cookies.get("loggedInUserRole");
+        const role = loggedInUser.id;
         const response = await fetch(`/api/menu-by-role?userRole=${role}`);
         const data = await response.json();
         if (data.success) {
@@ -44,7 +71,7 @@ const SideBar: React.FC = () => {
   useEffect(() => {
     const fetchUserById = async () => {
       try {
-        const userId = Cookies.get("loggedInUserId");
+        const userId = loggedInUser.id;
         const response = await fetch(`/api/users/${userId}/view-sadhak`);
         const data = await response.json();
         if (data.success) {

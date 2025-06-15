@@ -16,32 +16,6 @@ const AdminDashBoard: React.FC = () => {
   
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sdkData, setSdkData] = useState<SadhakDataProps>({sdkRegNo:""});
-  const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
-  });
-
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
     async function fetchCatData() {

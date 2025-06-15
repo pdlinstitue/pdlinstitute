@@ -273,9 +273,7 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
     useEffect(() => {
       try {
       const cookie = Cookies.get("loggedInUser");
-
       if (cookie) {
-
           const parsed = JSON.parse(cookie);
           setLoggedInUser({
           id: parsed.id || "",
@@ -285,12 +283,11 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
           });
       }
       } catch (error) {
-      console.error("Error parsing loggedInUser cookie:", error);
+        console.error("Error parsing loggedInUser cookie:", error);
       } finally {
-      setIsLoading(false);
+        setIsLoading(false);
       }
     }, []);
-
 
   if (isLoading) {
     return (

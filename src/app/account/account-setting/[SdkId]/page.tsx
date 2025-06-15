@@ -35,31 +35,30 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
-  });
+        id: "",
+        usrName: "",
+        usrRole: "",
+        isAdmin: "",
+    });
 
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    useEffect(() => {
+      try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+          const parsed = JSON.parse(cookie);
+          setLoggedInUser({
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "", 
+          });
+      }
+      } catch (error) {
+        console.error("Error parsing loggedInUser cookie:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -88,7 +87,7 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
               sdkPhone: contactDetails.sdkPhone,
               sdkWhtNbr: contactDetails.sdkWhtNbr,
               sdkEmail: contactDetails.sdkEmail,
-              updatedBy: loggedInUser.result._id,
+              updatedBy: loggedInUser.id,
             }),
           }
         );
@@ -97,7 +96,7 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
           toast.error(post.msg);
         } else {
           toast.success(post.msg);
-          if(loggedInUser.result.usrRole === "Admin" || loggedInUser.result.usrRole === "View-Admin"){
+          if(loggedInUser.usrRole === "Admin" || loggedInUser.usrRole === "View-Admin"){
             router.push("/account/admin-dashboard");
           } else {
             router.push("/account/sadhak-dashboard");
@@ -181,7 +180,7 @@ const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
             type="button"
             className="btnRight"
             onClick={() => {
-              if (loggedInUser.result.usrRole === "Sadhak") {
+              if (loggedInUser.usrRole === "Sadhak") {
                 router.push("/account/sadhak-dashboard");
               } else {
                 router.push("/account/admin-dashboard");

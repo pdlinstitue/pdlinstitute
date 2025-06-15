@@ -2,7 +2,6 @@
 import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, flexRender, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Loading from '../../Loading';
 import { useRouter } from 'next/navigation';
 import { BASE_API_URL } from '@/app/utils/constant';
@@ -71,7 +70,8 @@ const AdsCard : React.FC = () => {
     }, 
     
   ], []);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  
+    const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
     const [pageInput, setPageInput] = React.useState(1);
  

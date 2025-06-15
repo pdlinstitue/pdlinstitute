@@ -19,12 +19,13 @@ interface IModuleParams {
 }
 
 const EditModule: React.FC<IModuleParams> = ({ params }) => {
+
   const router = useRouter();
   const { ModId } = use(params);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);  
   const [errorMessage, setErrorMessage] = useState<string>("");
-
+  const [currentAction, setCurrentAction] = useState({ name: "", url: "" });
   const [data, setData] = useState<EditModuleProps>({
     modName: "",
     modActions: [],
@@ -32,19 +33,29 @@ const EditModule: React.FC<IModuleParams> = ({ params }) => {
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: { _id: "", usrName: "", usrRole: "" },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
-  const [currentAction, setCurrentAction] = useState({ name: "", url: "" });
-
   useEffect(() => {
-    const userId = Cookies.get("loggedInUserId") || "";
-    const userName = Cookies.get("loggedInUserName") || "";
-    const userRole = Cookies.get("loggedInUserRole") || "";
-    setLoggedInUser({
-      result: { _id: userId, usrName: userName, usrRole: userRole },
-    });
-    setIsLoading(false);
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -111,7 +122,7 @@ const EditModule: React.FC<IModuleParams> = ({ params }) => {
           method: "PUT",
           body: JSON.stringify({
             ...data,
-            updatedBy: loggedInUser.result._id,
+            updatedBy: loggedInUser.id,
           }),
         }
       );

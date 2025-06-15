@@ -75,17 +75,6 @@ const AttendanceList : React.FC = () => {
     fetchBatchesByCorId();
   }, [selectedCourse]); 
 
-  // // Handle course change
-  // const handleCourseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   setSelectedCourse(e.target.value);
-  //   setSelectedBatch(''); // Reset batch selection when course changes
-  // };
-
-  // // Handle batch change
-  // const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   setSelectedBatch(e.target.value);
-  // };
-
   const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
      setSelectedDuration(e.target.value);
   };
@@ -198,7 +187,6 @@ const AttendanceList : React.FC = () => {
             <select className="inputBox w-[120px] h-11" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
               <option value="current">Current</option>
               <option value="previous">Previous</option>
-              <option value="upcoming">Upcoming</option>
             </select>
             <Select
               className="w-[260px]"

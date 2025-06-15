@@ -4,14 +4,6 @@ import Cookies from 'js-cookie'
 
 const MyCourseMenu : React.FC = () => {
 
-    const loggedInUser = {
-        result:{
-          _id:Cookies.get("loggedInUserId"), 
-          usrName:Cookies.get("loggedInUserName"),
-          usrRole:Cookies.get("loggedInUserRole"),
-        }
-    }; 
-
   return (
     <div>
       <div className='flex flex-col w-auto'>    

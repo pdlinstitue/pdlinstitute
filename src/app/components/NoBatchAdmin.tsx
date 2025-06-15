@@ -3,7 +3,6 @@ import React, { FormEvent, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import Loading from '../account/Loading';
 import { BASE_API_URL } from '../utils/constant';
 import Cookies from 'js-cookie';
 

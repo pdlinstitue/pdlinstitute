@@ -40,6 +40,7 @@ interface IBthParams {
 }
 
 const MyClassAttd: React.FC<IBthParams> = ({ params }) => {
+
   const { BthId } = use(params);
   const router = useRouter();
   const [classData, setClassData] = useState<ClassItem[]>([]);
@@ -97,6 +98,32 @@ const MyClassAttd: React.FC<IBthParams> = ({ params }) => {
     ],
     []
   );
+
+  const [loggedInUser, setLoggedInUser] = useState({
+      id: "",
+      usrName: "",
+      usrRole: "",
+      isAdmin: "",
+    });
+  
+    useEffect(() => {
+    try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+          const parsed = JSON.parse(cookie);
+          setLoggedInUser({
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "", 
+        });
+      }
+      } catch (error) {
+        console.error("Error parsing loggedInUser cookie:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [filtered, setFiltered] = useState("");

@@ -27,27 +27,26 @@ const ProfMenu = () => {
   const [userProfile, setUserProfile] = useState<UserProfileProps>({_id:'', sdkImg:''})
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
-   
+
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-        console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +85,7 @@ const ProfMenu = () => {
   return (
     <div className="flex p-4 items-center gap-2 w-auto">
       <div className="w-auto">
-        <p>Hello, {loggedInUser.result?.usrName}</p>
+        <p>Hello, {loggedInUser.usrName}</p>
       </div>
       <div className="relative group transition-all"> 
         {
@@ -94,19 +93,19 @@ const ProfMenu = () => {
           : <FaUserCircle className="text-gray-400 w-[50px] h-[50px] cursor-pointer" />
         }
         <div className="absolute border-[1.5px] border-orange-700 divide-y z-50 group-hover:flex right-0 top-12 hidden w-[230px] flex-col transition-all px-2 py-2  bg-white rounded-md shadow-xl">
-            <Link href={`/account/profile-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2  hover:bg-orange-500">
+            <Link href={`/account/profile-setting/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-4 py-2  hover:bg-orange-500">
               <RiProfileLine size={24} />
               <span className='text-md'>Profile Setting</span>
             </Link>
-            <Link href={`/account/account-setting/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4  py-2 hover:bg-orange-500">
+            <Link href={`/account/account-setting/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-4  py-2 hover:bg-orange-500">
               <MdSettingsBrightness size={24} />
               <span className='text-md'>Account Setting</span>
             </Link>
-            <Link href={`/account/change-password/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
+            <Link href={`/account/change-password/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
               <PiFolderLockFill size={26} />
               <span className='text-md'>Change Password</span>
             </Link>
-            <Link href={`/account/my-id-card/${loggedInUser.result?._id}`} className="flex text-black hover:text-white gap-2 px-5 py-2  hover:bg-orange-500">
+            <Link href={`/account/my-id-card/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-5 py-2  hover:bg-orange-500">
               <FaIdCardClip size={22} />
               <span className='text-md'>My ID Card</span>
             </Link>

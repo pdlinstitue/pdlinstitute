@@ -33,32 +33,32 @@ const AddNewAds: React.FC = () => {
     sdkAdsNbr: "",
     createdBy: "",
   });
-  const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
-  });
 
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const [loggedInUser, setLoggedInUser] = useState({
+        id: "",
+        usrName: "",
+        usrRole: "",
+        isAdmin: "",
+    });
+
+    useEffect(() => {
+      try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+          const parsed = JSON.parse(cookie);
+          setLoggedInUser({
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "", 
+          });
+      }
+      } catch (error) {
+        console.error("Error parsing loggedInUser cookie:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
 
   const handleChange = (e: any) => {
     const name = e.target.name;
@@ -130,7 +130,7 @@ const AddNewAds: React.FC = () => {
           sdkAdsNbr: data.sdkAdsNbr,
           sdkDocRel: data.sdkDocRel,
           sdkAdsProof: image,
-          createdBy: loggedInUser.result._id,
+          createdBy: loggedInUser.id,
         }),
       });
 

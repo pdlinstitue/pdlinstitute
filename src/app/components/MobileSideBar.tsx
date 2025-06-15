@@ -1,5 +1,4 @@
 "use client";
-import Loading from "../account/Loading";
 import React, { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
@@ -19,6 +18,7 @@ import * as PiIcons from "react-icons/pi";
 import * as FaIcons from "react-icons/fa";
 
 const MobileSideBar: React.FC = () => {
+  
   const pathName = usePathname();
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);

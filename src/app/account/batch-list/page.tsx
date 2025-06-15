@@ -6,7 +6,6 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   FilterFn,
-  flexRender,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
@@ -42,6 +41,7 @@ interface BatchListProps {
 }
 
 const BatchList: React.FC = () => {
+
   const router = useRouter();
   const [batchData, setBatchData] = useState<BatchListProps[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -202,31 +202,30 @@ const BatchList: React.FC = () => {
   };
 
   const [loggedInUser, setLoggedInUser] = useState({
-      result: {
-        _id: "",
-        usrName: "",
-        usrRole: "",
-      },
-    });
-  
-    useEffect(() => {
-      try {
-        const userId = Cookies.get("loggedInUserId") || "";
-        const userName = Cookies.get("loggedInUserName") || "";
-        const userRole = Cookies.get("loggedInUserRole") || "";
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
         setLoggedInUser({
-          result: {
-            _id: userId,
-            usrName: userName,
-            usrRole: userRole,
-          },
-        });
-      } catch (error) {
-        console.error("Error fetching loggedInUserData.");
-      } finally {
-        setIsLoading(false);
-      }
-    }, []);
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -240,7 +239,7 @@ const BatchList: React.FC = () => {
     <div>
       <div className="flex items-center justify-between mb-2">
         <div className="flex gap-1 items-center w-auto">
-          { loggedInUser?.result?.usrRole !== "View-Admin" &&
+          { loggedInUser?.usrRole !== "View-Admin" &&
             (<Link
               href="/account/add-new-batch"
               title="Create Batch"

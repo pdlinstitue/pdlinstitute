@@ -97,27 +97,26 @@ const MyBatches : React.FC = () => {
   };
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: '',
-      usrName: '',
-      usrRole: '',
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
-   
+
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || '';
-      const userName = Cookies.get("loggedInUserName") || '';
-      const userRole = Cookies.get("loggedInUserRole") || '';
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-        console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +125,7 @@ const MyBatches : React.FC = () => {
   useEffect(() => {
     async function fetchEnrolledBatchesBySdkId() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/my-batches?sdkId=${Cookies.get("loggedInUserId")}`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/my-batches?sdkId=${loggedInUser.id}`, { cache: "no-store" });
         const batchData = await res.json();    
         const updatedBatchList = batchData?.enrListBySdkId?.map((item: any) => {
           return {
@@ -155,7 +154,7 @@ const MyBatches : React.FC = () => {
     }
   
     fetchEnrolledBatchesBySdkId();
-  }, []);
+  }, [loggedInUser.id]);
   
 
   const table = useReactTable(

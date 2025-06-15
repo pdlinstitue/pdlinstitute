@@ -1,6 +1,5 @@
 "use client";
-import React, { FormEvent, useEffect, useState, use } from "react";
-import Image from "next/image";
+import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "@/app/account/Loading";

@@ -36,12 +36,8 @@ interface CourseListProps {
   usrId: string;
 }
 
-interface CategoryProps {
-  _id: string;
-  catName: string;
-}
-
 const CourseList: React.FC = () => {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [coData, setCoData] = useState<CourseListProps[]>([]);
@@ -178,27 +174,26 @@ const CourseList: React.FC = () => {
   };
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
+    }
     } catch (error) {
-      console.error("Error fetching loggedInUserData.");
+      console.error("Error parsing loggedInUser cookie:", error);
     } finally {
       setIsLoading(false);
     }
@@ -215,7 +210,7 @@ const CourseList: React.FC = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        {loggedInUser.result.usrRole !== "View-Admin" && (
+        {loggedInUser.usrRole !== "View-Admin" && (
           <Link
             href="/account/add-new-course"
             title="Create Course"
