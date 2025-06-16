@@ -26,19 +26,18 @@ const DelPracticeClass: React.FC<DelPrcParams> = ({ params }): JSX.Element => {
     const [practiceName, setPracticeName] = useState<PracticeNameProps>({_id:'', prcName:''});
     
     useEffect(() => { 
-    async function fetchPrcClassById() { 
-        try 
-        { 
-            const res = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/view-practice-class`, {cache: "no-store"}); 
-            const practiceData = await res.json(); 
-            setPracticeName(practiceData.prcById); 
-                
-        } catch (error) { 
-            console.error("Error fetching eventData:", error); 
-        } finally {
-            setIsLoading(false);
-        }
-    } fetchPrcClassById(); 
+        async function fetchPrcClassById() { 
+            try 
+            { 
+                const res = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/view-practice-class`, {cache: "no-store"}); 
+                const practiceData = await res.json(); 
+                setPracticeName(practiceData.prcById.prcName);      
+            } catch (error) { 
+                console.error("Error fetching eventData:", error); 
+            } finally {
+                setIsLoading(false);
+            }
+        } fetchPrcClassById(); 
     }, []);
     
     const handleDelPracticeClass = async (): Promise<void> => {

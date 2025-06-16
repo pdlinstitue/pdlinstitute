@@ -74,6 +74,7 @@ const EditPracticeClass: React.FC<IPrcParams> = ({ params }) => {
         const prcClassById = await prcData.json();
         setData(prcClassById.prcById);
         setPracDays(prcClassById.prcById.prcDays);
+        setSelectedCourse(prcClassById.prcById.prcName); 
       } catch (error) {
         console.error("Error fetching practiceClassData: ", error);
       } finally {
@@ -207,7 +208,7 @@ const EditPracticeClass: React.FC<IPrcParams> = ({ params }) => {
     setErrorMessage(""); // Clear the previous error
 
     try {
-      if (!data.prcName.trim()) {
+      if (!selectedCourse.trim()) {
         setErrorMessage("Class name is must.");
       } else if (!data.prcStartsAt.trim()) {
         setErrorMessage("Please fix start time.");
@@ -223,7 +224,7 @@ const EditPracticeClass: React.FC<IPrcParams> = ({ params }) => {
           {
             method: "PUT",
             body: JSON.stringify({
-              prcName: data.prcName,
+              prcName: selectedCourse,
               prcImg: image,
               prcLang: data.prcLang,
               prcDays: pracDays,
@@ -313,7 +314,7 @@ const EditPracticeClass: React.FC<IPrcParams> = ({ params }) => {
                   value: course._id,
                 }))}
                 value={
-                  courseList?.find((c) => c._id === selectedCourse)
+                  courseList?.find((c:any) => c._id === selectedCourse)
                     ? {
                         label: courseList.find((c) => c._id === selectedCourse)!
                           .coName,
@@ -406,7 +407,7 @@ const EditPracticeClass: React.FC<IPrcParams> = ({ params }) => {
                       type="checkbox"
                       name="prcDays"
                       value={day}
-                      // checked={data.prcDays.includes(day)}
+                      checked={pracDays?.includes(day)}
                       onChange={(e: any) => handleCheckboxChange(e, day)}
                     />
                     <label>{day}</label>
@@ -417,7 +418,7 @@ const EditPracticeClass: React.FC<IPrcParams> = ({ params }) => {
             <div className="flex flex-col gap-2 w-full">
               <label>WhatsApp Group Link:</label>
               <input
-                type="text"
+                type="url"
                 className="inputBox"
                 name="prcWhatLink"
                 value={data.prcWhatLink}
@@ -427,7 +428,7 @@ const EditPracticeClass: React.FC<IPrcParams> = ({ params }) => {
             <div className="flex flex-col gap-2 w-full">
               <label>Meeting Link:</label>
               <input
-                type="text"
+                type="url"
                 className="inputBox"
                 name="prcLink"
                 value={data.prcLink}

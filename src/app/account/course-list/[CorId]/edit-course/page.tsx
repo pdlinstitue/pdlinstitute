@@ -68,8 +68,8 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
     coElg: "",
     coWhatGrp: "",
     coTeleGrp: "",
-    durDays: 0,
-    durHrs: 0,
+    durDays: 1,
+    durHrs: 1,
     coImg: "",
     updatedBy: "",
   });
@@ -236,10 +236,14 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         setErrorMessage("Please select elegibility type.");
       } else if (!data.coElg?.trim()) {
         setErrorMessage("Please select elegibility.");
-      } else if (data.durDays <= 1) {
-        setErrorMessage("Please duration days.");
-      } else if (data.durHrs <= 1) {
-        setErrorMessage("Please duration hours.");
+      } else if (!data.durDays) {
+        setErrorMessage("Please enter days.");
+      } else if (data.durDays <= 0) {
+        setErrorMessage("Days can not be zero or less.");
+      } else if (!data.durHrs) {
+        setErrorMessage("Please enter minutes.");
+      } else if (data.durHrs <= 0) {
+        setErrorMessage("Minutes can not be zero or less.");
       } else if (!data.coShort?.trim()) {
         setErrorMessage("Please enter course introduction.");
       } else {

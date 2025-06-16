@@ -180,7 +180,7 @@ const AddNewPractice = () => {
     setErrorMessage(""); // Clear the previous error
 
     try {
-      if (!data.prcName.trim()) {
+      if (!selectedCourse.trim()) {
         setErrorMessage("Class name is must.");
       } else if (!data.prcStartsAt.trim()) {
         setErrorMessage("Please provide start time.");
@@ -194,7 +194,7 @@ const AddNewPractice = () => {
         const response = await fetch(`${BASE_API_URL}/api/course-practice`, {
           method: "POST",
           body: JSON.stringify({
-            prcName: data.prcName,
+            prcName: selectedCourse,
             prcImg: image,
             prcLang: data.prcLang,
             prcDays: pracDays,
@@ -379,7 +379,7 @@ const AddNewPractice = () => {
             <div className="flex flex-col gap-2 w-full">
               <label>WhatsApp Group Link:</label>
               <input
-                type="text"
+                type="url"
                 className="inputBox"
                 name="prcWhatLink"
                 value={data.prcWhatLink}
@@ -389,7 +389,7 @@ const AddNewPractice = () => {
             <div className="flex flex-col gap-2 w-full">
               <label>Meeting Link:</label>
               <input
-                type="text"
+                type="url"
                 className="inputBox"
                 name="prcLink"
                 value={data.prcLink}

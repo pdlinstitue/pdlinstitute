@@ -15,7 +15,9 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ PrcId
       if(!PrcId){
         return NextResponse.json({ success: false, msg: "No practice class found." }, { status: 404 });
       } else {
-        const prcById = await Practices.findById(PrcId);
+        const prcById = await Practices.findById(PrcId)
+        .populate('prcName', 'coNick') 
+        .lean();
         return NextResponse.json({ prcById, success: true }, {status:200});
       }
     } catch (error) {

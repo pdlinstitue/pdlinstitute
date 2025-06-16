@@ -11,7 +11,7 @@ const TotalUsers: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${BASE_API_URL}/api/users/user-counts`);
+        const response = await fetch(`${BASE_API_URL}/api/users/user-counts`, { cache: "no-store" });
         const users = await response.json();
         setTotalUsers(users.activeSdkCount);
       } catch (error) {
