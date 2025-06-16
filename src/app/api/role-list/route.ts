@@ -1,7 +1,7 @@
 import Roles from "../../../../modals/Roles";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type RolType = {
     _id?: string;

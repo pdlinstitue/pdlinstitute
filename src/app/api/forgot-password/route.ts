@@ -3,7 +3,7 @@ import Users from "../../../../modals/Users";
 import dbConnect from "../../../../dbConnect";
 import sendEmail from "@/app/utils/email";
 import crypto from 'crypto';
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
  
 export const PUT = async (request:NextRequest) => {

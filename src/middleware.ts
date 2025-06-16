@@ -1,46 +1,53 @@
 import { NextResponse, NextRequest } from "next/server";
+import { match } from "path-to-regexp";
 
 const PUBLIC_PATHS = ["/login", "/account/unauthorized"];
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = request.cookies.get("token")?.value;
-  const roleType = request.cookies.get("loggedInUserRole")?.value;
+  const { pathname } = request.nextUrl;  
+  const userCookie = request.cookies.get('loggedInUser')?.value;
+
+  let parsed: any = {};
+  if (userCookie) {
+    parsed = JSON.parse(userCookie);
+  }
 
   // Allow public paths
   if (PUBLIC_PATHS.includes(pathname)) {
     return NextResponse.next();
   }
 
-  // Redirect to login if not authenticated
-  if (pathname.startsWith("/account") && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // Deny access if not authenticated
+  if (!parsed.usrRole) {
+    return NextResponse.redirect(new URL("/account/unauthorized", request.url));
   }
 
-  //If user is authenticated but doesn't have roleId, deny access
-  if (!roleType) {
+  const baseurl = process.env.NEXT_PUBLIC_BASE_API_URL;
+
+  if (!baseurl) {
+    console.error("Missing NEXT_PUBLIC_BASE_API_URL in env");
     return NextResponse.redirect(new URL("/account/unauthorized", request.url));
   }
 
   try {
-    // const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
-    // const res = await fetch(`${baseUrl}/api/role-permissions/${roleType}`);
-    // const data = await res.json();
-    // const allowedUrls: string[] = data.allowedUrls || [];
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+    const res = await fetch(`${baseUrl}/api/role-permissions/${parsed.usrRole}`);
+    const data = await res.json();
+    const allowedUrls: string[] = data.allowedUrls || [];
 
-    // const matchesAllowedUrl = allowedUrls.some((pattern) => {
-    //   const regex = new RegExp(
-    //     "^" + pattern.replace(/\[.*?\]/g, "[^/]+").replace(/\//g, "\\/") + "$"
-    //   );
-    //   return regex.test(pathname);
-    // });
+    const matchesAllowedUrl = allowedUrls.some((pattern) => {
+      const regex = new RegExp(
+        "^" + pattern.replace(/\[.*?\]/g, "[^/]+").replace(/\//g, "\\/") + "$"
+      );
+      return regex.test(pathname);
+    });
 
-    // // If the current path is not allowed for the user's role, redirect
-    // if (!matchesAllowedUrl) {
-    //   return NextResponse.redirect(
-    //     new URL("/account/unauthorized", request.url)
-    //   );
-    // }
+    // If the current path is not allowed for the user's role, redirect
+    if (!matchesAllowedUrl) {
+      return NextResponse.redirect(
+        new URL("/account/unauthorized", request.url)
+      );
+    }
 
     return NextResponse.next();
   } catch (error) {
@@ -49,7 +56,7 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// Apply middleware only to `/account/*` routes
+// Apply middleware only to /account/* routes
 export const config = {
   matcher: "/account/:path*",
 };

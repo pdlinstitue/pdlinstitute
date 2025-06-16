@@ -4,7 +4,7 @@ import Enrollments from "../../../../modals/Enrollments";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Categories from "../../../../modals/Categories";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export async function GET(req: NextRequest) {
     try {

@@ -16,44 +16,23 @@ import * as RiIcons from "react-icons/ri";
 import * as PiIcons from "react-icons/pi";
 import * as FaIcons from "react-icons/fa";
 
-const SideBar: React.FC = () => {
-
+const SideBar: React.FC = () => {  
+  const userCookie = Cookies.get('loggedInUser');
   const pathName = usePathname();
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [userData, setUserData] = useState<any>({});
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
 
-  const [loggedInUser, setLoggedInUser] = useState({
-    id: "",
-    usrName: "",
-    usrRole: "",
-    isAdmin: "",
-  });
-
-  useEffect(() => {
-  try {
-    const cookie = Cookies.get("loggedInUser");
-    if (cookie) {
-        const parsed = JSON.parse(cookie);
-        setLoggedInUser({
-        id: parsed.id || "",
-        usrName: parsed.usrName || "",
-        usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-      });
-    }
-    } catch (error) {
-      console.error("Error parsing loggedInUser cookie:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  let parsed: any = {};
+  if (userCookie) {
+    parsed = JSON.parse(userCookie);
+  }
   
   useEffect(() => {
     const fetchMenuByRole = async () => {
       try {
-        const role = loggedInUser.id;
+        const role = parsed.usrRole;
         const response = await fetch(`/api/menu-by-role?userRole=${role}`);
         const data = await response.json();
         if (data.success) {
@@ -71,7 +50,7 @@ const SideBar: React.FC = () => {
   useEffect(() => {
     const fetchUserById = async () => {
       try {
-        const userId = loggedInUser.id;
+        const userId = parsed.id;
         const response = await fetch(`/api/users/${userId}/view-sadhak`);
         const data = await response.json();
         if (data.success) {
@@ -87,8 +66,18 @@ const SideBar: React.FC = () => {
   }, []);
 
   const handleViewChange = (role: string, url: string) => {
-    Cookies.set("loggedInUserRole", role);
-    window.location.href = url;
+    //Cookies.set("loggedInUser", role);
+    fetch('/api/auth/login', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sdkRole: role }),
+    }).then((response) => {
+      if (response.ok) {
+        window.location.href = url;
+      }
+    });
   };
 
   const renderIcon = (iconName: string) => {
@@ -243,7 +232,7 @@ const SideBar: React.FC = () => {
                   />
                 </button>
               </div>
-              {Cookies.get("loggedInUserRole") !== userData.sdkRole &&
+              {parsed.usrRole !== userData.sdkRole &&
                 userData.isAdmin == "Yes" &&
                 selectedParentId === "admin-volunter" && (
                   <div
@@ -261,7 +250,7 @@ const SideBar: React.FC = () => {
                     </button>
                   </div>
                 )}
-              {Cookies.get("loggedInUserRole") !== "Sadhak" &&
+              {parsed.usrRole !== "Sadhak" &&
                 selectedParentId === "admin-volunter" && (
                   <div
                     key={"admin-volunter-child-2"}
@@ -278,7 +267,7 @@ const SideBar: React.FC = () => {
                   </div>
                 )}
 
-              {Cookies.get("loggedInUserRole") !== "Volunteer" &&
+              {parsed.usrRole !== "Volunteer" &&
                 userData.isVolunter == "Yes" &&
                 selectedParentId === "admin-volunter" && (
                   <div

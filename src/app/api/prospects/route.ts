@@ -1,7 +1,7 @@
 import Prospects from "../../../../modals/Prospects";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type ProsType = {
     _id:string,

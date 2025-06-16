@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Enrollments from "../../../../modals/Enrollments";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 export async function GET(req: NextRequest){

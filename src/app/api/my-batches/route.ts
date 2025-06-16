@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Enrollments from "../../../../modals/Enrollments";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 export async function GET(req: NextRequest){
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest){
       }
   
       // Populate 'bthId' with all fields from BatchType
-      const enrListBySdkId = await Enrollments.find({ sdkId:sdkId, isApproved:"Approved", isCompleted:"Pending" })
+      const enrListBySdkId = await Enrollments.find({ sdkId:sdkId })
       .populate("corId","coNick")
       .populate("bthId", "bthName bthShift bthStart bthEnd corId bthVtr bthWhatGrp bthTeleGrp bthLang bthMode bthLink bthLoc")
       .sort({createdAt: -1});

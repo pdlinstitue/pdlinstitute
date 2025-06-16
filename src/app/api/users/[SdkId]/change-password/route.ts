@@ -2,7 +2,7 @@ import Users from "../../../../../../modals/Users";
 import dbConnect from "../../../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type SdkType = {
     sdkPwd: string,

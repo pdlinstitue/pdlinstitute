@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Sidemenues from "../../../../../../modals/Sidemenues";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ SideId: string }>}){

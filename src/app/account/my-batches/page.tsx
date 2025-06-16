@@ -29,6 +29,7 @@ interface BatchListProps {
   bthMode: string,
   bthLink: string,
   bthLoc: string,
+  enrId: string,
 }
 
 const MyBatches : React.FC = () => {
@@ -81,8 +82,8 @@ const MyBatches : React.FC = () => {
       cell: ({ row }: { row: any }) => ( 
         <div className='flex items-center gap-3'> 
           <button type='button' title='View Details' onClick={()=> router.push(`/account/my-batches/${row.original._id}/batch-details`)} className='text-green-500 border-[1.5px] border-green-700 p-1 rounded-full hover:border-black'><FiEye size={12}/></button>
-          <button type='button' title='My Receipt' onClick={()=> router.push(`/account/my-batches/${row.original._id}/batch-details`)} className='text-blue-500 border-[1.5px] border-blue-700 p-1 rounded-full hover:border-black'><MdReceipt size={12}/></button>
-          <button type='button' title='My Payment' onClick={()=> router.push(`/account/my-batches/${row.original._id}/batch-details`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full hover:border-black'><CiMoneyCheck1 size={12}/></button>
+          <button type='button' title='My Receipt' onClick={()=> router.push(`/account/my-batches/${row.original._id}/my-receipt`)} className='text-blue-500 border-[1.5px] border-blue-700 p-1 rounded-full hover:border-black'><MdReceipt size={12}/></button>
+          <button type='button' title='My Payment' onClick={()=> router.push(`/account/my-batches/${row.original._id}/${row.original.enrId}/my-payment`)} className='text-red-500 border-[1.5px] border-red-700 p-1 rounded-full hover:border-black'><CiMoneyCheck1 size={12}/></button>
           <button type='button' title='My Classes' onClick={()=> router.push(`/account/my-batches/${row.original._id}/view-classes`)} className='text-orange-500 border-[1.5px] border-orange-700 p-1 rounded-full  hover:border-black'><PiChalkboardTeacher size={12}/></button>      
         </div> 
       ), 
@@ -131,6 +132,7 @@ const MyBatches : React.FC = () => {
           return {
             ...item,
             _id:item.bthId?._id,
+            enrId: item._id,
             coNick: item.corId?.coNick || "", // Ensuring corId exists
             bthName: item.bthId?.bthName || "",
             bthShift: item.bthId?.bthShift || "",

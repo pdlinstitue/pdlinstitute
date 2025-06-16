@@ -3,7 +3,7 @@ import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 import mongoose from "mongoose";
 import Enrollments from "../../../../../../modals/Enrollments";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type BatchType = {
   bthName:string, 

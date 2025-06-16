@@ -31,6 +31,7 @@
     "mongoose": "^8.9.3",
     "next": "^15.3.3",
     "nodemailer": "^6.10.0",
+    "path-to-regexp": "^8.2.0",
     "postcss": "8.4.49",
     "react": "^19.1.0",
     "react-datepicker": "^8.4.0",

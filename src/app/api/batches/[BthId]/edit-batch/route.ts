@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 type BatchType =  {

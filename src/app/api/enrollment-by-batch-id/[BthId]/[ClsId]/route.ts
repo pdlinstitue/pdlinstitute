@@ -4,7 +4,7 @@ import Enrollments from "../../../../../../modals/Enrollments";
 import Attendance from "../../../../../../modals/Attendance";
 import Classes from "../../../../../../modals/Classes";
 import mongoose from "mongoose";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 function addMinutesToTime(timeStr: string, minutesToAdd: number): string {
 

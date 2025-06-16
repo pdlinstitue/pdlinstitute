@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Classes from "../../../../../../../modals/Classes";
 import dbConnect from "../../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ ClsId: string, DayId: string }> }) {

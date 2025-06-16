@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import next from "next";
 import Users from "../../../../modals/Users";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type DocType = {
     sdkName: string;

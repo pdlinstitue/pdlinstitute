@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Courses from "../../../../../../modals/Courses";
 import Batches from "../../../../../../modals/Batches";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ CorId: string}> }) {

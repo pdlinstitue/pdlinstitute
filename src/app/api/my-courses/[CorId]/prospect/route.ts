@@ -2,7 +2,7 @@ import Enrollments from "../../../../../../modals/Enrollments";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Prospects from "../../../../../../modals/Prospects";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 type ProsType = {

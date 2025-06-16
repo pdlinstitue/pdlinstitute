@@ -2,7 +2,7 @@ import Courses from "../../../../modals/Courses";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Categories from "../../../../modals/Categories";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type CoType = {
     coName: string, 

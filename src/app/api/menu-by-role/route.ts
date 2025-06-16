@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Menuaccess from "../../../../modals/Menuaccess";
 import dbConnect from "../../../../dbConnect";
 import Roles from "../../../../modals/Roles";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export async function GET(req: NextRequest) {
 

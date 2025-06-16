@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Roles from "../../../../../../modals/Roles";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
  
 type RolType = {
   isActive:boolean;

@@ -1,113 +1,154 @@
 import Users from "../../../../../modals/Users";
 import dbConnect from "../../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcryptjs";
+import { generateAccessToken, generateRefreshToken } from "@/app/utils/token";
+import { encrypt } from "@/app/utils/crypto";
+import { cookies } from "next/headers";
 
 export const POST = async (request: NextRequest) => {
-
   try {
     const { sdkCred, sdkPwd } = await request.json();
     await dbConnect();
 
     if (!sdkCred || !sdkPwd) {
-      return NextResponse.json({ success: false, token: '', msg: 'Missing credentials!' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, token: "", msg: "Missing credentials!" },
+        { status: 400 }
+      );
     }
 
     const user = await Users.findOne({
-      $and: [
-        { isActive: true },
-        { $or: [{ sdkPhone: sdkCred }, { sdkEmail: sdkCred }] },
-      ],
+      isActive: true,
+      $or: [{ sdkPhone: sdkCred }, { sdkEmail: sdkCred }],
     });
 
     if (!user) {
-      return NextResponse.json({ success: false, token: '', msg: 'Invalid user!' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, token: "", msg: "Invalid user!" },
+        { status: 400 }
+      );
     }
 
     let isPasswordValid = await bcrypt.compare(sdkPwd, user.sdkPwd);
-    const expiryDate = new Date(user.sdkRegPwdExpiry);
+    const expiryDate = user.sdkRegPwdExpiry
+      ? new Date(user.sdkRegPwdExpiry)
+      : null;
     const currentDate = new Date();
 
-    if (!isPasswordValid) {
-      if (currentDate > expiryDate) {
-        return NextResponse.json({ success: false, token: '', msg: 'Password expired!' }, { status: 400 });
-      }
-      if (sdkPwd === user.sdkRegPwd) {
-        isPasswordValid = true;
-      }
+    if (!isPasswordValid && expiryDate && currentDate > expiryDate) {
+      return NextResponse.json(
+        { success: false, token: "", msg: "Password expired!" },
+        { status: 400 }
+      );
+    }
+
+    // Fallback: accept unencrypted registration password if not yet changed
+    if (!isPasswordValid && sdkPwd === user.sdkRegPwd) {
+      isPasswordValid = true;
     }
 
     if (!isPasswordValid) {
-      return NextResponse.json({ success: false, token: '', msg: 'Invalid password!' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, token: "", msg: "Invalid password!" },
+        { status: 400 }
+      );
     }
 
-    const accessSecret = process.env.JWT_SECRET;
-    const refreshSecret = process.env.JWT_REFRESH_SECRET;
+    const payload = { id: user._id };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
 
-    if (!accessSecret || !refreshSecret) {
-      throw new Error('JWT_SECRET or JWT_REFRESH_SECRET not defined in environment');
-    }
-
-    const accessExpiresIn = process.env.LOGIN_EXPIRES
-      ? parseInt(process.env.LOGIN_EXPIRES)
-      : 900; // 15 minutes
-
-    const refreshExpiresIn = 60 * 60 * 24; // 1 days
-
-    const accessToken = jwt.sign({ id: user._id }, accessSecret, { expiresIn: accessExpiresIn });
-    const refreshToken = jwt.sign({ id: user._id }, refreshSecret, { expiresIn: refreshExpiresIn });
-
-    user.sdkPwd = null;
-
-    const res = NextResponse.json({
-      result: {
-        id: user._id,
-        usrName: user.sdkFstName,
-        usrRole: user.sdkRole,
-        isAdmin: user.isAdmin,
-        success: true,
-      }
-    }, { status: 200 });
-
+    // Destructure necessary fields
+    const { _id, sdkFstName, sdkRole, isAdmin } = user;
     const loggedInUserInfo = {
-      id: user._id,
-      usrName: user.sdkFstName,
-      usrRole: user.sdkRole,
-      isAdmin:user.isAdmin
+      id: _id,
+      usrName: sdkFstName,
+      usrRole: sdkRole,
+      isAdmin,
     };
 
-    // Set HttpOnly cookies
-    res.cookies.set("token", accessToken, {
+    const cookieStore = await cookies();
+    cookieStore.set("accessToken", encrypt(accessToken), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: accessExpiresIn,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 15, // 15 minutes
     });
 
-    res.cookies.set("refreshToken", refreshToken, {
+    cookieStore.set("refreshToken", encrypt(refreshToken), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: refreshExpiresIn,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    res.cookies.set("loggedInUser", JSON.stringify(loggedInUserInfo), {
-      httpOnly: false, // client-side readable
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: refreshExpiresIn, // or any duration you want
+    cookieStore.set("loggedInUser", JSON.stringify(loggedInUserInfo), {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
     });
 
-    return res;
-
+    return NextResponse.json(
+      {
+        result: { ...loggedInUserInfo, success: true },
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
-    const errorMessage = error.name === 'ValidationError'
-      ? Object.values(error.errors).map((val: any) => val.message)
-      : "Error while processing request.";
-    return NextResponse.json({ success: false, msg: errorMessage }, { status: 400 });
+    console.error("Login Error:", error);
+    const errorMessage =
+      error.name === "ValidationError"
+        ? Object.values(error.errors)
+            .map((val: any) => val.message)
+            .join(", ")
+        : "Error while processing request.";
+    return NextResponse.json(
+      { success: false, msg: errorMessage },
+      { status: 400 }
+    );
   }
+};
+
+export const PUT = async (request: NextRequest) => {
+  const { sdkRole } = await request.json();
+  const cookieStore = await cookies();
+  const userCookie = cookieStore.get("loggedInUser")?.value;
+
+  if (userCookie) {
+    try {
+      const parsed = JSON.parse(userCookie);
+      // Update the user role or any other field as needed
+      parsed.usrRole = sdkRole;
+
+      cookieStore.set("loggedInUser", JSON.stringify(parsed), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    } catch (error) {
+      console.error("Failed to parse or update cookie:", error);
+      return NextResponse.json(
+        { success: false, msg: "Failed to update user role." },
+        { status: 400 }
+      );
+    }
+  } else {
+    console.warn("No cookie found to update");
+    return NextResponse.json(
+      { success: false, msg: "No user cookie found." },
+      { status: 400 }
+    );
+  }
+
+  return NextResponse.json(
+    { success: true, msg: "User role updated successfully." },
+    { status: 200 }
+  );
 };

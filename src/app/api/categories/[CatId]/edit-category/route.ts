@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Categories from "../../../../../../modals/Categories";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type CatType = {
   _id?: string;

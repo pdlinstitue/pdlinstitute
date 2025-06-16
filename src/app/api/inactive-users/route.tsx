@@ -1,7 +1,7 @@
 import Users from "../../../../modals/Users";
 import dbConnect from "../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type SdkType = {
     sdkFstName: string

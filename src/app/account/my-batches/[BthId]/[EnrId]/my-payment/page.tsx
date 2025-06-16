@@ -20,6 +20,7 @@ interface ViewPaymentProps {
     enrRemarks: string;
     enrTnsNo:string;
     updatedBy?: string;
+    isApproved: string;
 }
 
 const MyPayment : React.FC<IEnrParams> = ({params}) => {
@@ -28,7 +29,7 @@ const MyPayment : React.FC<IEnrParams> = ({params}) => {
     const {EnrId} = use(params);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [enrData, setEnrData] = useState<ViewPaymentProps>({_id:"", enrSrnShot:"", enrRemarks:"", enrTnsNo:"", updatedBy:""});
+    const [enrData, setEnrData] = useState<ViewPaymentProps>({_id:"", enrSrnShot:"", enrRemarks:"", enrTnsNo:"", updatedBy:"", isApproved:""});
     const [loggedInUser, setLoggedInUser] = useState({
     id: "",
     usrName: "",
@@ -123,11 +124,11 @@ const MyPayment : React.FC<IEnrParams> = ({params}) => {
          </div>
          <div className='flex flex-col gap-2'>
             <label>Trans No:</label>
-            <input className='inputBox' name='enrTnsNo' value={enrData?.enrTnsNo} onChange={handleChange}></input>
+            <input className='inputBox' name='enrTnsNo' value={enrData?.enrTnsNo} onChange={handleChange} readOnly={enrData.isApproved === "Approved"}></input>
          </div>
          <div className='flex flex-col gap-2'>
             <label>Remarks:</label>
-            <textarea className='inputBox' name='enrRemarks' value={enrData?.enrRemarks} onChange={handleChange} disabled placeholder='Remarks'></textarea>
+            <textarea className='inputBox' name='enrRemarks' value={enrData?.enrRemarks} onChange={handleChange} readOnly placeholder='Remarks'></textarea>
          </div>
          <div className='grid grid-cols-1 md:grid-cols-2 gap-1 items-center mt-3'>
             <button type='submit' className='btnLeft'  disabled={isSaving}>

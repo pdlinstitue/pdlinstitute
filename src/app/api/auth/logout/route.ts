@@ -1,24 +1,27 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-export async function POST() {
+export function POST() {
+  const response = NextResponse.json(
+    { success: true, msg: "Logged out successfully." },
+    { status: 200 }
+  );
 
-  const res = NextResponse.json({ success: true, msg:"Loggedout successfully." }, { status: 200 });
-
-  res.cookies.set('token', '', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
-    path: '/',
+  // Clear cookies by setting maxAge = 0
+  response.cookies.set("accessToken", "", {
+    path: "/",
     maxAge: 0,
   });
 
-  res.cookies.set('refreshToken', '', {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
-    path: '/',
+  response.cookies.set("refreshToken", "", {
+    path: "/",
     maxAge: 0,
   });
 
-  return res;
+  response.cookies.set("loggedInUser", "", {
+    path: "/",
+    maxAge: 0,
+  });
+
+  return response;
 }

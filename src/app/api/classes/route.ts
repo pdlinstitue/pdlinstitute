@@ -4,7 +4,7 @@ import Classes from "../../../../modals/Classes";
 import Enrollments from "../../../../modals/Enrollments";
 import Attendance from "../../../../modals/Attendance";
 import mongoose from "mongoose";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 export async function GET(req: NextRequest) {

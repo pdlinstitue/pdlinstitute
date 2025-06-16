@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Coupons from "../../../../modals/Coupons";
 import Enrollments from "../../../../modals/Enrollments";
 import moment from "moment";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 import dbConnect from "../../../../dbConnect";
 
 type CouponType = {

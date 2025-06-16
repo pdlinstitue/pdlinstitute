@@ -75,9 +75,9 @@ const LoginPage : React.FC = () => {
             if (post.success === false) {
                 toast.error(post.msg);
             } else{
-                Cookies.set("loggedInUserId", post.result.id);
-                Cookies.set("loggedInUserName", post.result.usrName);
-                Cookies.set("loggedInUserRole", post.result.usrRole);
+                // Cookies.set("loggedInUserId", post.result.id);
+                // Cookies.set("loggedInUserName", post.result.usrName);
+                // Cookies.set("loggedInUserRole", post.result.usrRole);
                 toast.success("Logged in successfully.");
 
                 // Redirect conditionally based on user role

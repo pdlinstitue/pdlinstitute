@@ -4,7 +4,7 @@ import sharp from "sharp";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { UPLOAD_PATH } from "@/app/utils/constant";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export async function GET(req: NextRequest) {
 

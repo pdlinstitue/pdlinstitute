@@ -13,14 +13,19 @@ interface SadhakDataProps {
 }
 
 const AdminDashBoard: React.FC = () => {
-  
+  const userCookie = Cookies.get('loggedInUser');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [sdkData, setSdkData] = useState<SadhakDataProps>({sdkRegNo:""});
+
+  let parsed: any = {};
+  if (userCookie) {
+    parsed = JSON.parse(userCookie);
+  }
 
   useEffect(() => {
     async function fetchCatData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/users/${Cookies.get("loggedInUserId")}/view-sadhak`);
+        const res = await fetch(`${BASE_API_URL}/api/users/${parsed.id}/view-sadhak`);
         const sadhakData = await res.json();
         setSdkData(sadhakData.sdkById);
       } catch (error) {

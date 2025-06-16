@@ -3,10 +3,9 @@ import dbConnect from "../../../../../dbConnect";
 import Permissions from "../../../../../modals/Permissions";
 import Roles from "../../../../../modals/Roles";
 import Modules from "../../../../../modals/Modules";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ RoleType: string }> }) {
-  
   await verifyApiToken();
   await dbConnect();
   const { RoleType } = await params;

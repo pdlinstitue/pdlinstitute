@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import Categories from "../../../../../../modals/Categories";
 import dbConnect from "../../../../../../dbConnect";
 import Courses from "../../../../../../modals/Courses";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type CatType = {
   isActive:boolean;

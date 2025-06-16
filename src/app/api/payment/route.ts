@@ -1,4 +1,4 @@
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 

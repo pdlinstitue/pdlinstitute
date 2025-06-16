@@ -5,7 +5,7 @@ import dbConnect from "../../../../dbConnect";
 import mongoose from "mongoose";
 import Attendance from "../../../../modals/Attendance";
 import Reenrollments from "../../../../modals/Reenrollments";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type EnrType = {
   sdkId: string;

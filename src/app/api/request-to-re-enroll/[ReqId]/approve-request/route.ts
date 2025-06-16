@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import Reenrollments from "../../../../../../modals/Reenrollments";
 import dbConnect from "../../../../../../dbConnect";
 import mongoose from "mongoose";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type ReenrollmentsType = {
     reqStatus: string;

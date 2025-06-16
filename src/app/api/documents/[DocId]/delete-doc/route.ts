@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import Documents from "../../../../../../modals/Documents";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/auth";
+import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ DocId: string}> }) {

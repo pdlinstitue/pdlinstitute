@@ -26,36 +26,16 @@ const ProfMenu = () => {
   const router = useRouter();
   const [userProfile, setUserProfile] = useState<UserProfileProps>({_id:'', sdkImg:''})
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loggedInUser, setLoggedInUser] = useState({
-    id: "",
-    usrName: "",
-    usrRole: "",
-    isAdmin: "",
-  });
-
-  useEffect(() => {
-  try {
-    const cookie = Cookies.get("loggedInUser");
-    if (cookie) {
-        const parsed = JSON.parse(cookie);
-        setLoggedInUser({
-        id: parsed.id || "",
-        usrName: parsed.usrName || "",
-        usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-      });
-    }
-    } catch (error) {
-      console.error("Error parsing loggedInUser cookie:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const userCookie = Cookies.get("loggedInUser");
+  let parsed: any = {};
+  if (userCookie) {
+    parsed = JSON.parse(userCookie);
+  }
 
   useEffect(() => {
     async function fetchUserProfileById() {
-      try {  
-          const res = await fetch(`${BASE_API_URL}/api/users/${Cookies.get("loggedInUserId")}/view-sadhak`);
+      try {
+        const res = await fetch(`${BASE_API_URL}/api/users/${parsed.id}/view-sadhak`);
           const userData = await res.json();
           setUserProfile(userData.sdkById);
         } catch (error) {
@@ -67,10 +47,7 @@ const ProfMenu = () => {
     fetchUserProfileById();
   }, []);
 
-  const handleLogOut = async () => {
-    Cookies.remove("loggedInUserId");
-    Cookies.remove("loggedInUserName");
-    Cookies.remove("loggedInUserRole");
+  const handleLogOut = async () => {    
     await fetch('/api/auth/logout', { method: 'POST' });
     toast.success('Loggedout successfully.');
     router.push('/login');
@@ -85,7 +62,7 @@ const ProfMenu = () => {
   return (
     <div className="flex p-4 items-center gap-2 w-auto">
       <div className="w-auto">
-        <p>Hello, {loggedInUser.usrName}</p>
+        <p>Hello, {parsed.usrName}</p>
       </div>
       <div className="relative group transition-all"> 
         {
@@ -93,19 +70,19 @@ const ProfMenu = () => {
           : <FaUserCircle className="text-gray-400 w-[50px] h-[50px] cursor-pointer" />
         }
         <div className="absolute border-[1.5px] border-orange-700 divide-y z-50 group-hover:flex right-0 top-12 hidden w-[230px] flex-col transition-all px-2 py-2  bg-white rounded-md shadow-xl">
-            <Link href={`/account/profile-setting/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-4 py-2  hover:bg-orange-500">
+            <Link href={`/account/profile-setting/${parsed.id}`} className="flex text-black hover:text-white gap-2 px-4 py-2  hover:bg-orange-500">
               <RiProfileLine size={24} />
               <span className='text-md'>Profile Setting</span>
             </Link>
-            <Link href={`/account/account-setting/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-4  py-2 hover:bg-orange-500">
+            <Link href={`/account/account-setting/${parsed.id}`} className="flex text-black hover:text-white gap-2 px-4  py-2 hover:bg-orange-500">
               <MdSettingsBrightness size={24} />
               <span className='text-md'>Account Setting</span>
             </Link>
-            <Link href={`/account/change-password/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
+            <Link href={`/account/change-password/${parsed.id}`} className="flex text-black hover:text-white gap-2 px-4 py-2 hover:bg-orange-500">
               <PiFolderLockFill size={26} />
               <span className='text-md'>Change Password</span>
             </Link>
-            <Link href={`/account/my-id-card/${loggedInUser.id}`} className="flex text-black hover:text-white gap-2 px-5 py-2  hover:bg-orange-500">
+            <Link href={`/account/my-id-card/${parsed.id}`} className="flex text-black hover:text-white gap-2 px-5 py-2  hover:bg-orange-500">
               <FaIdCardClip size={22} />
               <span className='text-md'>My ID Card</span>
             </Link>
