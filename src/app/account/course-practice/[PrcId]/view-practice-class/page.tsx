@@ -73,7 +73,7 @@ const ViewPracticeClass: React.FC<IPrcParams> = ({ params }) => {
         const prcClassById = await prcData.json();
         setData(prcClassById.prcById);
         setPracDays(prcClassById.prcById.prcDays);
-        setSelectedCourse(prcClassById.prcById.prcName); 
+        setSelectedCourse(prcClassById.prcById.prcName._id); 
       } catch (error) {
         console.error("Error fetching practiceClassData: ", error);
       } finally {

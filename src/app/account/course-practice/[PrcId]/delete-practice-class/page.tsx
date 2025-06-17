@@ -12,26 +12,20 @@ interface DelPrcParams {
     }>;
 }
 
-interface PracticeNameProps {
-    _id: string,
-    prcName:string
-}
-
 const DelPracticeClass: React.FC<DelPrcParams> = ({ params }): JSX.Element => {
     
     const router = useRouter();
     const { PrcId } = use(params);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [practiceName, setPracticeName] = useState<PracticeNameProps>({_id:'', prcName:''});
-    
-    useEffect(() => { 
-        async function fetchPrcClassById() { 
-            try 
-            { 
-                const res = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/view-practice-class`, {cache: "no-store"}); 
-                const practiceData = await res.json(); 
-                setPracticeName(practiceData.prcById.prcName);      
+    const [practiceName, setPracticeName] = useState<string>("");
+
+    useEffect(() => {
+        async function fetchPrcClassById() {
+            try {
+                const res = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/view-practice-class`, {cache: "no-store"});
+                const practiceData = await res.json();
+                setPracticeName(practiceData.prcById?.prcName?.coNick);
             } catch (error) { 
                 console.error("Error fetching eventData:", error); 
             } finally {
@@ -78,7 +72,7 @@ const DelPracticeClass: React.FC<DelPrcParams> = ({ params }): JSX.Element => {
                             Won't be able to restore. Are you sure to delete?
                         </p>
                         <p className='text-green-600 font-bold text-xl'>
-                            {practiceName.prcName}
+                            {practiceName}
                         </p>
                     </div>
                     <div className="flex gap-1">

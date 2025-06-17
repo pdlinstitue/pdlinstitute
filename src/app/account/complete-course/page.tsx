@@ -141,7 +141,7 @@ const CompleteCourse: React.FC = () => {
   async function fetchEnrollmentData() {
     try {
       const res = await fetch(
-        `${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`,
+        `${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}`,
         { cache: "no-store" }
       );
       const enrDataList = await res.json();

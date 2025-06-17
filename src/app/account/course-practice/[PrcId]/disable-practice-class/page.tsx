@@ -13,18 +13,13 @@ interface IPrcParams {
     }>;
 }
 
-interface PracticeNameProps {
-    _id: string,
-    prcName:string
-}
-
 const DisablePracticeClass : React.FC <IPrcParams>= ({params}) => {
 
   const router = useRouter();
   const { PrcId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [practiceName, setPracticeName] = useState<PracticeNameProps>({_id:'', prcName:''});
+  const [practiceName, setPracticeName] = useState<string>("");
 
   useEffect(() => { 
   async function fetchPrcClassById() { 
@@ -32,7 +27,7 @@ const DisablePracticeClass : React.FC <IPrcParams>= ({params}) => {
     { 
         const res = await fetch(`${BASE_API_URL}/api/course-practice/${PrcId}/view-practice-class`, {cache: "no-store"}); 
         const practiceData = await res.json(); 
-        setPracticeName(practiceData.prcById);      
+        setPracticeName(practiceData.prcById?.prcName?.coNick); 
     } catch (error) { 
         console.error("Error fetching eventData:", error); 
     } finally {
@@ -80,7 +75,7 @@ const DisablePracticeClass : React.FC <IPrcParams>= ({params}) => {
                     <h1 className="text-3xl p-3 text-center text-yellow-500 font-semibold">Warning !</h1>
                     <div className="text-center">
                         <p>Do you really want to disable this practice class?</p>
-                        <p className='text-green-600 font-bold text-xl'>{practiceName.prcName}</p>
+                        <p className='text-green-600 font-bold text-xl'>{practiceName}</p>
                     </div>
                 </div>
                 <div className="flex gap-1">
