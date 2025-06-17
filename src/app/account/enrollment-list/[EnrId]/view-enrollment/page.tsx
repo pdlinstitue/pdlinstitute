@@ -120,7 +120,11 @@ const ViewEnrollment : React.FC<IEnrParams> = ({params}) => {
     <div className='flex items-center justify-center'>
       <form className='formStyle  w-[450px] my-3' onSubmit={handleSubmit}>
          <div className=' bg-gray-200 w-auto h-auto rounded-md'>
-            <Image alt='paymentImg' src={enrData?.enrSrnShot} width={420} height={250}/>
+           {
+            enrData?.enrSrnShot && (
+                <Image alt='paymentImg' src={enrData?.enrSrnShot} width={420} height={250}/>
+            )
+           }
          </div>
          <div className='flex flex-col gap-2'>
             <label>Trans No:</label>

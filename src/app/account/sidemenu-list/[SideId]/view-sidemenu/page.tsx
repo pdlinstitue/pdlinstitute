@@ -137,7 +137,7 @@ const ViewSideMenu: React.FC<ISideMenuParams> = ({ params }) => {
           />
         </div>
 
-        <div className='grid grid-cols-2 gap-4 mt-4'>
+        <div className='grid grid-cols-2 gap-4'>
           <div className='flex items-center gap-2'>
             <input
               type="radio"
@@ -163,7 +163,7 @@ const ViewSideMenu: React.FC<ISideMenuParams> = ({ params }) => {
         </div>
 
         {selectedType !== 'child' && (
-          <div className='flex flex-col gap-2 mt-4'>
+          <div className='flex flex-col gap-2'>
             <label>Menu Icon:</label>
             <input
               type="text"
@@ -177,7 +177,7 @@ const ViewSideMenu: React.FC<ISideMenuParams> = ({ params }) => {
         )}
 
         {selectedType !== 'parent' && (
-          <div className='flex flex-col gap-2 mt-4'>
+          <div className='flex flex-col gap-2'>
             <label>Menu URL:</label>
             <input
               type="text"
@@ -191,7 +191,7 @@ const ViewSideMenu: React.FC<ISideMenuParams> = ({ params }) => {
         )}
 
         {selectedType === 'child' && (
-          <div className='flex flex-col gap-2 mt-4'>
+          <div className='flex flex-col gap-2'>
             <label>Parent ID:</label>
             <select
               name="parentId"
@@ -209,14 +209,10 @@ const ViewSideMenu: React.FC<ISideMenuParams> = ({ params }) => {
             </select>
           </div>
         )}
-
-        <div className='grid grid-cols-2 gap-1 mt-6'>
-          <button type="submit" className="btnLeft" disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save'}
-          </button>
+        <div className='grid grid-cols-1 gap-1'>
           <button
             type="button"
-            className="btnRight"
+            className="btnLeft"
             onClick={() => router.push('/account/sidemenu-list')}
           >
             Back

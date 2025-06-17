@@ -111,29 +111,28 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
   });
 
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
 
   useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
       });
-    } catch (error) {
-      console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
+    }
+  } catch (error) {
+    console.error("Error parsing loggedInUser cookie:", error);
+  } finally {
+    setIsLoading(false);
     }
   }, []);
 
@@ -464,7 +463,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkRole: sdkData.sdkRole,
               isVolunteer: sdkData.isVolunteer,
               isAdmin: sdkData.isAdmin,
-              updatedBy: loggedInUser.result?._id,
+              updatedBy: loggedInUser.id,
             }),
           }
         );
@@ -498,8 +497,8 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     <div>
       <form className="formStyle w-full" onSubmit={handleSubmit}>
         <div className="md:flex gap-8 w-auto">
-          <div className="flex flex-col gap-1 max-w-[400px] h-auto">
-            <div className="max-w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+          <div className="flex flex-col gap-1 w-auto h-auto">
+            <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
               {sdkData.sdkImg ? (
                 <Image
                   src={`/api/profile-upload?name=${sdkData?.sdkImg}`}
@@ -516,7 +515,9 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
                   height={345}
                   className="w-full h-full object-cover"
                 />
-              ) : null}
+              ) : (<div className="flex justify-center items-center w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+                No Image
+              </div>)}
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -712,7 +713,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
             <input
               className="inputBox"
               name="sdkRefName"
-              value={sdkData.sdkRefName}
+              value={sdkData?.sdkRefName}
               onChange={handleChange}
             >
             </input>
@@ -723,7 +724,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               type="number"
               className="inputBox"
               name="sdkRefCont"
-              value={sdkData.sdkRefCont}
+              value={sdkData?.sdkRefCont}
               onChange={handleChange}
             />
           </div>
@@ -854,7 +855,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               </label>
             </div>
           </div>
-          {loggedInUser.result.usrRole === "Super-Admin" && (
+          {loggedInUser.usrRole === "Super-Admin" && (
             <div className="flex flex-col gap-2">
               <label className="text-lg">Is Admin?</label>
               <div className="flex gap-4 mt-3">

@@ -1,9 +1,10 @@
 "use client";
-import React, { use, useEffect, useState } from "react";
+import React, { FormEvent, use, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/account/Loading";
 import { BASE_API_URL } from "@/app/utils/constant";
+import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 
 interface ISadhakParams {
@@ -15,6 +16,8 @@ interface ViewSadhakProps {
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
+  sdkEdc: string;
+  sdkOcp: string;
   sdkFthName: string;
   sdkMthName: string;
   sdkAbout: string;
@@ -24,6 +27,8 @@ interface ViewSadhakProps {
   sdkGender: string;
   sdkMarStts: string;
   sdkSpouce: string;
+  sdkRefName: string;
+  sdkRefCont: string;
   sdkCountry: string;
   sdkState: string;
   sdkCity: string;
@@ -34,6 +39,8 @@ interface ViewSadhakProps {
   sdkParAdds: string;
   sdkImg: string;
   sdkRole: string;
+  isVolunteer: string;
+  isAdmin: string;
   updatedBy: string;
 }
 
@@ -52,17 +59,19 @@ interface cityListProps {
   city_name: string;
 }
 
-interface SadhakTypeProps {
-  _id:string,
-  roleType:string
+interface RoleListProps {
+  _id: string;
+  roleType: string;
 }
 
 const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
 
   const router = useRouter();
   const { SdkId } = use(params);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [sadhakTypeList, setSadhakTypeList] = useState<SadhakTypeProps[] | null>([]);
+  const [image, setImage] = useState<File | string | null>(null);
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
@@ -70,6 +79,8 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
     sdkFstName: "",
     sdkMdlName: "",
     sdkLstName: "",
+    sdkEdc: "",
+    sdkOcp: "",
     sdkFthName: "",
     sdkMthName: "",
     sdkAbout: "",
@@ -79,6 +90,8 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
     sdkGender: "",
     sdkMarStts: "",
     sdkSpouce: "",
+    sdkRefName: "",
+    sdkRefCont: "",
     sdkPhone: "",
     sdkWhtNbr: "",
     sdkEmail: "",
@@ -89,8 +102,36 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
     sdkParAdds: "",
     sdkImg: "",
     sdkRole: "",
+    isVolunteer: "",
+    isAdmin: "",
     updatedBy: "",
   });
+
+  const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+  } catch (error) {
+    console.error("Error parsing loggedInUser cookie:", error);
+  } finally {
+    setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchSdkById() {
@@ -164,32 +205,34 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
   }, [sdkData.sdkState]);
 
   useEffect(() => {
-    async function fetchSadhakTypeData() {
+    async function fetchRoleList() {
       try {
         const res = await fetch(`${BASE_API_URL}/api/role-list`);
-        const sadhakTypeData = await res.json();        
+        const roleData = await res.json();
         let roleList =
           Cookies.get("loggedInUserRole") === "Admin"
-            ? sadhakTypeData?.rolList?.filter(
+            ? roleData?.rolList?.filter(
                 (a: any) =>
                   a.roleType !== "Super-Admin" && a.roleType !== "Admin"
               )
-            : sadhakTypeData?.rolList;
-        setSadhakTypeList(roleList);
+            : roleData?.rolList;
+        setRoleList(roleList);
       } catch (error) {
-        console.error("Error fetching country data:", error);
+        console.error("Error fetching role data:", error);
       } finally {
         setIsLoading(false);
       }
     }
-    fetchSadhakTypeData();
+    fetchRoleList();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ): void => {
     const { name, value } = e.target;
-    setSdkData((prevData) => (
-      { ...prevData, [name]: value }
-    ));
+    setSdkData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   if (isLoading) {
@@ -202,18 +245,25 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
 
   return (
     <div>
-      <form className="flex flex-col gap-4 h-auto border-[1.5px] border-orange-500 p-9 rounded-md">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="w-full h-auto border-[1.5px] bg-gray-100 ">
-            <Image
-              src={`/api/profile-upload?name=${sdkData.sdkImg}`}
-              alt="sadhak"
-              width={600}
-              height={350}
-            />
+      <form className="formStyle w-full" >
+        <div className="md:flex gap-8 w-auto">
+          <div className="flex flex-col gap-1 w-auto h-auto">
+            <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
+              {sdkData.sdkImg ? (
+                <Image
+                  src={`/api/profile-upload?name=${sdkData?.sdkImg}`}
+                  alt="Profile Preview"
+                  width={400}
+                  height={345}
+                  className="w-full h-full object-cover"
+                />
+              ) : (<div className="flex justify-center items-center w-[400px] h-[388px] border-[1.5px] bg-gray-100">
+                No Image
+              </div>)}
+            </div>
           </div>
           <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
                 <label className="text-lg">First Name:</label>
                 <input
@@ -245,9 +295,9 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Father Name:</label>
+                <label className="text-lg">Father's Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -257,7 +307,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Mother Name:</label>
+                <label className="text-lg">Mother's Name:</label>
                 <input
                   type="text"
                   className="inputBox"
@@ -272,18 +322,32 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
                   type="date"
                   className="inputBox"
                   name="sdkBthDate"
-                  value={
-                    sdkData.sdkBthDate
-                      ? new Date(sdkData.sdkBthDate)
-                          .toISOString()
-                          .substring(0, 10)
-                      : ""
-                  }
+                  value={sdkData.sdkBthDate}
                   onChange={handleChange}
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Education:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkEdc"
+                  value={sdkData.sdkEdc}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-lg">Occupation:</label>
+                <input
+                  type="text"
+                  className="inputBox"
+                  name="sdkOcp"
+                  value={sdkData.sdkOcp}
+                  onChange={handleChange}
+                />
+              </div>
               <div className="flex flex-col gap-2">
                 <label className="text-lg">Phone:</label>
                 <input
@@ -317,7 +381,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Gender:</label>
             <select
@@ -343,7 +407,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Marital Status:</label>
             <select
@@ -369,7 +433,29 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Name:</label>
+            <input
+              className="inputBox"
+              name="sdkRefName"
+              value={sdkData?.sdkRefName}
+              onChange={handleChange}
+            >
+            </input>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Referer Phone:</label>
+            <input
+              type="number"
+              className="inputBox"
+              name="sdkRefCont"
+              value={sdkData?.sdkRefCont}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Country:</label>
             <select
@@ -407,7 +493,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">City:</label>
             <select
@@ -434,18 +520,18 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
               value={sdkData.sdkRole}
               onChange={handleChange}
             >
-              <option className="text-center"> --- Select --- </option>
-              {
-                sadhakTypeList?.map((typ:any)=>{
-                  return (
-                    <option key={typ._id} value={typ.roleType}>{typ.roleType}</option>
-                  )
-                })
-              }
+              <option className="text-center"> --- Select Role --- </option>
+              {roleList?.map((item: any) => {
+                return (
+                  <option key={item._id} value={item.roleType}>
+                    {item.roleType}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Permanent Address:</label>
             <textarea
@@ -467,7 +553,7 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-lg">Do you have any medical issues?</label>
             <div className="flex gap-4 mt-3">
@@ -487,7 +573,63 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
                   type="radio"
                   name="isMedIssue"
                   value="No"
-                  checked={sdkData.isMedIssue !== "Yes"}
+                  checked={sdkData.isMedIssue === "No"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                No
+              </label>
+            </div>
+          </div>
+          {loggedInUser.usrRole === "Super-Admin" && (
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Is Admin?</label>
+              <div className="flex gap-4 mt-3">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="isAdmin"
+                    value="Yes"
+                    checked={sdkData.isAdmin === "Yes"}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  Yes
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="isAdmin"
+                    value="No"
+                    checked={sdkData.isAdmin === "No"}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  No
+                </label>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Is Volunteer?</label>
+            <div className="flex gap-4 mt-3">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isVolunteer"
+                  value="Yes"
+                  checked={sdkData.isVolunteer === "Yes"}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Yes
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="isVolunteer"
+                  value="No"
+                  checked={sdkData.isVolunteer !== "Yes"}
                   onChange={handleChange}
                   className="mr-2"
                 />
@@ -496,27 +638,18 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
             </div>
           </div>
         </div>
-        {
-          sdkData.isMedIssue === "Yes" && (
-            <div className="flex flex-col gap-2">
-              <label className="text-lg">Medical Issues:</label>
-              <textarea
-                rows={3}
-                className="inputBox"
-                name="sdkMedIssue"
-                value={sdkData.sdkMedIssue}
-                onChange={handleChange}
-              />
-            </div>
-          )
-        }
-        <div className="flex flex-col gap-2">
-          <h2 className="text-lg text-center p-3 bg-gray-200 rounded-md font-semibold uppercase">
-            List of Courses Done
-          </h2>
-          <p>BSK 1</p>
-          <p>GK 1</p>
-        </div>
+        {sdkData.isMedIssue === "Yes" && (
+          <div className="flex flex-col gap-2">
+            <label className="text-lg">Medical Issues:</label>
+            <textarea
+              rows={3}
+              className="inputBox"
+              name="sdkMedIssue"
+              value={sdkData.sdkMedIssue}
+              onChange={handleChange}
+            />
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-1">
           <button
             type="button"
@@ -531,5 +664,3 @@ const ViewSadhak: React.FC<ISadhakParams> = ({ params }) => {
   );
 };
 export default ViewSadhak;
-
-

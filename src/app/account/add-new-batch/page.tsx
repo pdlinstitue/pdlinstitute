@@ -403,7 +403,7 @@ const AddNewBatch: React.FC = () => {
           <div className="flex flex-col gap-2">
             <label className="text-lg">Meeting Link:</label>
             <input
-              type="text"
+              type="url"
               className="inputBox"
               name="bthLink"
               value={data.bthLink}

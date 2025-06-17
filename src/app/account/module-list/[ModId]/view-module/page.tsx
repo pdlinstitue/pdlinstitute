@@ -89,7 +89,7 @@ const ViewModule: React.FC<IModuleParams> = ({ params }) => {
         <div className="flex gap-1 w-full mt-4">          
           <button
             type="button"
-            className="btnRight w-full"
+            className="btnLeft w-full"
             onClick={() => router.push("/account/module-list")}
           >
             Back

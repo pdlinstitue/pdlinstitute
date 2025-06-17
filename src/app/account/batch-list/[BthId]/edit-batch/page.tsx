@@ -15,9 +15,9 @@ interface VolunteerListProps {
 }
 
 interface IBthParam {
-  params:Promise<{
-    BthId:string
-  }>
+  params: Promise<{
+    BthId: string;
+  }>;
 }
 interface EditBatchProps {
   bthName: string;
@@ -25,7 +25,7 @@ interface EditBatchProps {
   bthStart: string;
   bthEnd: string;
   corId: string;
-  bthVtr: string;
+  bthVtr: string | undefined;
   bthWhatGrp: string;
   bthTeleGrp: string;
   bthLang: string;
@@ -43,10 +43,9 @@ interface CoListProps {
   coName: string;
 }
 
-const EditBatch: React.FC <IBthParam>= ({params}) => {
-
+const EditBatch: React.FC<IBthParam> = ({ params }) => {
   const router = useRouter();
-  const {BthId} = use(params);
+  const { BthId } = use(params);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [image, setImage] = useState<File | string | null>(null);
@@ -81,17 +80,17 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
   });
 
   useEffect(() => {
-  try {
-    const cookie = Cookies.get("loggedInUser");
-    if (cookie) {
+    try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
         const parsed = JSON.parse(cookie);
         setLoggedInUser({
-        id: parsed.id || "",
-        usrName: parsed.usrName || "",
-        usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-      });
-    }
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "",
+        });
+      }
     } catch (error) {
       console.error("Error parsing loggedInUser cookie:", error);
     } finally {
@@ -119,7 +118,6 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
   };
 
   const handleUpload = async () => {
-
     if (!image) {
       toast.error("Please select an image!");
       return;
@@ -206,27 +204,34 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
   useEffect(() => {
     async function fetchBatchDataById() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/batches/${BthId}/view-batch`, {
-          cache: "no-store",
-        });
+        const res = await fetch(
+          `${BASE_API_URL}/api/batches/${BthId}/view-batch`,
+          {
+            cache: "no-store",
+          }
+        );
 
-        const batchDetails = await res.json(); 
-        batchDetails.bthById.bthStart = format(parseISO(batchDetails.bthById.bthStart), "yyyy-MM-dd");
-        batchDetails.bthById.bthEnd = format(parseISO(batchDetails.bthById.bthEnd), "yyyy-MM-dd");    
-        setData(batchDetails.bthById);
+        const batchDetails = await res.json();
+        batchDetails.bthById.bthStart = format(
+          parseISO(batchDetails.bthById.bthStart),
+          "yyyy-MM-dd"
+        );
+        batchDetails.bthById.bthEnd = format(
+          parseISO(batchDetails.bthById.bthEnd),
+          "yyyy-MM-dd"
+        );
+        setData(batchDetails?.bthById);
       } catch (error) {
         console.error("Error fetching course data:", error);
       } finally {
         setIsLoading(false);
       }
     }
-    
+
     fetchBatchDataById();
   }, []);
-  
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-
     e.preventDefault();
     setIsSaving(true);
     setErrorMessage(""); // Clear the previous error
@@ -245,26 +250,29 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
       } else if (data.bthMode !== "Online" && !data.bthLoc.trim()) {
         setErrorMessage("Please provide location details.");
       } else {
-        const response = await fetch(`${BASE_API_URL}/api/batches/${BthId}/edit-batch`, {
-          method: "PUT",
-          body: JSON.stringify({
-            bthName: batchTitle,
-            bthShift: data.bthShift,
-            bthStart: data.bthStart,
-            bthEnd: data.bthEnd,
-            corId: data.corId,
-            bthVtr: data.bthVtr,
-            bthWhatGrp: data.bthWhatGrp,
-            bthTeleGrp: data.bthTeleGrp,
-            bthLang: data.bthLang,
-            bthMode: data.bthMode,
-            bthLink: data.bthLink,
-            bthLoc: data.bthLink,
-            bthBank: data.bthBank,
-            bthQr: image,
-            updatedBy: loggedInUser.id,
-          }),
-        });
+        const response = await fetch(
+          `${BASE_API_URL}/api/batches/${BthId}/edit-batch`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              bthName: batchTitle,
+              bthShift: data.bthShift,
+              bthStart: data.bthStart,
+              bthEnd: data.bthEnd,
+              corId: data.corId,
+              bthVtr: data.bthVtr,
+              bthWhatGrp: data.bthWhatGrp,
+              bthTeleGrp: data.bthTeleGrp,
+              bthLang: data.bthLang,
+              bthMode: data.bthMode,
+              bthLink: data.bthLink,
+              bthLoc: data.bthLoc,
+              bthBank: data.bthBank,
+              bthQr: image,
+              updatedBy: loggedInUser.id,
+            }),
+          }
+        );
 
         const post = await response.json();
 
@@ -276,11 +284,11 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
         }
       }
     } catch (error) {
-        toast.error("Error creating batch.");
-      } finally {
-        setIsSaving(false);
-      }
-    };
+      toast.error("Error updating batch.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -469,7 +477,7 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
           <div className="flex flex-col gap-2">
             <label>Bank Details</label>
             <textarea
-              rows={6}
+              rows={16}
               className="inputBox"
               name="bthBank"
               value={data.bthBank}
@@ -479,7 +487,22 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
           <div className="flex flex-col gap-1">
             <div className="flex flex-col gap-2">
               <label className="text-lg">QR Code:</label>
-              <Image src={data.bthQr || preview || "/images/uploadImage.jpg"} alt="QR-Code" width={800} height={400} />
+              <div className="flex justify-center items-center bg-gray-200 border-[1.5px] h-[354px]">
+                {data.bthQr ? (
+                  <Image
+                    src={data.bthQr}
+                    alt="QR-Code"
+                    width={800}
+                    height={400}
+                  />
+                ) : preview ? (
+                  <Image src={preview} alt="QR-Code" width={800} height={400} />
+                ) : (
+                  <div className="flex justify-center items-center bg-gray-200 border-[1.5px] h-[354px]">
+                    No QR Scanner
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -488,7 +511,12 @@ const EditBatch: React.FC <IBthParam>= ({params}) => {
                 className="inputBox w-full h-[45px]"
                 onChange={handleFileChange}
               ></input>
-              <button type="button" className="btnLeft" onClick={handleUpload} disabled={isUploading}>
+              <button
+                type="button"
+                className="btnLeft"
+                onClick={handleUpload}
+                disabled={isUploading}
+              >
                 {isUploading ? "Uploading..." : "Upload"}
               </button>
             </div>

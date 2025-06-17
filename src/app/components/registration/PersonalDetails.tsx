@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format } from 'date-fns';
 
 const PersonalDetails : React.FC = () => {
 
@@ -48,13 +47,14 @@ const PersonalDetails : React.FC = () => {
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-1'>
           <div className='flex flex-col gap-2'>
+            <label>Birth Date:<span className='text-red-500'>*</span></label>
             <DatePicker
               selected={userData.sdkBthDate}
               onChange={handleDateChange}
               dateFormat="dd/MM/yyyy"
               placeholderText="dd/mm/yyyy"
               isClearable
-              className="inputBox w-full "
+              className="inputBox w-full"
             />
           </div>
           <div className='flex flex-col gap-2'>

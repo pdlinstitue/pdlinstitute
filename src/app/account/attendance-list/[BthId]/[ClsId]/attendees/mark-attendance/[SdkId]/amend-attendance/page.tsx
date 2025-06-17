@@ -79,9 +79,9 @@ const AmendAttendance : React.FC<IAttdParams> = ({params}) => {
         const attData = await res.json();
   
         setAttdStatus({
-          status: attData.attendance[0]?.status || "", // ✅ Use optional chaining & fallback values
-          absRemarks: attData.attendance[0]?.absRemarks || "",
-          updatedBy: attData.attendance[0]?.updatedBy || "", // ✅ Ensure `updatedBy` is handled
+          status: attData?.attendance[0]?.status || "", // ✅ Use optional chaining & fallback values
+          absRemarks: attData?.attendance[0]?.absRemarks || "",
+          updatedBy: attData?.attendance[0]?.updatedBy || "", // ✅ Ensure `updatedBy` is handled
         });
       } catch (error) {
         console.error("Error fetching attendance data:", error);

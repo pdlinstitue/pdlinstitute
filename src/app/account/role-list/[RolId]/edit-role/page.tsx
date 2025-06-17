@@ -27,30 +27,30 @@ const EditRole: React.FC<IRoleParams> = ({ params }) => {
     const [data, setData] = useState<CatType>({ roleType: '', updatedBy: '' });
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [loggedInUser, setLoggedInUser] = useState({
-    id: "",
-    usrName: "",
-    usrRole: "",
-    isAdmin: "",
-  });
+        id: "",
+        usrName: "",
+        usrRole: "",
+        isAdmin: "",
+    });
 
-  useEffect(() => {
-  try {
-    const cookie = Cookies.get("loggedInUser");
-    if (cookie) {
-        const parsed = JSON.parse(cookie);
-        setLoggedInUser({
-        id: parsed.id || "",
-        usrName: parsed.usrName || "",
-        usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-      });
-    }
-    } catch (error) {
-      console.error("Error parsing loggedInUser cookie:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    useEffect(() => {
+    try {
+        const cookie = Cookies.get("loggedInUser");
+        if (cookie) {
+            const parsed = JSON.parse(cookie);
+            setLoggedInUser({
+            id: parsed.id || "",
+            usrName: parsed.usrName || "",
+            usrRole: parsed.usrRole || "",
+            isAdmin: parsed.isAdmin || "", 
+        });
+        }
+        } catch (error) {
+        console.error("Error parsing loggedInUser cookie:", error);
+        } finally {
+        setIsLoading(false);
+        }
+    }, []);
       
     useEffect(() => {
     async function fetchRoleById() {
