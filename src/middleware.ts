@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { match } from "path-to-regexp";
 
 const PUBLIC_PATHS = ["/login", "/account/unauthorized"];
 
@@ -19,14 +18,14 @@ export async function middleware(request: NextRequest) {
 
   // Deny access if not authenticated
   if (!parsed.usrRole) {
-    return NextResponse.redirect(new URL("/account/unauthorized", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const baseurl = process.env.NEXT_PUBLIC_BASE_API_URL;
 
   if (!baseurl) {
     console.error("Missing NEXT_PUBLIC_BASE_API_URL in env");
-    return NextResponse.redirect(new URL("/account/unauthorized", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   try {

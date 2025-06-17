@@ -40,14 +40,19 @@ export async function GET(req: NextRequest) {
       .sort({ createdAt: -1 });
 
     if (duration) {
-      bthList = bthList?.filter(
-        (bth: any) =>
+      bthList = bthList?.filter((bth: any) => {
+        const bthStart = new Date(bth.bthStart);
+        const bthStartMidnight = new Date(
+          bthStart.setHours(0, 0, 0, 0)
+        ).getTime();
+
+        return (
           bth?.isActive &&
-          ((duration === "previous" && bth.bthStart < today) ||
-            (duration === "current" &&
-              bth.bthStart.setHours(0, 0, 0, 0) === today) ||
-            (duration === "upcoming" && bth.bthStart >= tomorrow))
-      );
+          ((duration === "previous" && bthStartMidnight < today.getTime()) ||
+            (duration === "current" && bthStartMidnight === today.getTime()) ||
+            (duration === "upcoming" && bthStartMidnight >= tomorrow.getTime()))
+        );
+      });
     }
     
     if (Array.isArray(bthList) && bthList.length > 0) {

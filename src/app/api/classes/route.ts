@@ -83,17 +83,28 @@ export async function GET(req: NextRequest) {
     const clsListWithCounts = clsList?.map((cls) => {
       const joinersKey = `${cls.corId?._id}_${cls.bthId?._id}`;
       const joinersCount = countMap.get(joinersKey) || 0;
+      
       // Ensure cls.clsName is an array before filtering and mapping
       const classAttendance = Array.isArray(cls.clsName)
         ? cls.clsName
-            .filter(
-              (session: any) =>
-                session?.isActive &&
-                (!duration || ((duration === "previous" && session.clsDate < today) ||
-                  (duration === "current" &&
-                    session.clsDate.setHours(0, 0, 0, 0) === today) ||
-                  (duration === "upcoming" && session.clsDate >= tomorrow)))
-            ) // Use filter instead of find()
+            .filter((session: any) => {
+              if (!session?.isActive) return false;
+
+              const clsDate = new Date(session.clsDate);
+              const clsDateMidnight = new Date(
+                clsDate.setHours(0, 0, 0, 0)
+              ).getTime();
+
+              return (
+                !duration ||
+                (duration === "previous" &&
+                  clsDateMidnight < today.getTime()) ||
+                (duration === "current" &&
+                  clsDateMidnight === today.getTime()) ||
+                (duration === "upcoming" &&
+                  clsDateMidnight >= tomorrow.getTime())
+              );
+            })
             .map((session: any) => {
               const attendanceKey = `${session._id}`;
               const { presentCount = 0, absentCount = 0 } =
