@@ -12,7 +12,6 @@ const ActiveSadhakList : React.FC = async () => {
     return <div>No user info found in cookies.</div>;
   }
 
-  // Parse role from cookie
   let role = '';
   try {
     const parsed = JSON.parse(userCookie);
@@ -22,9 +21,7 @@ const ActiveSadhakList : React.FC = async () => {
     return <div>Invalid user cookie format.</div>;
   }
 
-  // Fetch data from API
   let activeSdkList = [];
-  debugger;
   try {
     const res = await fetch(`${BASE_API_URL}/api/users/list?usrRole=${role}`, {
       method: 'GET',
