@@ -123,7 +123,7 @@ const MyCoupons : React.FC = () => {
 
   return (
     <div>
-      <div className='my-4'>
+      <div className='mb-2'>
         <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
       </div>
       <div className='overflow-auto max-h-[412px]'>

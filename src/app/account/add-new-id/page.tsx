@@ -141,7 +141,7 @@ const AddNewID: React.FC = () => {
         toast.error(post.msg);
       } else {
         toast.success(post.msg);
-        router.push("/account/doc-list/id-card");
+        router.push("/account/my-docs/id-card");
       }
     } catch (error) {
       toast.error("Error uploading id.");
@@ -225,7 +225,7 @@ const AddNewID: React.FC = () => {
           <button
             type="button"
             className="btnRight w-full"
-            onClick={() => router.push("/account/doc-list/id-card")}
+            onClick={() => router.push("/account/my-docs/id-card")}
           >
             Back
           </button>

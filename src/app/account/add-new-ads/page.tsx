@@ -141,7 +141,7 @@ const AddNewAds: React.FC = () => {
         toast.error(post.msg);
       } else {
         toast.success(post.msg);
-        router.push("/account/doc-list/ads-card");
+        router.push("/account/my-docs/ads-card");
       }
     } catch (error) {
       toast.error("Error uploading document.");
@@ -225,7 +225,7 @@ const AddNewAds: React.FC = () => {
           <button
             type="button"
             className="btnRight w-full"
-            onClick={() => router.push("/account/doc-list/id-card")}
+            onClick={() => router.push("/account/my-docs/ads-card")}
           >
             Back
           </button>

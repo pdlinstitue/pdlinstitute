@@ -13,8 +13,8 @@ const MyElgCourses: React.FC<MyCoursesProps> = ({ myCoData }) => {
   return (
     <div className='grid grid-cols-1 md:grid-cols-3 gap-4 p-2 md:p-4'>
       {myCoData?.map((cor: any) => (
-        <div className="max-w-[400px]" key={cor._id}>
-          <div className="flex flex-col bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600">
+        <div className="flex w-auto" key={cor._id}>
+          <div className="flex flex-col w-[400px] bg-white rounded-md shadow-xl p-9 gap-1 border-[1.5px] border-orange-600">
             {cor.coImg ? (
               <Image
                 src={`/api/image-upload?name=${cor.coImg}`}

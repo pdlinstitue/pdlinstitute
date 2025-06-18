@@ -119,7 +119,7 @@ const MyPayment : React.FC<IEnrParams> = ({params}) => {
   return (
     <div className='flex items-center justify-center'>
       <form className='formStyle  w-[450px] my-3' onSubmit={handleSubmit}>
-         <div className=' bg-gray-200 w-auto h-auto rounded-md'>
+         <div className=' bg-gray-200 w-auto h-auto border-[1.5px] rounded-md'>
             <Image alt='paymentImg' src={enrData?.enrSrnShot} width={420} height={250}/>
          </div>
          <div className='flex flex-col gap-2'>
@@ -134,7 +134,7 @@ const MyPayment : React.FC<IEnrParams> = ({params}) => {
             <button type='submit' className='btnLeft'  disabled={isSaving}>
                 {isSaving ? "Saving..." : "Save"}
             </button>
-            <button type='button' className='btnLeft' onClick={()=>router.push('/account/my-batches')}>BACK</button>
+            <button type='button' className='btnRight' onClick={()=>router.push('/account/my-batches')}>BACK</button>
          </div>
       </form>
     </div>
