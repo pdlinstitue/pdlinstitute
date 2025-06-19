@@ -4,9 +4,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/account/Loading";
 import { BASE_API_URL } from "@/app/utils/constant";
+import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 
-interface ViewSadhakItems {
+interface EditSadhakItems {
+  _id:string;
   sdkFstName: string;
   sdkMdlName: string;
   sdkLstName: string;
@@ -38,8 +40,8 @@ interface ViewSadhakItems {
   updatedBy: string;
 }
 
-interface ViewSadhakProps {
-    sdkData:ViewSadhakItems;
+interface EditSadhakProps {
+    sdkDataById:EditSadhakItems;
 }
 
 interface countryListProps {
@@ -62,20 +64,45 @@ interface RoleListProps {
   roleType: string;
 }
 
-const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
+const EditSadhak: React.FC<EditSadhakProps> = ({ sdkDataById }) => {
 
   const router = useRouter();
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [image, setImage] = useState<File | string | null>(null);
+  const [preview, setPreview] = useState<string>("");
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
+  const [sdkData, setSdkData] = useState<EditSadhakItems>(sdkDataById);
+
   const cookie = Cookies.get("loggedInUser");
   let parsedCookie: any = null;
   if (cookie) {
     parsedCookie = JSON.parse(cookie);
   }
-  
+
+//   useEffect(() => {
+//     async function fetchSdkById() {
+//       try {
+//         const res = await fetch(
+//           `${BASE_API_URL}/api/users/${SdkId}/view-sadhak`,
+//           { cache: "no-store" }
+//         );
+//         const sadhakData = await res.json();
+//         setSdkData(sadhakData.sdkById);
+//       } catch (error) {
+//         console.error("Error fetching sadhak data:", error);
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     }
+//     fetchSdkById();
+//   }, []);
+
   useEffect(() => {
     async function fetchCountryList() {
       try {
@@ -151,6 +178,262 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
     fetchRoleList();
   }, []);
 
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ): void => {
+    const { name, value } = e.target;
+    setSdkData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleFileChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+
+    if (!image) {
+      toast.error("Please select an image!");
+      return;
+    }
+
+    setIsUploading(true);
+    // Validate image type
+    const img = new window.Image();
+    if (image instanceof File) {
+      img.src = URL.createObjectURL(image);
+    } else {
+      toast.error("Invalid image format!");
+      return;
+    }
+
+    // Validate image resolution
+    const formData = new FormData();
+    formData.append("profileImage", image);
+    formData.append("profileImageFileName", sdkData?.sdkImg);
+
+    try {
+      const res = await fetch("/api/profile-upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Image uploaded successfully!");
+        setImage(data.imageUrl);
+        setSdkData((prevData) => ({
+          ...prevData,
+          sdkImg: data.imageUrl,
+        }));
+      } else {
+        throw new Error(data.error || "Upload failed");
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    try {
+      if (
+        !sdkData ||
+        !("sdkFstName" in sdkData) ||
+        sdkData.sdkFstName === null ||
+        sdkData.sdkFstName.trim() === ""
+      ) {
+        setErrorMessage("First name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkLstName" in sdkData) ||
+        sdkData.sdkLstName === null ||
+        sdkData.sdkLstName.trim() === ""
+      ) {
+        setErrorMessage("Last name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkBthDate" in sdkData) ||
+        sdkData.sdkBthDate === null ||
+        sdkData.sdkBthDate.toString().trim() === ""
+      ) {
+        setErrorMessage("DOB name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkGender" in sdkData) ||
+        sdkData.sdkGender === null ||
+        sdkData.sdkGender.trim() === ""
+      ) {
+        setErrorMessage("Gender is required.");
+      } else if (
+        !sdkData ||
+        !("sdkMarStts" in sdkData) ||
+        sdkData.sdkMarStts === null ||
+        sdkData.sdkMarStts.trim() === ""
+      ) {
+        setErrorMessage("Marital status is required.");
+      } else if (
+        sdkData &&
+        "sdkMarStts" in sdkData &&
+        sdkData.sdkMarStts === "Married" &&
+        (!sdkData ||
+          !("sdkSpouce" in sdkData) ||
+          sdkData.sdkSpouce === null ||
+          sdkData.sdkSpouce?.trim() === "")
+      ) {
+        setErrorMessage("Spouce name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkRefName" in sdkData) ||
+        sdkData.sdkRefName === null ||
+        sdkData.sdkRefName.trim() === ""
+      ) {
+        setErrorMessage("Referer name is required.");
+      } else if (
+        !sdkData ||
+        !("sdkRefCont" in sdkData) ||
+        sdkData.sdkRefCont === null ||
+        sdkData.sdkRefCont.trim() === ""
+      ) {
+        setErrorMessage("Referer phone is required.");
+      } else if (
+        !sdkData ||
+        !("sdkCountry" in sdkData) ||
+        sdkData.sdkCountry === null ||
+        sdkData.sdkCountry.trim() === ""
+      ) {
+        setErrorMessage("Country is required.");
+      } else if (
+        !sdkData ||
+        !("sdkState" in sdkData) ||
+        sdkData.sdkState === null ||
+        sdkData.sdkState.trim() === ""
+      ) {
+        setErrorMessage("State is required.");
+      } else if (
+        !sdkData ||
+        !("sdkCity" in sdkData) ||
+        sdkData.sdkCity === null ||
+        sdkData.sdkCity.trim() === ""
+      ) {
+        setErrorMessage("City is required.");
+      } else if (
+        !sdkData ||
+        !("sdkParAdds" in sdkData) ||
+        sdkData.sdkParAdds === null ||
+        sdkData.sdkParAdds.trim() === ""
+      ) {
+        setErrorMessage("Permanent address is must.");
+      } else if (
+        !sdkData ||
+        !("sdkComAdds" in sdkData) ||
+        sdkData.sdkComAdds === null ||
+        sdkData.sdkComAdds.trim() === ""
+      ) {
+        setErrorMessage("Communication address is must.");
+      } else if (
+        !sdkData ||
+        !("sdkWhtNbr" in sdkData) ||
+        sdkData.sdkWhtNbr === null ||
+        sdkData.sdkWhtNbr.trim() === ""
+      ) {
+        setErrorMessage("Whatsapp number is required.");
+      } else if (
+        !sdkData ||
+        !("sdkPhone" in sdkData) ||
+        sdkData.sdkPhone === null ||
+        sdkData.sdkPhone.trim() === ""
+      ) {
+        setErrorMessage("Phone number is required.");
+      } else if (
+        !sdkData ||
+        !("sdkEmail" in sdkData) ||
+        sdkData.sdkEmail === null ||
+        sdkData.sdkEmail.trim() === ""
+      ) {
+        setErrorMessage("Email is required.");
+      } else if (
+        !sdkData ||
+        !("isMedIssue" in sdkData) ||
+        sdkData.isMedIssue === null ||
+        sdkData.isMedIssue.trim() === ""
+      ) {
+        setErrorMessage("Please check medical issue.");
+      } else if (
+        sdkData &&
+        "isMedIssue" in sdkData &&
+        sdkData.isMedIssue === "Yes" &&
+        (!sdkData ||
+          !("sdkMedIssue" in sdkData) ||
+          sdkData.sdkMedIssue === null ||
+          sdkData.sdkMedIssue?.trim() === "")
+      ) {
+        setErrorMessage("Please describe medical issue.");
+      } else {
+        const response = await fetch(
+          `${BASE_API_URL}/api/users/${sdkData._id}/edit-sadhak`,
+          {
+            method: "PUT",
+            body: JSON.stringify({
+              sdkFstName: sdkData.sdkFstName,
+              sdkMdlName: sdkData.sdkMdlName,
+              sdkLstName: sdkData.sdkLstName,
+              sdkEdc: sdkData.sdkEdc,
+              sdkOcp: sdkData.sdkOcp,
+              sdkFthName: sdkData.sdkFthName,
+              sdkMthName: sdkData.sdkMthName,
+              sdkAbout: sdkData.sdkAbout,
+              isMedIssue: sdkData.isMedIssue,
+              sdkMedIssue: sdkData.sdkMedIssue,
+              sdkBthDate: sdkData.sdkBthDate,
+              sdkGender: sdkData.sdkGender,
+              sdkMarStts: sdkData.sdkMarStts,
+              sdkSpouce: sdkData.sdkSpouce,
+              sdkRefName: sdkData.sdkRefName,
+              sdkRefCont: sdkData.sdkRefCont,
+              sdkCountry: sdkData.sdkCountry,
+              sdkState: sdkData.sdkState,
+              sdkCity: sdkData.sdkCity,
+              sdkPhone: sdkData.sdkPhone,
+              sdkWhtNbr: sdkData.sdkWhtNbr,
+              sdkEmail: sdkData.sdkEmail,
+              sdkComAdds: sdkData.sdkComAdds,
+              sdkParAdds: sdkData.sdkParAdds,
+              sdkImg: sdkData.sdkImg,
+              sdkRole: sdkData.sdkRole,
+              isVolunteer: sdkData.isVolunteer,
+              isAdmin: sdkData.isAdmin,
+              updatedBy: parsedCookie?.id,
+            }),
+          }
+        );
+
+        const post = await response.json();
+        console.log(post);
+
+        if (post.success === false) {
+          toast.error(post.msg);
+        } else {
+          toast.success(post.msg);
+          router.push("/account/sadhak-list/active-sadhak");
+        }
+      }
+    } catch (error) {
+      toast.error("Error updating sadhak profile.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div>
@@ -161,7 +444,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
 
   return (
     <div>
-      <form className="formStyle w-full" >
+      <form className="formStyle w-full" onSubmit={handleSubmit}>
         <div className="md:flex gap-8 w-auto">
           <div className="flex flex-col gap-1 w-auto h-auto">
             <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
@@ -173,9 +456,33 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   height={345}
                   className="w-full h-full object-cover"
                 />
-              ) : (<div className="flex justify-center items-center w-[400px] h-[388px] border-[1.5px] bg-gray-100">
+              ) : preview ? (
+                <Image
+                  src={preview}
+                  alt="Profile Preview"
+                  width={400}
+                  height={345}
+                  className="w-full h-full object-cover"
+                />
+              ) : (<div className="flex justify-center items-center w-[400px] h-[345px] border-[1.5px] bg-gray-100">
                 No Image
               </div>)}
+            </div>
+            <div className="flex items-center gap-1">
+              <input
+                type="file"
+                accept="image/*"
+                className="inputBox w-full h-[45px]"
+                onChange={handleFileChange}
+              ></input>
+              <button
+                type="button"
+                className="btnLeft"
+                onClick={handleUpload}
+                disabled={isUploading}
+              >
+                {isUploading ? "Uploading..." : "Upload"}
+              </button>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -186,7 +493,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkFstName"
-                  defaultValue={sdkData.sdkFstName}                
+                  value={sdkData.sdkFstName}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -195,7 +503,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkMdlName"
-                  defaultValue={sdkData.sdkMdlName}                
+                  value={sdkData.sdkMdlName}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -204,7 +513,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkLstName"
-                  defaultValue={sdkData.sdkLstName}                
+                  value={sdkData.sdkLstName}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -215,16 +525,18 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkFthName"
-                  defaultValue={sdkData.sdkFthName}                
+                  value={sdkData?.sdkFthName}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-lg">Mother's Name:</label>
+                <label className="text-lg">Mother Name:</label>
                 <input
                   type="text"
                   className="inputBox"
                   name="sdkMthName"
-                  defaultValue={sdkData.sdkMthName}                
+                  value={sdkData?.sdkMthName}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -232,8 +544,9 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 <input
                   type="date"
                   className="inputBox"
-                  name="sdkBthDate"                  
-                  defaultValue={new Date(sdkData.sdkBthDate).toLocaleDateString('en-CA')}                
+                  name="sdkBthDate"
+                  value={new Date(sdkData.sdkBthDate).toLocaleDateString('en-CA')}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -244,7 +557,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkEdc"
-                  defaultValue={sdkData.sdkEdc}                
+                  value={sdkData.sdkEdc}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -253,7 +567,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkOcp"
-                  defaultValue={sdkData.sdkOcp}                
+                  value={sdkData.sdkOcp}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -262,7 +577,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkPhone"
-                  defaultValue={sdkData.sdkPhone}                
+                  value={sdkData.sdkPhone}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -271,7 +587,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkWhtNbr"
-                  defaultValue={sdkData.sdkWhtNbr}                
+                  value={sdkData.sdkWhtNbr}
+                  onChange={handleChange}
                 />
               </div>
             </div>
@@ -281,7 +598,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 rows={3}
                 className="inputBox"
                 name="sdkAbout"
-                defaultValue={sdkData.sdkAbout}                
+                value={sdkData.sdkAbout}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -292,8 +610,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
             <select
               className="inputBox"
               name="sdkGender"
-              value={sdkData.sdkGender} 
-              disabled           
+              value={sdkData.sdkGender}
+              onChange={handleChange}
             >
               <option className="text-center"> --- Select --- </option>
               <option value="Female">Female</option>
@@ -307,7 +625,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               type="email"
               className="inputBox"
               name="sdkEmail"
-              defaultValue={sdkData.sdkEmail}            
+              value={sdkData.sdkEmail}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -317,8 +636,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
             <select
               className="inputBox"
               name="sdkMarStts"
-              value={sdkData.sdkMarStts}      
-              disabled      
+              value={sdkData.sdkMarStts}
+              onChange={handleChange}
             >
               <option className="text-center"> --- Select --- </option>
               <option value="Married">Married</option>
@@ -332,7 +651,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               type="text"
               className="inputBox"
               name="sdkSpouce"
-              defaultValue={sdkData.sdkSpouce}            
+              value={sdkData.sdkSpouce}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -342,7 +662,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
             <input
               className="inputBox"
               name="sdkRefName"
-              defaultValue={sdkData?.sdkRefName}            
+              value={sdkData?.sdkRefName}
+              onChange={handleChange}
             >
             </input>
           </div>
@@ -352,7 +673,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               type="number"
               className="inputBox"
               name="sdkRefCont"
-              defaultValue={sdkData?.sdkRefCont}            
+              value={sdkData?.sdkRefCont}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -363,7 +685,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkCountry"
               value={sdkData.sdkCountry}
-              disabled            
+              onChange={handleChange}
             >
               <option className="text-center"> --- Select --- </option>
               {countryList?.map((ctr: any) => {
@@ -381,7 +703,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkState"
               value={sdkData.sdkState}
-              disabled            
+              onChange={handleChange}
             >
               <option className="text-center"> --- Select --- </option>
               {stateList?.map((stt: any) => {
@@ -401,7 +723,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkCity"
               value={sdkData.sdkCity}
-              disabled            
+              onChange={handleChange}
             >
               <option className="text-center"> --- Select --- </option>
               {cityList?.map((cty: any) => {
@@ -419,7 +741,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkRole"
               value={sdkData.sdkRole}
-              disabled            
+              onChange={handleChange}
             >
               <option className="text-center"> --- Select Role --- </option>
               {roleList?.map((item: any) => {
@@ -439,7 +761,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               rows={3}
               className="inputBox"
               name="sdkParAdds"
-              defaultValue={sdkData.sdkParAdds}            
+              value={sdkData.sdkParAdds}
+              onChange={handleChange}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -448,7 +771,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               rows={3}
               className="inputBox"
               name="sdkComAdds"
-              defaultValue={sdkData.sdkComAdds}            
+              value={sdkData.sdkComAdds}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -460,8 +784,9 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 <input
                   type="radio"
                   name="isMedIssue"
-                  defaultValue="Yes"
-                  defaultChecked={sdkData.isMedIssue === "Yes"}                
+                  value="Yes"
+                  checked={sdkData.isMedIssue === "Yes"}
+                  onChange={handleChange}
                   className="mr-2"
                 />
                 Yes
@@ -470,15 +795,16 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 <input
                   type="radio"
                   name="isMedIssue"
-                  defaultValue="No"
-                  defaultChecked={sdkData.isMedIssue === "No"}                
+                  value="No"
+                  checked={sdkData.isMedIssue === "No"}
+                  onChange={handleChange}
                   className="mr-2"
                 />
                 No
               </label>
             </div>
           </div>
-          {parsedCookie.usrRole === "Super-Admin" && (
+          {parsedCookie?.usrRole === "Super-Admin" && (
             <div className="flex flex-col gap-2">
               <label className="text-lg">Is Admin?</label>
               <div className="flex gap-4 mt-3">
@@ -486,8 +812,9 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   <input
                     type="radio"
                     name="isAdmin"
-                    defaultValue="Yes"
-                    defaultChecked={sdkData.isAdmin === "Yes"}                    
+                    value="Yes"
+                    checked={sdkData.isAdmin === "Yes"}
+                    onChange={handleChange}
                     className="mr-2"
                   />
                   Yes
@@ -496,8 +823,9 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   <input
                     type="radio"
                     name="isAdmin"
-                    defaultValue="No"
-                    defaultChecked={sdkData.isAdmin === "No"}                    
+                    value="No"
+                    checked={sdkData.isAdmin === "No"}
+                    onChange={handleChange}
                     className="mr-2"
                   />
                   No
@@ -512,8 +840,9 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 <input
                   type="radio"
                   name="isVolunteer"
-                  defaultValue="Yes"
-                  defaultChecked={sdkData.isVolunteer === "Yes"}                
+                  value="Yes"
+                  checked={sdkData.isVolunteer === "Yes"}
+                  onChange={handleChange}
                   className="mr-2"
                 />
                 Yes
@@ -522,8 +851,9 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 <input
                   type="radio"
                   name="isVolunteer"
-                  defaultValue="No"
-                  defaultChecked={sdkData.isVolunteer !== "Yes"}                
+                  value="No"
+                  checked={sdkData.isVolunteer !== "Yes"}
+                  onChange={handleChange}
                   className="mr-2"
                 />
                 No
@@ -538,14 +868,21 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               rows={3}
               className="inputBox"
               name="sdkMedIssue"
-              defaultValue={sdkData.sdkMedIssue}            
+              value={sdkData.sdkMedIssue}
+              onChange={handleChange}
             />
           </div>
         )}
-        <div className="grid grid-cols-1 gap-1">
+        {errorMessage && (
+          <p className="text-sm italic text-red-600">{errorMessage}</p>
+        )}
+        <div className="grid grid-cols-2 gap-1">
+          <button type="submit" className="btnLeft" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
           <button
             type="button"
-            className="btnLeft"
+            className="btnRight"
             onClick={() => router.push("/account/sadhak-list/active-sadhak")}
           >
             Back
@@ -555,4 +892,4 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
     </div>
   );
 };
-export default ViewSadhak;
+export default EditSadhak;

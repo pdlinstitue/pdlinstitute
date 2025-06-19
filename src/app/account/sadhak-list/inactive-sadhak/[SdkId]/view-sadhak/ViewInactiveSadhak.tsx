@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/account/Loading";
@@ -62,7 +62,7 @@ interface RoleListProps {
   roleType: string;
 }
 
-const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
+const ViewInactiveSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
 
   const router = useRouter();
   const [roleList, setRoleList] = useState<RoleListProps[] | null>([]);
@@ -72,6 +72,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
   const cookie = Cookies.get("loggedInUser");
   let parsedCookie: any = null;
+  
   if (cookie) {
     parsedCookie = JSON.parse(cookie);
   }
@@ -165,7 +166,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
         <div className="md:flex gap-8 w-auto">
           <div className="flex flex-col gap-1 w-auto h-auto">
             <div className="w-[400px] h-[345px] border-[1.5px] bg-gray-100">
-              {sdkData.sdkImg ? (
+              {sdkData?.sdkImg ? (
                 <Image
                   src={`/api/profile-upload?name=${sdkData?.sdkImg}`}
                   alt="Profile Preview"
@@ -555,4 +556,4 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
     </div>
   );
 };
-export default ViewSadhak;
+export default ViewInactiveSadhak;
