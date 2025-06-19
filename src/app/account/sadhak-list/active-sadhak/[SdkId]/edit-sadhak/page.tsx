@@ -110,31 +110,11 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
     updatedBy: "",
   });
 
-  const [loggedInUser, setLoggedInUser] = useState({
-    id: "",
-    usrName: "",
-    usrRole: "",
-    isAdmin: "",
-  });
-
-  useEffect(() => {
-  try {
-    const cookie = Cookies.get("loggedInUser");
-    if (cookie) {
-        const parsed = JSON.parse(cookie);
-        setLoggedInUser({
-        id: parsed.id || "",
-        usrName: parsed.usrName || "",
-        usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-      });
-    }
-  } catch (error) {
-    console.error("Error parsing loggedInUser cookie:", error);
-  } finally {
-    setIsLoading(false);
-    }
-  }, []);
+  const cookie = Cookies.get("loggedInUser");
+  let parsedCookie: any = null;
+  if (cookie) {
+    parsedCookie = JSON.parse(cookie);
+  }
 
   useEffect(() => {
     async function fetchSdkById() {
@@ -213,7 +193,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
         const res = await fetch(`${BASE_API_URL}/api/role-list`);
         const roleData = await res.json();
         let roleList =
-          Cookies.get("loggedInUserRole") === "Admin"
+          parsedCookie?.usrRole === "Admin"
             ? roleData?.rolList?.filter(
                 (a: any) =>
                   a.roleType !== "Super-Admin" && a.roleType !== "Admin"
@@ -463,7 +443,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               sdkRole: sdkData.sdkRole,
               isVolunteer: sdkData.isVolunteer,
               isAdmin: sdkData.isAdmin,
-              updatedBy: loggedInUser.id,
+              updatedBy: parsedCookie?.id,
             }),
           }
         );
@@ -596,7 +576,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
                   type="date"
                   className="inputBox"
                   name="sdkBthDate"
-                  value={sdkData.sdkBthDate}
+                  value={new Date(sdkData.sdkBthDate).toLocaleDateString('en-CA')}
                   onChange={handleChange}
                 />
               </div>
@@ -855,7 +835,7 @@ const EditSadhak: React.FC<ISadhakParams> = ({ params }) => {
               </label>
             </div>
           </div>
-          {loggedInUser.usrRole === "Super-Admin" && (
+          {parsedCookie?.usrRole === "Super-Admin" && (
             <div className="flex flex-col gap-2">
               <label className="text-lg">Is Admin?</label>
               <div className="flex gap-4 mt-3">

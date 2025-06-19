@@ -4,14 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/account/Loading";
 import { BASE_API_URL } from "@/app/utils/constant";
-import toast from "react-hot-toast";
 import Cookies from "js-cookie";
-
-interface ISadhakParams {
-  params: Promise<{
-    SdkId: string;
-  }>;
-}
 
 interface ViewSadhakItems {
   sdkFstName: string;
@@ -77,82 +70,12 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
   const [countryList, setCountryList] = useState<countryListProps[] | null>([]);
   const [stateList, setStateList] = useState<stateListProps[] | null>([]);
   const [cityList, setCityList] = useState<cityListProps[] | null>([]);
-//   const [sdkData, setSdkData] = useState<ViewSadhakProps>({
-//     sdkFstName: "",
-//     sdkMdlName: "",
-//     sdkLstName: "",
-//     sdkEdc: "",
-//     sdkOcp: "",
-//     sdkFthName: "",
-//     sdkMthName: "",
-//     sdkAbout: "",
-//     isMedIssue: "",
-//     sdkMedIssue: "",
-//     sdkBthDate: "",
-//     sdkGender: "",
-//     sdkMarStts: "",
-//     sdkSpouce: "",
-//     sdkRefName: "",
-//     sdkRefCont: "",
-//     sdkPhone: "",
-//     sdkWhtNbr: "",
-//     sdkEmail: "",
-//     sdkCountry: "",
-//     sdkState: "",
-//     sdkCity: "",
-//     sdkComAdds: "",
-//     sdkParAdds: "",
-//     sdkImg: "",
-//     sdkRole: "",
-//     isVolunteer: "",
-//     isAdmin: "",
-//     updatedBy: "",
-//   });
-
-  const [loggedInUser, setLoggedInUser] = useState({
-    id: "",
-    usrName: "",
-    usrRole: "",
-    isAdmin: "",
-  });
-
-  useEffect(() => {
-  try {
-    const cookie = Cookies.get("loggedInUser");
-    if (cookie) {
-        const parsed = JSON.parse(cookie);
-        setLoggedInUser({
-        id: parsed.id || "",
-        usrName: parsed.usrName || "",
-        usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-      });
-    }
-  } catch (error) {
-    console.error("Error parsing loggedInUser cookie:", error);
-  } finally {
-    setIsLoading(false);
-    }
-  }, []);
-
-//   useEffect(() => {
-//     async function fetchSdkById() {
-//       try {
-//         const res = await fetch(
-//           `${BASE_API_URL}/api/users/${SdkId}/view-sadhak`,
-//           { cache: "no-store" }
-//         );
-//         const sadhakData = await res.json();
-//         setSdkData(sadhakData.sdkById);
-//       } catch (error) {
-//         console.error("Error fetching sadhak data:", error);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     }
-//     fetchSdkById();
-//   }, []);
-
+  const cookie = Cookies.get("loggedInUser");
+  let parsedCookie: any = null;
+  if (cookie) {
+    parsedCookie = JSON.parse(cookie);
+  }
+  
   useEffect(() => {
     async function fetchCountryList() {
       try {
@@ -212,7 +135,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
         const res = await fetch(`${BASE_API_URL}/api/role-list`);
         const roleData = await res.json();
         let roleList =
-          Cookies.get("loggedInUserRole") === "Admin"
+          parsedCookie?.usrRole === "Admin"
             ? roleData?.rolList?.filter(
                 (a: any) =>
                   a.roleType !== "Super-Admin" && a.roleType !== "Admin"
@@ -227,13 +150,6 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
     }
     fetchRoleList();
   }, []);
-
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
-//     const { name, value } = e.target;
-//     setSdkData((prevData) => (
-//         { ...prevData, [name]: value }
-//     ));
-//   };
 
   if (isLoading) {
     return (
@@ -270,8 +186,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkFstName"
-                  defaultValue={sdkData.sdkFstName}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkFstName}                
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -280,8 +195,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkMdlName"
-                  defaultValue={sdkData.sdkMdlName}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkMdlName}                
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -290,8 +204,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkLstName"
-                  defaultValue={sdkData.sdkLstName}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkLstName}                
                 />
               </div>
             </div>
@@ -302,8 +215,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkFthName"
-                  defaultValue={sdkData.sdkFthName}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkFthName}                
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -312,8 +224,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkMthName"
-                  defaultValue={sdkData.sdkMthName}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkMthName}                
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -321,9 +232,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 <input
                   type="date"
                   className="inputBox"
-                  name="sdkBthDate"
-                  defaultValue={sdkData.sdkBthDate}
-                //   onChange={handleChange}
+                  name="sdkBthDate"                  
+                  value={new Date(sdkData.sdkBthDate).toLocaleDateString('en-CA')}                
                 />
               </div>
             </div>
@@ -334,8 +244,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkEdc"
-                  defaultValue={sdkData.sdkEdc}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkEdc}                
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -344,8 +253,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkOcp"
-                  defaultValue={sdkData.sdkOcp}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkOcp}                
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -354,8 +262,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkPhone"
-                  defaultValue={sdkData.sdkPhone}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkPhone}                
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -364,8 +271,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="text"
                   className="inputBox"
                   name="sdkWhtNbr"
-                  defaultValue={sdkData.sdkWhtNbr}
-                //   onChange={handleChange}
+                  defaultValue={sdkData.sdkWhtNbr}                
                 />
               </div>
             </div>
@@ -375,8 +281,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                 rows={3}
                 className="inputBox"
                 name="sdkAbout"
-                defaultValue={sdkData.sdkAbout}
-                // onChange={handleChange}
+                defaultValue={sdkData.sdkAbout}                
               />
             </div>
           </div>
@@ -387,8 +292,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
             <select
               className="inputBox"
               name="sdkGender"
-              defaultValue={sdkData.sdkGender}
-            //   onChange={handleChange}
+              value={sdkData.sdkGender} 
+              disabled           
             >
               <option className="text-center"> --- Select --- </option>
               <option value="Female">Female</option>
@@ -402,8 +307,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               type="email"
               className="inputBox"
               name="sdkEmail"
-              defaultValue={sdkData.sdkEmail}
-            //   onChange={handleChange}
+              defaultValue={sdkData.sdkEmail}            
             />
           </div>
         </div>
@@ -413,8 +317,8 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
             <select
               className="inputBox"
               name="sdkMarStts"
-              defaultValue={sdkData.sdkMarStts}
-            //   onChange={handleChange}
+              value={sdkData.sdkMarStts}      
+              disabled      
             >
               <option className="text-center"> --- Select --- </option>
               <option value="Married">Married</option>
@@ -428,8 +332,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               type="text"
               className="inputBox"
               name="sdkSpouce"
-              defaultValue={sdkData.sdkSpouce}
-            //   onChange={handleChange}
+              defaultValue={sdkData.sdkSpouce}            
             />
           </div>
         </div>
@@ -439,8 +342,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
             <input
               className="inputBox"
               name="sdkRefName"
-              defaultValue={sdkData?.sdkRefName}
-            //   onChange={handleChange}
+              defaultValue={sdkData?.sdkRefName}            
             >
             </input>
           </div>
@@ -450,8 +352,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               type="number"
               className="inputBox"
               name="sdkRefCont"
-              defaultValue={sdkData?.sdkRefCont}
-            //   onChange={handleChange}
+              defaultValue={sdkData?.sdkRefCont}            
             />
           </div>
         </div>
@@ -462,8 +363,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkCountry"
               value={sdkData.sdkCountry}
-              disabled
-            //   onChange={handleChange}
+              disabled            
             >
               <option className="text-center"> --- Select --- </option>
               {countryList?.map((ctr: any) => {
@@ -481,8 +381,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkState"
               value={sdkData.sdkState}
-              disabled
-            //   onChange={handleChange}
+              disabled            
             >
               <option className="text-center"> --- Select --- </option>
               {stateList?.map((stt: any) => {
@@ -502,8 +401,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkCity"
               value={sdkData.sdkCity}
-              disabled
-            //   onChange={handleChange}
+              disabled            
             >
               <option className="text-center"> --- Select --- </option>
               {cityList?.map((cty: any) => {
@@ -521,8 +419,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               className="inputBox"
               name="sdkRole"
               value={sdkData.sdkRole}
-              disabled
-            //   onChange={handleChange}
+              disabled            
             >
               <option className="text-center"> --- Select Role --- </option>
               {roleList?.map((item: any) => {
@@ -542,8 +439,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               rows={3}
               className="inputBox"
               name="sdkParAdds"
-              defaultValue={sdkData.sdkParAdds}
-            //   onChange={handleChange}
+              defaultValue={sdkData.sdkParAdds}            
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -552,8 +448,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               rows={3}
               className="inputBox"
               name="sdkComAdds"
-              defaultValue={sdkData.sdkComAdds}
-            //   onChange={handleChange}
+              defaultValue={sdkData.sdkComAdds}            
             />
           </div>
         </div>
@@ -566,8 +461,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="radio"
                   name="isMedIssue"
                   defaultValue="Yes"
-                  defaultChecked={sdkData.isMedIssue === "Yes"}
-                //   onChange={handleChange}
+                  defaultChecked={sdkData.isMedIssue === "Yes"}                
                   className="mr-2"
                 />
                 Yes
@@ -577,15 +471,14 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="radio"
                   name="isMedIssue"
                   defaultValue="No"
-                  defaultChecked={sdkData.isMedIssue === "No"}
-                //   onChange={handleChange}
+                  defaultChecked={sdkData.isMedIssue === "No"}                
                   className="mr-2"
                 />
                 No
               </label>
             </div>
           </div>
-          {loggedInUser.usrRole === "Super-Admin" && (
+          {parsedCookie.usrRole === "Super-Admin" && (
             <div className="flex flex-col gap-2">
               <label className="text-lg">Is Admin?</label>
               <div className="flex gap-4 mt-3">
@@ -594,8 +487,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                     type="radio"
                     name="isAdmin"
                     defaultValue="Yes"
-                    defaultChecked={sdkData.isAdmin === "Yes"}
-                    // onChange={handleChange}
+                    defaultChecked={sdkData.isAdmin === "Yes"}                    
                     className="mr-2"
                   />
                   Yes
@@ -605,8 +497,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                     type="radio"
                     name="isAdmin"
                     defaultValue="No"
-                    defaultChecked={sdkData.isAdmin === "No"}
-                    // onChange={handleChange}
+                    defaultChecked={sdkData.isAdmin === "No"}                    
                     className="mr-2"
                   />
                   No
@@ -622,8 +513,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="radio"
                   name="isVolunteer"
                   defaultValue="Yes"
-                  defaultChecked={sdkData.isVolunteer === "Yes"}
-                //   onChange={handleChange}
+                  defaultChecked={sdkData.isVolunteer === "Yes"}                
                   className="mr-2"
                 />
                 Yes
@@ -633,8 +523,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
                   type="radio"
                   name="isVolunteer"
                   defaultValue="No"
-                  defaultChecked={sdkData.isVolunteer !== "Yes"}
-                //   onChange={handleChange}
+                  defaultChecked={sdkData.isVolunteer !== "Yes"}                
                   className="mr-2"
                 />
                 No
@@ -649,8 +538,7 @@ const ViewSadhak: React.FC<ViewSadhakProps> = ({ sdkData }) => {
               rows={3}
               className="inputBox"
               name="sdkMedIssue"
-              defaultValue={sdkData.sdkMedIssue}
-            //   onChange={handleChange}
+              defaultValue={sdkData.sdkMedIssue}            
             />
           </div>
         )}

@@ -108,6 +108,7 @@ const CreateSideMenu: React.FC = () => {
           menuUrl: data.menuUrl,
           isParent: selectedType === "parent",
           isChild: selectedType === "child",
+          menuOrder: data.menuOrder,
           parentId: data.parentId,
           createdBy: loggedInUser.id,
         }),
