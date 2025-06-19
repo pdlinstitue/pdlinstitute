@@ -24,8 +24,8 @@ const TotalUsers: React.FC = () => {
 
   return (
     <div>
-      <div className='flex uppercase flex-col gap-3 items-center justify-center p-6'>
-        <FaUser className=' text-orange-700' size={54}/> 
+      <div className='flex text-white uppercase flex-col gap-3 items-center justify-center p-6'>
+        <FaUser size={54}/> 
         <div className='flex items-center gap-2'>
             <h2 className='font-bold'>Sadhaks:</h2>
             <p>{totalUsers}</p>

@@ -1,18 +1,6 @@
-"use client";
-import Loading from "../../Loading";
-import { BASE_API_URL } from "@/app/utils/constant";
-import { useRouter } from "next/navigation";
-import React, { ChangeEvent, FormEvent, use, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import Cookies from "js-cookie";
-
-interface AccountSettingProps {
-  _id?: string;
-  sdkPhone: string;
-  sdkWhtNbr: string;
-  sdkEmail: string;
-  updatedBy?: string;
-}
+import React from 'react';
+import SadhakAccount from './SadhakAccount';
+import { BASE_API_URL } from '@/app/utils/constant';
 
 interface IAccountParams {
   params: Promise<{
@@ -20,179 +8,36 @@ interface IAccountParams {
   }>;
 }
 
-const AccountSetting: React.FC<IAccountParams> = ({ params }) => {
+const AccountSetting:React.FC<IAccountParams> = async ({params}:IAccountParams) => {
 
-  const router = useRouter();
-  const { SdkId } = use(params);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  
-  const [contactDetails, setContactDetails] = useState<AccountSettingProps>({
-    sdkPhone: "",
-    sdkWhtNbr: "",
-    sdkEmail: "",
-  });
+  const { SdkId } = await params;
+  let sdkAccountById = null;
 
-  const [loggedInUser, setLoggedInUser] = useState({
-        id: "",
-        usrName: "",
-        usrRole: "",
-        isAdmin: "",
+  try {
+    const res = await fetch(`${BASE_API_URL}/api/users/${SdkId}/view-sadhak`, {
+      cache: "no-store",
     });
 
-    useEffect(() => {
-      try {
-      const cookie = Cookies.get("loggedInUser");
-      if (cookie) {
-          const parsed = JSON.parse(cookie);
-          setLoggedInUser({
-          id: parsed.id || "",
-          usrName: parsed.usrName || "",
-          usrRole: parsed.usrRole || "",
-          isAdmin: parsed.isAdmin || "", 
-          });
-      }
-      } catch (error) {
-        console.error("Error parsing loggedInUser cookie:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }, []);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setContactDetails((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-
-    e.preventDefault();
-    setIsSaving(true);
-    setErrorMessage(""); // Clear the previous error
-    
-    try {
-      if (!contactDetails.sdkPhone.trim()) {
-        setErrorMessage("Phone is required.");
-      } else if (!contactDetails.sdkWhtNbr.trim()) {
-        setErrorMessage("Whatsapp number is required.");
-      } else if (!contactDetails.sdkEmail.trim()) {
-        setErrorMessage("Email is required.");
-      } else {
-        const response = await fetch(
-          `${BASE_API_URL}/api/users/${SdkId}/update-contact`,
-          {
-            method: "PUT",
-            body: JSON.stringify({
-              sdkPhone: contactDetails.sdkPhone,
-              sdkWhtNbr: contactDetails.sdkWhtNbr,
-              sdkEmail: contactDetails.sdkEmail,
-              updatedBy: loggedInUser.id,
-            }),
-          }
-        );
-        const post = await response.json();
-        if (post.success === false) {
-          toast.error(post.msg);
-        } else {
-          toast.success(post.msg);
-          if(loggedInUser.usrRole === "Admin" || loggedInUser.usrRole === "View-Admin"){
-            router.push("/account/admin-dashboard");
-          } else {
-            router.push("/account/sadhak-dashboard");
-          }
-        }
-      }
-    } catch (error) {
-        toast.error("Error updating contact details.");
-    } finally {
-        setIsSaving(true);
-      }
-    };
-
-  useEffect(() => {
-    async function fetchContactDetails() {
-      try {
-        const response = await fetch(
-          `${BASE_API_URL}/api/users/${SdkId}/view-sadhak`,
-          { cache: "no-store" }
-        );
-        const data = await response.json();
-        setContactDetails(data?.sdkById);
-      } catch (error) {
-        console.error("Error fetching contact details:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    if (!res.ok) {
+      throw new Error("Failed to fetch sadhak data");
     }
-    fetchContactDetails();
-  }, []);
+    
+    const sadhakData  = await res.json();
+    sdkAccountById = sadhakData.sdkById;
 
-  if (isLoading) {
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
+  } catch (error) {
+    console.error("Error fetching sadhak data:", error);
+  }
+
+  if (!sdkAccountById) {
+    return <div>Failed to load sadhak data.</div>;
   }
 
   return (
-    <div className="flex justify-center items-center my-24">
-      <form className="formStyle w-[400px]" onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-2">
-          <label>Phone:</label>
-          <input
-            type="text"
-            className="inputBox"
-            name="sdkPhone"
-            value={contactDetails.sdkPhone}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label>WhatsApp:</label>
-          <input
-            type="text"
-            className="inputBox"
-            name="sdkWhtNbr"
-            value={contactDetails.sdkWhtNbr}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label>Email:</label>
-          <input
-            type="email"
-            className="inputBox"
-            name="sdkEmail"
-            value={contactDetails.sdkEmail}
-            onChange={handleChange}
-          />
-        </div>
-        {errorMessage && (
-          <p className="text-sm italic text-red-600">{errorMessage}</p>
-        )}
-        <div className="grid grid-cols-2 gap-1">
-          <button type="submit" className="btnLeft" disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save"}
-          </button>
-          <button
-            type="button"
-            className="btnRight"
-            onClick={() => {
-              if (loggedInUser.usrRole === "Sadhak") {
-                router.push("/account/sadhak-dashboard");
-              } else {
-                router.push("/account/admin-dashboard");
-              }
-            }}
-          >
-            Back
-          </button>
-        </div>
-      </form>
+    <div>
+      <SadhakAccount sdkAccountById={sdkAccountById} />
     </div>
   );
-};
+}
 
-export default AccountSetting;
+export default AccountSetting
