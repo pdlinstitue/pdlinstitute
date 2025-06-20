@@ -7,7 +7,7 @@ import Loading from "@/app/account/Loading";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
-import { parseISO } from "date-fns/parseISO";
+import parseISO from "date-fns/parseISO";
 
 interface VolunteerListProps {
   _id: string;
