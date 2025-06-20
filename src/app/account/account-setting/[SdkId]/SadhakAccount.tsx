@@ -87,13 +87,22 @@ const SadhakAccount: React.FC<SadhakAccountProps> = ({ sdkAccountById }) => {
         if (post.success === false) {
           toast.error(post.msg);
         } else {
-          toast.success(post.msg);          
+          toast.success(post.msg);    
+          if (
+            loggedInUser.usrRole === "Super-Admin" ||
+            loggedInUser.usrRole === "Admin" ||
+            loggedInUser.usrRole === "View-Admin"
+          ) {
+            router.push("/account/admin-dashboard");
+          } else {
+            router.push("/account/sadhak-dashboard");
+          }      
         }
       }
     } catch (error) {
         toast.error("Error updating contact details.");
     } finally {
-        setIsSaving(true);
+        setIsSaving(false);
       }
     };
 
@@ -166,7 +175,17 @@ const SadhakAccount: React.FC<SadhakAccountProps> = ({ sdkAccountById }) => {
           <button
             type="button"
             className="btnRight"
-            onClick={() => router.back()}
+            onClick={() => {
+              if (
+                loggedInUser.usrRole === "Super-Admin" ||
+                loggedInUser.usrRole === "Admin" ||
+                loggedInUser.usrRole === "View-Admin"
+              ) {
+                router.push("/account/admin-dashboard");
+              } else {
+                router.push("/account/sadhak-dashboard");
+              }
+            }}
           >
             Back
           </button>

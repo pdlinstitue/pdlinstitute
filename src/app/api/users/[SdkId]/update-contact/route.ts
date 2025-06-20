@@ -41,15 +41,15 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ SdkId
       if (emailExists) {
         return NextResponse.json({ success: false, msg: "Another user with the same email already exists." }, { status: 400 });
       }
-    } else {
-      // Proceed with update if the values are unchanged or no duplicates exist
+    } 
+
+    // Proceed with update if the values are unchanged or no duplicates exist
       const sdkById = await Users.findByIdAndUpdate(
         SdkId,
         { sdkPhone, sdkWhtNbr, sdkEmail, updatedBy },
         { runValidators: true, new: true }
       );
       return NextResponse.json({ sdkById, success: true, msg: "Contact updated successfully." }, { status: 200 });
-    }
   } catch (error:any) {
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((val:any) => val.message);

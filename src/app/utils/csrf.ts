@@ -11,5 +11,3 @@ export function generateCsrfTokenAndSecret(): { csrfToken: string; csrfSecret: s
 export function verifyCsrfToken(csrfToken: string, csrfSecret: string): boolean {
   return csrf.verify(csrfSecret, csrfToken);
 }
-
-

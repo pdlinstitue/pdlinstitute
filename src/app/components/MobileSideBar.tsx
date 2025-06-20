@@ -26,9 +26,15 @@ const MobileSideBar: React.FC = () => {
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
+  const userCookie = Cookies.get('loggedInUser');
+  let parsed: any = {};
+  if (userCookie) {
+    parsed = JSON.parse(userCookie);
+  }
+
   useEffect(() => {
     const fetchMenu = async () => {
-      const role = Cookies.get("loggedInUserRole");
+      const role = parsed.usrRole;
       const res = await fetch(`/api/menu-by-role?userRole=${role}`);
       const data = await res.json();
       if (data.success) {
@@ -39,7 +45,7 @@ const MobileSideBar: React.FC = () => {
   }, []);
  
   useEffect(() => {
-    const userRole = Cookies.get("loggedInUserRole");
+    const userRole = parsed.usrRole;
     if (userRole === "Super-Admin" || userRole === "Admin" || userRole === "View-Admin") {
       setDashboardUrl("/account/admin-dashboard");
     } else {
@@ -90,7 +96,7 @@ const MobileSideBar: React.FC = () => {
     <>
       {/* Slide-up Menu */}
       <div
-        className={`fixed bottom-[60px] left-0 w-full bg-white border-t transition-transform duration-300 z-40 ${
+        className={`fixed bottom-[58px] left-0 w-full bg-white border-t transition-transform duration-300 z-40 ${
           isMenuOpen ? "translate-y-0" : "translate-y-full"
         } max-h-[80vh] overflow-auto shadow-lg`}
       >

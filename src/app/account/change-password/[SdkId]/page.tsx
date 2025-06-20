@@ -89,7 +89,7 @@ const ChangePassword : React.FC<IChangePwdParams>= ({params}) => {
           toast.error(post.msg);
       } else {
         toast.success(post.msg);
-        if(loggedInUser.usrRole === "Admin" || loggedInUser.usrRole === "View-Admin"){
+        if(loggedInUser.usrRole === "Super-Admin" || loggedInUser.usrRole === "Admin" || loggedInUser.usrRole === "View-Admin"){
           router.push("/account/admin-dashboard");
         } else {
           router.push("/account/sadhak-dashboard");
@@ -110,46 +110,69 @@ const ChangePassword : React.FC<IChangePwdParams>= ({params}) => {
   }
   
   return (
-    <div className='flex justify-center items-center my-24'> 
-        <form className='flex w-[400px] flex-col border border-orange-500 p-9 gap-2 rounded-md shadow-xl' onSubmit={handleSubmit}>
-            <div className='flex flex-col gap-2'>
-                <label>Old Password:</label>
-                <input type='password' className='inputBox' name='sdkPwd' value={changePwd.sdkPwd} onChange={handleChange} />
-            </div>
-            <div className='flex flex-col gap-2'>
-                <label>New Password:</label>
-                <input type='password' className='inputBox' name='sdkNewPwd' value={changePwd.sdkNewPwd} onChange={handleChange} />
-            </div>
-            <div className='flex flex-col gap-2'>
-                <label>Confirm Password:</label>
-                <input type='password' className='inputBox' name='sdkConfPwd' value={changePwd.sdkConfPwd} onChange={handleChange}/>
-            </div>
-            {errorMessage && <p className="text-sm italic text-red-600">{errorMessage}</p>}
-            <div className="grid grid-cols-2 gap-1">
-              <button 
-                type='submit' 
-                className='btnLeft'
-                disabled={isSaving} 
-                >
-                {isSaving ? 'Saving...' : 'Save'}
-              </button>
-              <button
-                  type="button"
-                  className="btnRight"
-                  onClick={() => {
-                    if (loggedInUser.usrRole === "Sadhak") {
-                      router.push("/account/sadhak-dashboard");
-                    } else {
-                      router.push("/account/admin-dashboard");
-                    }
-                  }}
-                >
-                  Back
-                </button>
-            </div>
-        </form>
+    <div className="flex justify-center items-center my-24">
+      <form
+        className="flex w-[400px] flex-col border border-orange-500 p-9 gap-2 rounded-md shadow-xl"
+        onSubmit={handleSubmit}
+      >
+        <div className="flex flex-col gap-2">
+          <label>Old Password:</label>
+          <input
+            type="password"
+            className="inputBox"
+            name="sdkPwd"
+            value={changePwd.sdkPwd}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label>New Password:</label>
+          <input
+            type="password"
+            className="inputBox"
+            name="sdkNewPwd"
+            value={changePwd.sdkNewPwd}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label>Confirm Password:</label>
+          <input
+            type="password"
+            className="inputBox"
+            name="sdkConfPwd"
+            value={changePwd.sdkConfPwd}
+            onChange={handleChange}
+          />
+        </div>
+        {errorMessage && (
+          <p className="text-sm italic text-red-600">{errorMessage}</p>
+        )}
+        <div className="grid grid-cols-2 gap-1">
+          <button type="submit" className="btnLeft" disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            className="btnRight"
+            onClick={() => {
+              if (
+                loggedInUser.usrRole === "Super-Admin" ||
+                loggedInUser.usrRole === "Admin" ||
+                loggedInUser.usrRole === "View-Admin"
+              ) {
+                router.push("/account/admin-dashboard");
+              } else {
+                router.push("/account/sadhak-dashboard");
+              }
+            }}
+          >
+            Back
+          </button>
+        </div>
+      </form>
     </div>
-  )
+  );
 }
 
 export default ChangePassword;
