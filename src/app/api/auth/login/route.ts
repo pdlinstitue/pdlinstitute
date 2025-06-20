@@ -5,12 +5,11 @@ import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from "@/app/utils/token";
 import { encrypt } from "@/app/utils/crypto";
 import { cookies } from "next/headers";
-import { generateCsrfTokenAndSecret } from "@/app/utils/csrf";
 
 export const POST = async (request: NextRequest) => {
   try {
-    const { sdkCred, sdkPwd } = await request.json();
 
+    const { sdkCred, sdkPwd } = await request.json();
     await dbConnect();
 
     if (!sdkCred || !sdkPwd) {
