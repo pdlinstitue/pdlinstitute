@@ -1,162 +1,238 @@
 "use client";
-import DataTable from '@/app/components/table/DataTable';
+import DataTable from "@/app/components/table/DataTable";
 import {
-  useReactTable, 
-  getCoreRowModel, 
-  getFilteredRowModel,FilterFn,
-  getPaginationRowModel, 
-  getSortedRowModel, 
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  FilterFn,
+  getPaginationRowModel,
+  getSortedRowModel,
   SortingState,
-} from '@tanstack/react-table';
-import Select from 'react-select';
-import Loading from '../Loading';
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { BASE_API_URL } from '@/app/utils/constant';
-import { format } from 'date-fns';
-import { MdOutlineThumbsUpDown } from 'react-icons/md';
+} from "@tanstack/react-table";
+import Select from "react-select";
+import Loading from "../Loading";
+import React, { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { BASE_API_URL } from "@/app/utils/constant";
+import { format } from "date-fns";
+import { MdOutlineThumbsUpDown } from "react-icons/md";
+import { addDays } from "date-fns";
+import { DateRange } from "react-date-range";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
 interface EnrollmentListProps {
-  sdkRegNo:string,
-  enrBthName:string,
-  enrTnsNo:string,
-  enrSrnShot:string,
-  corId:string,
-  bthId:string,
-  createdBy?:string
+  sdkRegNo: string;
+  enrBthName: string;
+  enrTnsNo: string;
+  enrSrnShot: string;
+  corId: string;
+  bthId: string;
+  createdBy?: string;
 }
 interface SelectedCourseProps {
-  _id:string,
-  coName:string
+  _id: string;
+  coName: string;
 }
 interface SelectedBatchProps {
-  _id:string,
-  bthName:string
+  _id: string;
+  bthName: string;
 }
 
-const EnrollmentList : React.FC = () => {
-
+const EnrollmentList: React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [enrData, setEnrData] = useState<EnrollmentListProps[] | null>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [selectedCourse, setSelectedCourse] = useState<string>(''); 
-  const [selectedBatch, setSelectedBatch] = useState<string>('')
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [selectedBatch, setSelectedBatch] = useState<string>("");
   const [courseList, setCourseList] = useState<SelectedCourseProps[]>([]);
   const [batchList, setBatchList] = useState<SelectedBatchProps[]>([]);
-  const [filtered, setFiltered] = React.useState('');
+  const [filtered, setFiltered] = React.useState("");
   const [pageInput, setPageInput] = React.useState(1);
-  const [selectedDuration, setSelectedDuration]=useState<string>("current");
+  const [selectedDuration, setSelectedDuration] = useState<string>("current");
   const data = React.useMemo(() => enrData ?? [], [enrData]);
+  const [range, setRange] = useState([
+    {
+      startDate: addDays(new Date(), -7),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+
+  const [customDate, setCustomDate] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  const formattedRange = `${format(
+    range[0].startDate,
+    "dd-MM-yyyy"
+  )} To ${format(range[0].endDate, "dd-MM-yyyy")}`;
+
+  const handleInputFocus = () => {
+    setShowPicker(true);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      pickerRef.current &&
+      !pickerRef.current.contains(event.target as Node)
+    ) {
+      setShowPicker(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleChange = (item: any) => {
+    setRange([item.selection]);
+    setShowPicker(false);
+  };
 
   //changing the status color as per the status
   const StatusCell = ({ row }: { row: any }) => {
-    const statusClass = (value: string) => 
-      value === 'Approved' ? 'text-green-500 italic'
-      : 
-      value === 'Rejected' ? 'text-red-500 italic'
-      : 
-      value === 'Pending' ? 'text-orange-500 italic' : 'text-black';
-      return <span className={statusClass(row.original.isApproved)}>
-            {row.original.isApproved}
-        </span>;
+    const statusClass = (value: string) =>
+      value === "Approved"
+        ? "text-green-500 italic"
+        : value === "Rejected"
+        ? "text-red-500 italic"
+        : value === "Pending"
+        ? "text-orange-500 italic"
+        : "text-black";
+    return (
+      <span className={statusClass(row.original.isApproved)}>
+        {row.original.isApproved}
+      </span>
+    );
   };
 
-  const columns = React.useMemo(() => [
-    { header: 'Sadhak', accessorKey: 'sdkFstName'},
-    { header: 'SDK Id', accessorKey: 'sdkRegNo'},
-    { header: 'Phone',  accessorKey: 'sdkPhone'},
-    { header: 'Course', accessorKey: 'coNick'},
-    { header: 'Type',   accessorKey: 'coType'},
-    { header: 'Batch',  accessorKey: 'bthId'},
-    // { header: 'Bth Date', 
-    //   accessorKey: 'bthStart',
-    //   cell: ({ row }: { row: any }) => formatDate(row.original.bthStart),
-    // },
-    // { header: 'Enr Date', 
-    //   accessorKey: 'createdAt',
-    //   cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
-    // },
-    { header: 'Trans Id', accessorKey: 'enrTnsNo'},
-    { header: 'Status', accessorKey: 'isApproved', cell: StatusCell},
-    { header: 'Action', accessorKey: 'action', 
-      cell: ({ row }: { row: any }) => ( 
-        <div className='flex items-center justify-center'> 
-          <button type='button' title='Approve' onClick={()=> router.push(`/account/enrollment-list/${row.original._id}/view-enrollment`)} className='text-blue-500 border-[1.5px] border-blue-700 p-1 rounded-full hover:border-black'><MdOutlineThumbsUpDown size={12} /></button>
-        </div> 
-      ), 
-    },
-  ], []);
+  const columns = React.useMemo(
+    () => [
+      { header: "Sadhak", accessorKey: "sdkFstName" },
+      { header: "SDK Id", accessorKey: "sdkRegNo" },
+      { header: "Phone", accessorKey: "sdkPhone" },
+      { header: "Course", accessorKey: "coNick" },
+      { header: "Type", accessorKey: "coType" },
+      { header: "Batch", accessorKey: "bthId" },
+      // { header: 'Bth Date',
+      //   accessorKey: 'bthStart',
+      //   cell: ({ row }: { row: any }) => formatDate(row.original.bthStart),
+      // },
+      // { header: 'Enr Date',
+      //   accessorKey: 'createdAt',
+      //   cell: ({ row }: { row: any }) => formatDate(row.original.createdAt),
+      // },
+      { header: "Trans Id", accessorKey: "enrTnsNo" },
+      { header: "Status", accessorKey: "isApproved", cell: StatusCell },
+      {
+        header: "Action",
+        accessorKey: "action",
+        cell: ({ row }: { row: any }) => (
+          <div className="flex items-center justify-center">
+            <button
+              type="button"
+              title="Approve"
+              onClick={() =>
+                router.push(
+                  `/account/enrollment-list/${row.original._id}/view-enrollment`
+                )
+              }
+              className="text-blue-500 border-[1.5px] border-blue-700 p-1 rounded-full hover:border-black"
+            >
+              <MdOutlineThumbsUpDown size={12} />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
-  const globalFilterFn: FilterFn<any> = (row, columnId: string, filterValue) => { 
-    return String(row.getValue(columnId)).toLowerCase().includes(String(filterValue).toLowerCase()); 
+  const globalFilterFn: FilterFn<any> = (
+    row,
+    columnId: string,
+    filterValue
+  ) => {
+    return String(row.getValue(columnId))
+      .toLowerCase()
+      .includes(String(filterValue).toLowerCase());
   };
 
-  useEffect(()=>{
-    async function fetchEnrollmentData(){
+  useEffect(() => {
+    async function fetchEnrollmentData() {
       try {
-        const res = await fetch(`${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}`, { cache: "no-store" });
+        const res = await fetch(
+          `${BASE_API_URL}/api/enrollments?corId=${selectedCourse}&bthId=${selectedBatch}&dur=${selectedDuration}&startDate=${range[0].startDate}&endDate=${range[0].endDate}`,
+          { cache: "no-store" }
+        );
         const enrDataList = await res.json();
-        const updatedEnrDataList = enrDataList.enrList.map((item:any) => { 
-          return { 
-            ...item, 
-            coNick: item.corId.coNick, 
-            coType: item.corId.coType,  
-            bthId: item.bthId.bthName, 
+        const updatedEnrDataList = enrDataList.enrList.map((item: any) => {
+          return {
+            ...item,
+            coNick: item.corId.coNick,
+            coType: item.corId.coType,
+            bthId: item.bthId.bthName,
             sdkFstName: item.sdkId.sdkFstName,
             sdkPhone: item.sdkId.sdkPhone,
             sdkRegNo: item.sdkId.sdkRegNo,
-            bthStart: format(new Date(item.bthId.bthStart), 'dd MMM, yyyy'),  
-            createdAt: format(new Date(item.createdAt), 'dd MMM, yyyy')   
+            bthStart: format(new Date(item.bthId.bthStart), "dd MMM, yyyy"),
+            createdAt: format(new Date(item.createdAt), "dd MMM, yyyy"),
           };
         });
         setEnrData(updatedEnrDataList);
       } catch (error) {
-        console.log('error fetching enrData' + error)
-      } finally{
+        console.log("error fetching enrData" + error);
+      } finally {
         setIsLoading(false);
       }
     }
     fetchEnrollmentData();
-  },[selectedCourse, selectedBatch, selectedDuration])
+  }, [selectedCourse, selectedBatch, selectedDuration, range[0].startDate, range[0].endDate]);
 
-  const table = useReactTable(
-    {
-      data, 
-      columns, 
-      getCoreRowModel: getCoreRowModel(), 
-      getPaginationRowModel: getPaginationRowModel(), 
-      getSortedRowModel: getSortedRowModel(),
-      globalFilterFn: globalFilterFn,
-      state: {
-        sorting: sorting,
-        globalFilter: filtered,
-        pagination: { pageIndex: pageInput - 1, pageSize: 100 }
-      },
-      onSortingChange: setSorting,
-      getFilteredRowModel: getFilteredRowModel(),
-      onGlobalFilterChange: setFiltered,   
-    }
-  );
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    globalFilterFn: globalFilterFn,
+    state: {
+      sorting: sorting,
+      globalFilter: filtered,
+      pagination: { pageIndex: pageInput - 1, pageSize: 100 },
+    },
+    onSortingChange: setSorting,
+    getFilteredRowModel: getFilteredRowModel(),
+    onGlobalFilterChange: setFiltered,
+  });
 
-  const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
-    const page = e.target.value ? Number(e.target.value) - 1 : 0; 
-    setPageInput(Number(e.target.value)); 
-    table.setPageIndex(page); 
+  const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const page = e.target.value ? Number(e.target.value) - 1 : 0;
+    setPageInput(Number(e.target.value));
+    table.setPageIndex(page);
   };
 
   useEffect(() => {
     async function fetchCourseData() {
       try {
-          const res = await fetch(`${BASE_API_URL}/api/courses`, {cache: "no-store"});
-          const coData = await res.json();
-          setCourseList(coData.coList.sort((a:any, b:any) => a.coName.localeCompare(b.coName)));
-        } catch (error) {
-          console.error("Error fetching course data:", error);
+        const res = await fetch(`${BASE_API_URL}/api/courses`, {
+          cache: "no-store",
+        });
+        const coData = await res.json();
+        setCourseList(
+          coData.coList.sort((a: any, b: any) =>
+            a.coName.localeCompare(b.coName)
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching course data:", error);
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       }
     }
-  fetchCourseData();
+    fetchCourseData();
   }, []);
 
   useEffect(() => {
@@ -166,74 +242,124 @@ const EnrollmentList : React.FC = () => {
         return;
       }
       try {
-        const res = await fetch(`${BASE_API_URL}/api/batches`, { cache: 'no-store' });
+        const res = await fetch(`${BASE_API_URL}/api/batches`, {
+          cache: "no-store",
+        });
         const batchData = await res.json();
-        const filteredBatches = batchData.bthList.filter((batch: any) => batch.corId._id === selectedCourse);
+        const filteredBatches = batchData.bthList.filter(
+          (batch: any) => batch.corId._id === selectedCourse
+        );
         setBatchList(filteredBatches);
       } catch (error) {
-        console.error('Error fetching batch data:', error);
+        console.error("Error fetching batch data:", error);
       }
     }
     fetchBatchesByCorId();
-  }, [selectedCourse]); 
+  }, [selectedCourse]);
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-     setSelectedDuration(e.target.value);
+    if (e.target.value === "custom") {
+      setCustomDate(true);
+    } else {
+      setCustomDate(false);
+      setRange([
+        {
+          startDate: addDays(new Date(), -7),
+          endDate: new Date(),
+          key: "selection",
+        },
+      ]);
+    }
+    setSelectedDuration(e.target.value);
   };
 
-  if(isLoading){
-    return <div>
-      <Loading/>
-    </div>
+  if (isLoading) {
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   }
 
   return (
     <div>
       <div>
-        <div className='flex mb-2 items-center justify-between'>
+        <div className="flex mb-2 items-center justify-between">
           <div className="flex gap-1 items-center w-auto">
-            <select className="inputBox w-[120px] h-11" name="duration" value={selectedDuration} onChange={handleDurationChange}>              
+            <select
+              className="inputBox w-[120px] h-11"
+              name="duration"
+              value={selectedDuration}
+              onChange={handleDurationChange}
+            >
               <option value="current">Current</option>
               <option value="previous">Previous</option>
               <option value="upcoming">Upcoming</option>
+              <option value="custom">Custom</option>
             </select>
+            <div className="relative inline-block">
+              {customDate && (
+                <input
+                  type="text"
+                  readOnly
+                  onFocus={handleInputFocus}
+                  value={formattedRange}
+                  className="border p-2 rounded w-64"                  
+                />
+              )}
+              {showPicker && (
+                <div ref={pickerRef} className="absolute z-10 mt-2">
+                  <DateRange
+                    ranges={range}
+                    onChange={handleChange}
+                    editableDateInputs={true}
+                    moveRangeOnFirstSelection={false}
+                  />
+                </div>
+              )}
+            </div>
             <Select
               className="w-[260px]"
               placeholder="--- Select Course ---"
               options={courseList.map((course) => ({
                 label: course.coName,
-                value: course._id
+                value: course._id,
               }))}
-              value={courseList.find(c => c._id === selectedCourse) ? {
-                label: courseList.find(c => c._id === selectedCourse)!.coName,
-                value: selectedCourse
-              } : null}
+              value={
+                courseList.find((c) => c._id === selectedCourse)
+                  ? {
+                      label: courseList.find((c) => c._id === selectedCourse)!
+                        .coName,
+                      value: selectedCourse,
+                    }
+                  : null
+              }
               onChange={(option) => {
-                setSelectedCourse(option?.value || '');
-                setSelectedBatch(''); // Reset batch when course changes
+                setSelectedCourse(option?.value || "");
+                setSelectedBatch(""); // Reset batch when course changes
               }}
               isSearchable
               styles={{
                 control: (provided, state) => ({
                   ...provided,
-                  padding: '4px', // ⬅ Matches horizontal padding
-                  minHeight: '46px',
-                  boxShadow: state.isFocused ? '0 0 0 1.5px #FFA500' : 'none', // ⬅ Focus outline
-                  backgroundColor: state.isFocused ? '#FFEBCC' : 'white',
-                  '&:hover': {
-                    borderColor: '#ea580c',
+                  padding: "4px", // ⬅ Matches horizontal padding
+                  minHeight: "46px",
+                  boxShadow: state.isFocused ? "0 0 0 1.5px #FFA500" : "none", // ⬅ Focus outline
+                  backgroundColor: state.isFocused ? "#FFEBCC" : "white",
+                  "&:hover": {
+                    borderColor: "#ea580c",
                   },
                 }),
                 menu: (provided) => ({
                   ...provided,
                   maxHeight: 200,
-                  overflowY: 'auto',
+                  overflowY: "auto",
                   zIndex: 5,
                 }),
                 valueContainer: (provided) => ({
                   ...provided,
-                  paddingTop: '4px',
-                  paddingBottom: '4px',
+                  paddingTop: "4px",
+                  paddingBottom: "4px",
                 }),
                 input: (provided) => ({
                   ...provided,
@@ -242,9 +368,8 @@ const EnrollmentList : React.FC = () => {
                 }),
                 placeholder: (provided) => ({
                   ...provided,
-                  color: '#666',
+                  color: "#666",
                 }),
-                
               }}
             />
             <Select
@@ -252,75 +377,133 @@ const EnrollmentList : React.FC = () => {
               placeholder="--- Select Batch ---"
               options={batchList?.map((batch) => ({
                 label: batch.bthName,
-                value: batch._id
+                value: batch._id,
               }))}
-              value={batchList?.find(b => b._id === selectedBatch) ? {
-                label: batchList?.find(b => b._id === selectedBatch)!.bthName,
-                value: selectedBatch
-              } : null}
+              value={
+                batchList?.find((b) => b._id === selectedBatch)
+                  ? {
+                      label: batchList?.find((b) => b._id === selectedBatch)!
+                        .bthName,
+                      value: selectedBatch,
+                    }
+                  : null
+              }
               onChange={(option) => {
-                setSelectedBatch(option?.value || '');
+                setSelectedBatch(option?.value || "");
               }}
               styles={{
-              control: (provided, state) => ({
-                ...provided,
-                padding: '4px', // ⬅ Matches horizontal padding
-                minHeight: '46px',
-                boxShadow: state.isFocused ? '0 0 0 1.5px #FFA500' : 'none', // ⬅ Focus outline
-                backgroundColor: state.isFocused ? '#FFEBCC' : 'white',
-                '&:hover': {
-                  borderColor: '#ea580c',
-                },
-              }),
-              menu: (provided) => ({
-                ...provided,
-                maxHeight: 200,
-                overflowY: 'auto',
-                zIndex: 5,
-              }),
-              valueContainer: (provided) => ({
-                ...provided,
-                paddingTop: '4px',
-                paddingBottom: '4px',
-              }),
-              input: (provided) => ({
-                ...provided,
-                margin: 0,
-                padding: 0,
-              }),
-              placeholder: (provided) => ({
-                ...provided,
-                color: '#666',
-              }),
-            }}
-          />
+                control: (provided, state) => ({
+                  ...provided,
+                  padding: "4px", // ⬅ Matches horizontal padding
+                  minHeight: "46px",
+                  boxShadow: state.isFocused ? "0 0 0 1.5px #FFA500" : "none", // ⬅ Focus outline
+                  backgroundColor: state.isFocused ? "#FFEBCC" : "white",
+                  "&:hover": {
+                    borderColor: "#ea580c",
+                  },
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 200,
+                  overflowY: "auto",
+                  zIndex: 5,
+                }),
+                valueContainer: (provided) => ({
+                  ...provided,
+                  paddingTop: "4px",
+                  paddingBottom: "4px",
+                }),
+                input: (provided) => ({
+                  ...provided,
+                  margin: 0,
+                  padding: 0,
+                }),
+                placeholder: (provided) => ({
+                  ...provided,
+                  color: "#666",
+                }),
+              }}
+            />
           </div>
-          <input type='text' className='inputBox w-[300px]' placeholder='Search anything...' onChange={(e) => setFiltered(e.target.value)}/>
+          <input
+            type="text"
+            className="inputBox w-[300px]"
+            placeholder="Search anything..."
+            onChange={(e) => setFiltered(e.target.value)}
+          />
         </div>
       </div>
-      <div className='overflow-auto max-h-[412px]'>
-        <DataTable  table={table}/>
-      </div> 
+      <div className="overflow-auto max-h-[412px]">
+        <DataTable table={table} />
+      </div>
       <div>
-        <div className='flex mt-4 gap-1'>
-          <button type='button' className='px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100' onClick={() => { setPageInput(1); table.setPageIndex(0); }}>{"<<"}</button>
-          <button type='button' className='px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100' onClick={() => { setPageInput((prev) => Math.max(prev - 1, 1)); table.previousPage(); }} disabled={!table.getCanPreviousPage()}>Previous</button>
-          <button type='button' className='px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100' onClick={() => { setPageInput((prev) => Math.min(prev + 1, table.getPageCount())); table.nextPage(); }} disabled={!table.getCanNextPage()}>Next</button>
-          <button type='button' className='px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100' onClick={() => { setPageInput(table.getPageCount()); table.setPageIndex(table.getPageCount() - 1); }}>{">>"}</button>
+        <div className="flex mt-4 gap-1">
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput(1);
+              table.setPageIndex(0);
+            }}
+          >
+            {"<<"}
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput((prev) => Math.max(prev - 1, 1));
+              table.previousPage();
+            }}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput((prev) => Math.min(prev + 1, table.getPageCount()));
+              table.nextPage();
+            }}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
+            onClick={() => {
+              setPageInput(table.getPageCount());
+              table.setPageIndex(table.getPageCount() - 1);
+            }}
+          >
+            {">>"}
+          </button>
         </div>
-        <div className='flex mt-4 items-center justify-between'>
-          <div className='flex flex-col'>
-            <p className='italic'>Total Pages: &nbsp; {table.getPageCount()}</p>
-            <p className='italic'>You are on page: &nbsp; {(table.options.state.pagination?.pageIndex ?? 0) + 1}</p>
+        <div className="flex mt-4 items-center justify-between">
+          <div className="flex flex-col">
+            <p className="italic">Total Pages: &nbsp; {table.getPageCount()}</p>
+            <p className="italic">
+              You are on page: &nbsp;{" "}
+              {(table.options.state.pagination?.pageIndex ?? 0) + 1}
+            </p>
           </div>
-          <div className='flex gap-1 items-center'>
-            <p className='italic'>Jump to page: &nbsp;</p>
-            <input type='number' className='px-2 py-1 rounded-lg border-[1.5px] border-black w-[70px] inline' value={pageInput} onChange={handlePageChange} min={1} max={table.getPageCount()}/>
+          <div className="flex gap-1 items-center">
+            <p className="italic">Jump to page: &nbsp;</p>
+            <input
+              type="number"
+              className="px-2 py-1 rounded-lg border-[1.5px] border-black w-[70px] inline"
+              value={pageInput}
+              onChange={handlePageChange}
+              min={1}
+              max={table.getPageCount()}
+            />
           </div>
         </div>
-      </div>  
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default EnrollmentList;

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { BASE_API_URL } from "@/app/utils/constant";
 import Loading from "@/app/account/Loading";
 import { format } from "date-fns";
-import { parseISO } from "date-fns/parseISO";
+import parseISO from "date-fns/parseISO";
 
 interface VolunteerListProps {
   _id: string;
