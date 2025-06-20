@@ -287,14 +287,12 @@ const EnrollmentList: React.FC = () => {
         <div className="flex mb-2 items-center justify-between">
           <div className="flex gap-1 items-center w-auto">
             <select
-              className="inputBox w-[120px] h-11"
+              className="inputBox w-[118px] h-11"
               name="duration"
               value={selectedDuration}
               onChange={handleDurationChange}
             >
               <option value="current">Current</option>
-              <option value="previous">Previous</option>
-              <option value="upcoming">Upcoming</option>
               <option value="custom">Custom</option>
             </select>
             <div className="relative inline-block">
@@ -304,7 +302,7 @@ const EnrollmentList: React.FC = () => {
                   readOnly
                   onFocus={handleInputFocus}
                   value={formattedRange}
-                  className="border p-2 rounded w-64"                  
+                  className="inputBox w-64"                  
                 />
               )}
               {showPicker && (

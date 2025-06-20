@@ -53,7 +53,6 @@ const PersonalDetails : React.FC = () => {
               onChange={handleDateChange}
               dateFormat="dd/MM/yyyy"
               placeholderText="dd/mm/yyyy"
-              isClearable
               className="inputBox w-full"
             />
           </div>
