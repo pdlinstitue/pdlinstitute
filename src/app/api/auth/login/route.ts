@@ -5,10 +5,12 @@ import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from "@/app/utils/token";
 import { encrypt } from "@/app/utils/crypto";
 import { cookies } from "next/headers";
+import { generateCsrfTokenAndSecret } from "@/app/utils/csrf";
 
 export const POST = async (request: NextRequest) => {
   try {
     const { sdkCred, sdkPwd } = await request.json();
+
     await dbConnect();
 
     if (!sdkCred || !sdkPwd) {
@@ -43,7 +45,6 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // Fallback: accept unencrypted registration password if not yet changed
     if (!isPasswordValid && sdkPwd === user.sdkRegPwd) {
       isPasswordValid = true;
     }
@@ -59,7 +60,6 @@ export const POST = async (request: NextRequest) => {
     const accessToken = generateAccessToken(payload);
     const refreshToken = generateRefreshToken(payload);
 
-    // Destructure necessary fields
     const { _id, sdkFstName, sdkRole, isAdmin } = user;
     const loggedInUserInfo = {
       id: _id,
@@ -69,12 +69,13 @@ export const POST = async (request: NextRequest) => {
     };
 
     const cookieStore = await cookies();
+
     cookieStore.set("accessToken", encrypt(accessToken), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 15, // 15 minutes
+      maxAge: 60 * 15,
     });
 
     cookieStore.set("refreshToken", encrypt(refreshToken), {
@@ -82,7 +83,7 @@ export const POST = async (request: NextRequest) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     cookieStore.set("loggedInUser", JSON.stringify(loggedInUserInfo), {
@@ -93,16 +94,27 @@ export const POST = async (request: NextRequest) => {
       maxAge: 60 * 60 * 24 * 7,
     });
 
+    // 🔐 Generate CSRF Token + Secret
+    // const { csrfToken, csrfSecret } = generateCsrfTokenAndSecret();
+
+    // cookieStore.set("csrfSecret", csrfSecret, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    //   path: "/",
+    // });
+
+    // ✅ Return both login info + CSRF token
     return NextResponse.json(
       {
         result: { ...loggedInUserInfo, success: true },
+        // csrfToken,
       },
       { status: 200 }
     );
   } catch (error: any) {
     console.error("Login Error:", error);
-    const errorMessage =
-      error.name === "ValidationError"
+    const errorMessage = error.name === "ValidationError"
         ? Object.values(error.errors)
             .map((val: any) => val.message)
             .join(", ")
@@ -112,43 +124,4 @@ export const POST = async (request: NextRequest) => {
       { status: 400 }
     );
   }
-};
-
-export const PUT = async (request: NextRequest) => {
-  const { sdkRole } = await request.json();
-  const cookieStore = await cookies();
-  const userCookie = cookieStore.get("loggedInUser")?.value;
-
-  if (userCookie) {
-    try {
-      const parsed = JSON.parse(userCookie);
-      // Update the user role or any other field as needed
-      parsed.usrRole = sdkRole;
-
-      cookieStore.set("loggedInUser", JSON.stringify(parsed), {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      });
-    } catch (error) {
-      console.error("Failed to parse or update cookie:", error);
-      return NextResponse.json(
-        { success: false, msg: "Failed to update user role." },
-        { status: 400 }
-      );
-    }
-  } else {
-    console.warn("No cookie found to update");
-    return NextResponse.json(
-      { success: false, msg: "No user cookie found." },
-      { status: 400 }
-    );
-  }
-
-  return NextResponse.json(
-    { success: true, msg: "User role updated successfully." },
-    { status: 200 }
-  );
 };
