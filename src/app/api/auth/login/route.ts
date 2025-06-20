@@ -123,3 +123,42 @@ export const POST = async (request: NextRequest) => {
     );
   }
 };
+
+export const PUT = async (request: NextRequest) => {
+  const { sdkRole } = await request.json();
+  const cookieStore = await cookies();
+  const userCookie = cookieStore.get("loggedInUser")?.value;
+
+  if (userCookie) {
+    try {
+      const parsed = JSON.parse(userCookie);
+      // Update the user role or any other field as needed
+      parsed.usrRole = sdkRole;
+
+      cookieStore.set("loggedInUser", JSON.stringify(parsed), {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    } catch (error) {
+      console.error("Failed to parse or update cookie:", error);
+      return NextResponse.json(
+        { success: false, msg: "Failed to update user role." },
+        { status: 400 }
+      );
+    }
+  } else {
+    console.warn("No cookie found to update");
+    return NextResponse.json(
+      { success: false, msg: "No user cookie found." },
+      { status: 400 }
+    );
+  }
+
+  return NextResponse.json(
+    { success: true, msg: "User role updated successfully." },
+    { status: 200 }
+  );
+};

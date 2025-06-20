@@ -87,8 +87,7 @@ const SadhakAccount: React.FC<SadhakAccountProps> = ({ sdkAccountById }) => {
         if (post.success === false) {
           toast.error(post.msg);
         } else {
-          toast.success(post.msg);
-          router.back();
+          toast.success(post.msg);          
         }
       }
     } catch (error) {
