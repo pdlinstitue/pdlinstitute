@@ -3,7 +3,7 @@ interface UserDataProps {
   sdkFstName: string, 
   sdkMdlName:string,
   sdkLstName: string, 
-  sdkBthDate: Date, 
+  sdkBthDate: Date | null, 
   sdkGender: string, 
   sdkMarStts: string, 
   sdkSpouce: string | undefined, 

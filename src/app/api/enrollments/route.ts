@@ -29,6 +29,8 @@ export async function GET(req: NextRequest) {
     const corId = req.nextUrl.searchParams.get("corId");
     const bthId = req.nextUrl.searchParams.get("bthId");
     const duration = req.nextUrl.searchParams.get("dur");
+    const startDate = req.nextUrl.searchParams.get("startDate");
+    const endDate = req.nextUrl.searchParams.get("endDate");
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -60,7 +62,12 @@ export async function GET(req: NextRequest) {
           ((duration === "previous" && session.createdAt < today) ||
             (duration === "current" &&
               session.createdAt.setHours(0, 0, 0, 0) === today) ||
-            (duration === "upcoming" && session.createdAt >= tomorrow))
+            (duration === "upcoming" && session.createdAt >= tomorrow)) ||
+            (duration === "custom" &&
+              startDate !== null &&
+              endDate !== null &&
+              session.createdAt >= new Date(startDate) &&
+              session.createdAt <= new Date(endDate))
       );
     }
 
