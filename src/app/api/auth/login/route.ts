@@ -108,7 +108,6 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json(
       {
         result: { ...loggedInUserInfo, success: true },
-        // csrfToken,
       },
       { status: 200 }
     );
