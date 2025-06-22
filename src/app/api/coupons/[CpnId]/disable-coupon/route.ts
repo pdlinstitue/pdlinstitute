@@ -1,8 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import Coupons from "../../../../../../modals/Coupons";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 type CpnType = {
   isActive: boolean,
@@ -13,8 +11,6 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Cpn
 
     try 
     {
-
-      await verifyApiToken(); 
       await dbConnect();
       const { CpnId } = await params;
       const { disabledBy }: CpnType = await req.json();

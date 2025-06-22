@@ -1,21 +1,58 @@
-import crypto from 'crypto';
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
-const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY!, 'base64'); // 32 bytes
-const IV_LENGTH = 16;
-
-export function encrypt(text: string) {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-  let encrypted = cipher.update(text, 'utf8', 'base64');
-  encrypted += cipher.final('base64');
-  return iv.toString('base64') + ':' + encrypted;
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
 }
 
-export function decrypt(encryptedText: string) {
-  const [ivStr, encrypted] = encryptedText.split(':');
-  const iv = Buffer.from(ivStr, 'base64');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-  let decrypted = decipher.update(encrypted, 'base64', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
+const rawKeyBytes = base64ToBytes(process.env.ENCRYPTION_KEY || "");
+
+async function getKey(): Promise<CryptoKey> {
+  return crypto.subtle.importKey(
+    "raw",
+    rawKeyBytes,
+    "AES-CBC",
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+const IV_LENGTH = 16;
+
+export async function encrypt(text: string): Promise<string> {
+  const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
+  const key = await getKey();
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-CBC", iv },
+    key,
+    encoder.encode(text)
+  );
+
+  const encryptedBytes = new Uint8Array(iv.length + encrypted.byteLength);
+  encryptedBytes.set(iv, 0);
+  encryptedBytes.set(new Uint8Array(encrypted), iv.length);
+  const encryptedBase64 = btoa(
+    String.fromCharCode.apply(null, Array.from(encryptedBytes))
+  );
+  return encryptedBase64;
+}
+
+export async function decrypt(encryptedText: string): Promise<string> {
+  const encryptedBuffer = Uint8Array.from(atob(encryptedText), c => c.charCodeAt(0));
+  const iv = encryptedBuffer.slice(0, IV_LENGTH);
+  const data = encryptedBuffer.slice(IV_LENGTH);
+
+  const key = await getKey();
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-CBC", iv },
+    key,
+    data
+  );
+
+  return decoder.decode(decrypted);
 }

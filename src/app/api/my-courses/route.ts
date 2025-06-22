@@ -4,12 +4,9 @@ import Enrollments from "../../../../modals/Enrollments";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Categories from "../../../../modals/Categories";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export async function GET(req: NextRequest) {
     try {
-
-        await verifyApiToken();
         await dbConnect();
 
         const sdkId = req.nextUrl.searchParams.get("sdkid");

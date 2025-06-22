@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Coupons from "../../../../modals/Coupons";
 import Enrollments from "../../../../modals/Enrollments";
 import moment from "moment";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 import dbConnect from "../../../../dbConnect";
 
 type CouponType = {
@@ -15,8 +14,6 @@ type CouponType = {
 export  async function POST (req:NextRequest) {
 
     try {
-
-        await verifyApiToken(); 
         await dbConnect();
         
         const { cpnName, appliedBy, corId } : CouponType = await req.json();

@@ -1,8 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 type BatchType =  {
     _id?:string,
@@ -27,8 +25,6 @@ export async function PUT(req: Request,{ params }: { params: Promise<{ BthId: st
 
   try 
   {
-
-    await verifyApiToken();
     await dbConnect();
     const { BthId } = await params;
 

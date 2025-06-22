@@ -2,14 +2,10 @@ import { NextResponse, NextRequest } from "next/server";
 import Categories from "../../../../../../modals/Categories";
 import Courses from "../../../../../../modals/Courses";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ CatId: string }>}) {
 
     try {
-
-        await verifyApiToken(); 
         await dbConnect();
         const { CatId } = await params;
         const isCategoryUsed = await Courses.findOne({ coCat: CatId });

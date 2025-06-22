@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Documents from "../../../../../../modals/Documents";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type DocType = {
   _id?: string;
@@ -18,8 +17,6 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ DocId
 
     try 
     {  
-
-      await verifyApiToken(); 
       await dbConnect();
       const { DocId } = await params;
       const docById = await Documents.findById(DocId);
@@ -38,8 +35,6 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Doc
 
   try 
   {
-
-    await verifyApiToken(); 
     await dbConnect();
     const { DocId } = await params;
 

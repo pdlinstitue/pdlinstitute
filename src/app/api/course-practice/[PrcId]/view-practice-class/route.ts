@@ -1,14 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import Practices from "../../../../../../modals/Practices";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ PrcId: string}> }){
 
-    try {
-  
-      await verifyApiToken(); 
+    try { 
       await dbConnect();
       const { PrcId } = await params;
 

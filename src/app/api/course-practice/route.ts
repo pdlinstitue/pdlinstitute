@@ -1,7 +1,6 @@
 import Practices from "../../../../modals/Practices";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type PrcType = {
   prcName: String,
@@ -18,8 +17,6 @@ type PrcType = {
 export async function GET(req:NextRequest){
 
     try {
-  
-      await verifyApiToken(); 
       await dbConnect();
       const prcList:PrcType[] = await Practices.find({isActive: true})
       .populate("prcName", "coName coNick")
@@ -38,8 +35,6 @@ export async function GET(req:NextRequest){
 export async function POST(req: NextRequest) {
   
     try {
-  
-      await verifyApiToken();
       await dbConnect();
       const { prcName, prcLang, prcDays, prcStartsAt, prcEndsAt, prcLink, prcWhatLink,  prcImg, createdBy }: PrcType = await req.json();
   

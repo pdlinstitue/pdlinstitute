@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import Documents from "../../../../../../modals/Documents";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type DocType = {
   isActive:boolean,
@@ -12,8 +11,6 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Doc
 
     try 
     {
-
-      await verifyApiToken(); 
       await dbConnect();
       const { DocId } = await params;
       const {disabledBy} : DocType = await req.json();

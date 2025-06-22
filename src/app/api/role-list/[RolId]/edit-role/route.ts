@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Roles from "../../../../../../modals/Roles";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type RolType = {
   _id?: string;
@@ -12,8 +11,6 @@ type RolType = {
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ RolId: string }> }) {
 
   try {
-
-    await verifyApiToken(); 
     await dbConnect();
     const { RolId } = await params;
     const { roleType, updatedBy }: RolType = await req.json();

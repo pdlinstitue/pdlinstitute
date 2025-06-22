@@ -1,7 +1,6 @@
 import Coupons from "../../../../modals/Coupons";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type CpnType = {
     cpnName: String,
@@ -18,8 +17,6 @@ type CpnType = {
 export async function GET(req:NextRequest){
 
     try {
-  
-      await verifyApiToken(); 
       await dbConnect();
       const cpnList:CpnType[] = await Coupons.find({isActive: true})
       .populate('cpnCourse', 'coNick')
@@ -35,8 +32,6 @@ export async function GET(req:NextRequest){
   export async function POST(req: NextRequest) {
   
     try {
-  
-      await verifyApiToken(); 
       await dbConnect();
       const { cpnName, cpnUse, cpnVal, cpnDisType, cpnDisc, cpnCourse, cpnFor, cpnSdk, createdBy  }: CpnType = await req.json();
   

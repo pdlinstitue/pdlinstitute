@@ -23,5 +23,10 @@ export function POST() {
     maxAge: 0,
   });
 
+  response.cookies.set("allowedUrls", "", {
+    path: "/",
+    maxAge: 0,
+  });
+
   return response;
 }

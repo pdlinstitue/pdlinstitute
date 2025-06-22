@@ -3,14 +3,10 @@ import Users from "../../../../modals/Users";
 import dbConnect from "../../../../dbConnect";
 import sendEmail from "@/app/utils/email";
 import crypto from 'crypto';
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
  
 export const PUT = async (request:NextRequest) => {
 
     try {
-
-        await verifyApiToken();
         await dbConnect();
         
         const {sdkEmail} = await request.json();

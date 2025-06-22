@@ -1,13 +1,9 @@
 import Users from "../../../../../modals/Users";
 import dbConnect from "../../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function GET(req: NextRequest) {
   try {
-    
-    await verifyApiToken();
     await dbConnect();
     const activeSdkCount: number = await Users.countDocuments({ isActive: true });
     return NextResponse.json({ activeSdkCount, success: true }, { status: 200 });

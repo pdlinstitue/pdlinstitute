@@ -1,7 +1,6 @@
 import Users from "../../../../../modals/Users";
 import dbConnect from "../../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type SdkType = {
   sdkFstName: string;
@@ -30,8 +29,6 @@ type SdkType = {
 
 export async function GET(req: NextRequest) {
   try {
-    
-    //await verifyApiToken();
     const { searchParams } = new URL(req.url);
     const usrRole = searchParams.get("usrRole");
 

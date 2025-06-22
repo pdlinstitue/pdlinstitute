@@ -1,14 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import Users from "../../../../../../modals/Users";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ SdkId: string }> }){
 
   try 
     {
-      await verifyApiToken();
       await dbConnect();
       const { SdkId } = await params;
       const sdkById = await Users.findById(SdkId);

@@ -1,14 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import Coupons from "../../../../../../modals/Coupons";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ CpnId: string}> }){
 
     try {
-
-        await verifyApiToken(); 
         await dbConnect();      
         const { CpnId } = await params;
 

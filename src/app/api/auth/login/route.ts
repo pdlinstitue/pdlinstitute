@@ -5,10 +5,13 @@ import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from "@/app/utils/token";
 import { encrypt } from "@/app/utils/crypto";
 import { cookies } from "next/headers";
+import Roles from "../../../../../modals/Roles";
+import Permissions from "../../../../../modals/Permissions";
+import Modules from "../../../../../modals/Modules";
+import { compressToEncodedURIComponent } from 'lz-string';
 
 export const POST = async (request: NextRequest) => {
   try {
-
     const { sdkCred, sdkPwd } = await request.json();
     await dbConnect();
 
@@ -56,8 +59,8 @@ export const POST = async (request: NextRequest) => {
     }
 
     const payload = { id: user._id };
-    const accessToken = generateAccessToken(payload);
-    const refreshToken = generateRefreshToken(payload);
+    const accessToken = await generateAccessToken(payload);
+    const refreshToken = await generateRefreshToken(payload);
 
     const { _id, sdkFstName, sdkRole, isAdmin } = user;
     const loggedInUserInfo = {
@@ -69,7 +72,7 @@ export const POST = async (request: NextRequest) => {
 
     const cookieStore = await cookies();
 
-    cookieStore.set("accessToken", encrypt(accessToken), {
+    cookieStore.set("accessToken", await encrypt(accessToken), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -77,7 +80,7 @@ export const POST = async (request: NextRequest) => {
       maxAge: 60 * 15,
     });
 
-    cookieStore.set("refreshToken", encrypt(refreshToken), {
+    cookieStore.set("refreshToken", await encrypt(refreshToken), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -93,15 +96,35 @@ export const POST = async (request: NextRequest) => {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    // 🔐 Generate CSRF Token + Secret
-    // const { csrfToken, csrfSecret } = generateCsrfTokenAndSecret();
+    //allowed url role wise
+    const role = await Roles.find({ roleType: sdkRole, isActive: true });
+    const permissions = await Permissions.find({
+      rolId: role[0]._id,
+      isActive: true,
+      isDeleted: false,
+    });
 
-    // cookieStore.set("csrfSecret", csrfSecret, {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    //   path: "/",
-    // });
+    const allowedUrls: string[] = [];
+
+    const modules = await Modules.find();
+
+    permissions.forEach((perm: any) => {
+      modules.forEach((mod: any) => {
+        mod.modActions?.forEach((action: any) => {
+          if (perm.modAtnIds.includes(action._id)) {
+            allowedUrls.push(action.url.trim());
+          }
+        });
+      });
+    });
+
+    cookieStore.set("allowedUrls", compressToEncodedURIComponent(JSON.stringify(allowedUrls)), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
     // ✅ Return both login info + CSRF token
     return NextResponse.json(
@@ -112,7 +135,8 @@ export const POST = async (request: NextRequest) => {
     );
   } catch (error: any) {
     console.error("Login Error:", error);
-    const errorMessage = error.name === "ValidationError"
+    const errorMessage =
+      error.name === "ValidationError"
         ? Object.values(error.errors)
             .map((val: any) => val.message)
             .join(", ")
@@ -137,6 +161,36 @@ export const PUT = async (request: NextRequest) => {
 
       cookieStore.set("loggedInUser", JSON.stringify(parsed), {
         httpOnly: false,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
+      //allowed url role wise
+      const role = await Roles.find({ roleType: sdkRole, isActive: true });
+      const permissions = await Permissions.find({
+        rolId: role[0]._id,
+        isActive: true,
+        isDeleted: false,
+      });
+
+      const allowedUrls: string[] = [];
+
+      const modules = await Modules.find();
+
+      permissions.forEach((perm: any) => {
+        modules.forEach((mod: any) => {
+          mod.modActions?.forEach((action: any) => {
+            if (perm.modAtnIds.includes(action._id)) {
+              allowedUrls.push(action.url.trim());
+            }
+          });
+        });
+      });
+
+      cookieStore.set("allowedUrls", compressToEncodedURIComponent(JSON.stringify(allowedUrls)), {
+        httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",

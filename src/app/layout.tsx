@@ -1,13 +1,14 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { Toaster } from 'react-hot-toast';
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PDL Institute | Spiritual Development & Universal Harmony",
-  description:"PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
+  description:
+    "PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
   keywords: [
     "Conscious Mind Development",
     "Subconscious Mind Training",
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     "Non-Duality and Universal Consciousness",
     "Journey Beyond Ego and Illusion",
     "Awakening Dormant Spiritual Potential",
-    "Inner Science and Metaphysical Education"
+    "Inner Science and Metaphysical Education",
   ],
   authors: [
     {
@@ -60,7 +61,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "PDL Institute | Spiritual Development & Universal Harmony",
-    description: "PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
+    description:
+      "PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
     url: "https://www.pdlinstitute.org",
     siteName: "PDL Institute | Spiritual Development & Universal Harmony",
     images: [
@@ -77,7 +79,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "PDL Institute | Spiritual Development & Universal Harmony",
-    description: "PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
+    description:
+      "PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
     images: [
       {
         url: "https://www.pdlinstitute.org/images/cover-image.jpg",
@@ -94,32 +97,31 @@ export const metadata: Metadata = {
     noarchive: false,
     noimageindex: false,
     notranslate: false,
-  }
+  },
 };
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
-
+export default function RootLayout({ children }: RootLayoutProps) {    
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Toaster 
-          toastOptions={{ 
-            duration: 3000, 
-            style: { 
-              background: "white", 
-              border: "1.5px solid orange", 
+        <Toaster
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "white",
+              border: "1.5px solid orange",
               borderRadius: "10px",
-              padding: "6px", 
-              width: "auto", 
-              textAlign: "center"
-            }
-          }} 
+              padding: "6px",
+              width: "auto",
+              textAlign: "center",
+            },
+          }}
         />
-      {children}
+        {children}
       </body>
-    </html>  
+    </html>
   );
 }

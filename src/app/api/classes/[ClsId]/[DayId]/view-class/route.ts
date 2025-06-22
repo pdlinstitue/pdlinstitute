@@ -1,14 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import Classes from "../../../../../../../modals/Classes";
 import dbConnect from "../../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function GET(req: NextRequest,{ params }: { params: Promise<{ ClsId: string, DayId: string }> }){
 
     try {
-  
-      await verifyApiToken(); 
       await dbConnect();
       const { ClsId, DayId } = await params;
       const clsData = await Classes.findById(ClsId);

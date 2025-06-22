@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../../../dbConnect";
 import Menuaccess from "../../../../../../modals/Menuaccess";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type MenuAccessType = {
     _id?: string;
@@ -15,8 +14,6 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ MacId
 
   try 
   {
-
-    await verifyApiToken(); 
     await dbConnect();
     const { MacId } = await params;
 

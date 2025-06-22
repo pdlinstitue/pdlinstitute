@@ -1,14 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import Documents from "../../../../../../modals/Documents";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ DocId: string}> }) {
 
     try {
-
-        await verifyApiToken(); 
         await dbConnect();   
         const { DocId } = await params; 
         

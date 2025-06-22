@@ -1,7 +1,6 @@
 import Modules from "../../../../modals/Modules";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type ModulesData = {
   modName: string;
@@ -11,8 +10,6 @@ type ModulesData = {
 
 export async function GET(req: NextRequest) {
   try {
-
-    await verifyApiToken(); 
     await dbConnect();
     const modules = await Modules.find({ isActive: true })
       .populate("createdBy", "sdkFstName")
@@ -36,8 +33,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-
-    await verifyApiToken(); 
     await dbConnect();
     const { modName, modActions, createdBy }: ModulesData = await req.json();
 

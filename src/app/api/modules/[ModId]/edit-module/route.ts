@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import Modules from "../../../../../../modals/Modules";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type ModulesData = {
   modName: string;
@@ -12,8 +11,6 @@ type ModulesData = {
 export async function PUT(req: NextRequest,{ params }: { params: Promise<{ ModId: string }> }) {
 
   try {
-
-    await verifyApiToken(); 
     await dbConnect();
     const { ModId } = await params;
     const { modName, modActions, updatedBy }: ModulesData = await req.json();

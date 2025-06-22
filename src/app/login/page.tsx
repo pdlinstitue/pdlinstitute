@@ -67,17 +67,10 @@ const LoginPage : React.FC = () => {
             });
 
              const post = await result.json();
-             //if (post.redirect && post.location) {
-             //    window.location.href = post.location;
-             //  } else if (post.success === false) {
-             //    toast.error(post.msg);
-             //} else {
+             
             if (post.success === false) {
                 toast.error(post.msg);
-            } else{
-                // Cookies.set("loggedInUserId", post.result.id);
-                // Cookies.set("loggedInUserName", post.result.usrName);
-                // Cookies.set("loggedInUserRole", post.result.usrRole);
+            } else{                
                 toast.success("Logged in successfully.");
 
                 // Redirect conditionally based on user role

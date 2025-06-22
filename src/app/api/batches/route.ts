@@ -1,7 +1,6 @@
 import Batches from "../../../../modals/Batches";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type BatchType = {
   bthName: String;
@@ -23,8 +22,6 @@ type BatchType = {
 
 export async function GET(req: NextRequest) {
   try {
-
-    await verifyApiToken(); 
     const duration = req.nextUrl.searchParams.get("dur");
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -71,9 +68,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-
-    await verifyApiToken(); 
+  try { 
     await dbConnect();
     const {
       bthName,

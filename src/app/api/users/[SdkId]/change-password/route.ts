@@ -2,7 +2,6 @@ import Users from "../../../../../../modals/Users";
 import dbConnect from "../../../../../../dbConnect";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type SdkType = {
     sdkPwd: string,
@@ -14,7 +13,6 @@ type SdkType = {
 export async function PUT(req: NextRequest, {params}:{params: Promise<{SdkId: string}>}) {
   
   try {
-    await verifyApiToken();
     await dbConnect();
     const { SdkId } = await params;
     const { sdkPwd, sdkNewPwd, sdkConfPwd, updatedBy }: SdkType = await req.json();

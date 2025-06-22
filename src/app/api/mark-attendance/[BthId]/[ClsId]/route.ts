@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Attendance from "../../../../../../modals/Attendance";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ BthId: string; ClsId: string; }> }) {
   try {
-
-    await verifyApiToken(); 
     await dbConnect();
     const { BthId, ClsId } = await params;
     const { sdkIds, status, markedBy, absRemarks } = await req.json();

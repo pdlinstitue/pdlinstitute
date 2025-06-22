@@ -2,13 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Classes from "../../../../../../modals/Classes";
 import dbConnect from "../../../../../../dbConnect";
 import Attendance from "../../../../../../modals/Attendance";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ BthId: string }> }) {
   
   try {
-
-    await verifyApiToken(); 
     await dbConnect();
     const { BthId } = await params;
     const sdkId = req.nextUrl.searchParams.get("sdkId");

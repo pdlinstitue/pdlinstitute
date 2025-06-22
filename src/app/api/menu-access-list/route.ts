@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import mongoose from "mongoose";
 import Menuaccess from "../../../../modals/Menuaccess";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
-
 
 type AccMenuType = {
     roleId:mongoose.Schema.Types.ObjectId;
@@ -14,8 +12,6 @@ type AccMenuType = {
 export async function GET(req:NextRequest){
 
     try {
-  
-      await verifyApiToken(); 
       await dbConnect();
       const accessList: AccMenuType[] = await Menuaccess.find({isActive: true})
       .populate('roleId', 'roleType')
@@ -37,8 +33,6 @@ export async function GET(req:NextRequest){
   export async function POST(req: NextRequest) {
   
     try {
-  
-      await verifyApiToken(); 
       await dbConnect();
       const { roleId, menuId, createdBy }: AccMenuType = await req.json();
   

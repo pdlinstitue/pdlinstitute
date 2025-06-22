@@ -65,8 +65,7 @@ const SideBar: React.FC = () => {
     fetchUserById();
   }, []);
 
-  const handleViewChange = (role: string, url: string) => {
-    //Cookies.set("loggedInUser", role);
+  const handleViewChange = (role: string, url: string) => {    
     fetch('/api/auth/login', {
       method: 'PUT',
       headers: {

@@ -3,13 +3,10 @@ import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 import Classes from "../../../../../../modals/Classes";
 import Enrollments from "../../../../../../modals/Enrollments";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export async function DELETE(req: NextRequest,{ params }: { params: Promise<{ BthId: string }>}) {
   
   try {
-
-    await verifyApiToken();
     await dbConnect();
     const { BthId } = await params;
 

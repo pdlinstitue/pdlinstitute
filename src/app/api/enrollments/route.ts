@@ -5,7 +5,6 @@ import dbConnect from "../../../../dbConnect";
 import mongoose from "mongoose";
 import Attendance from "../../../../modals/Attendance";
 import Reenrollments from "../../../../modals/Reenrollments";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type EnrType = {
   sdkId: string;
@@ -23,8 +22,6 @@ type EnrType = {
 
 export async function GET(req: NextRequest) {
   try {
-
-    await verifyApiToken();  
     await dbConnect();
     const corId = req.nextUrl.searchParams.get("corId");
     const bthId = req.nextUrl.searchParams.get("bthId");
@@ -114,8 +111,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-
-    await verifyApiToken();  
     await dbConnect();
     const {
       enrTnsNo,

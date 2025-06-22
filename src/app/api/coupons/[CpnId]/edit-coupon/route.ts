@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import Coupons from "../../../../../../modals/Coupons";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type CpnType = {
   _id: string,
@@ -20,9 +19,7 @@ type CpnType = {
 export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CpnId: string}> }) {
 
   try 
-  {
-
-    await verifyApiToken(); 
+  { 
     await dbConnect();
     const { CpnId } = await params;
 

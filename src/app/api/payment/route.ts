@@ -1,10 +1,7 @@
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-
-  await verifyApiToken(); 
   const enrId = req.nextUrl.searchParams.get("enrId");
   const corId = req.nextUrl.searchParams.get("corId");
   const { order_id, amount, customer_email, customer_phone } = await req.json();

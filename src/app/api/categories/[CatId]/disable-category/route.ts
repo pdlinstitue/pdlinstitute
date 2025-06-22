@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from "next/server";
 import Categories from "../../../../../../modals/Categories";
 import dbConnect from "../../../../../../dbConnect";
 import Courses from "../../../../../../modals/Courses";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type CatType = {
   isActive:boolean;
@@ -13,7 +12,6 @@ export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ Cat
 
     try 
     {
-      await verifyApiToken(); 
       await dbConnect();
       const { CatId } = await params;
       const { disabledBy }: CatType = await req.json();

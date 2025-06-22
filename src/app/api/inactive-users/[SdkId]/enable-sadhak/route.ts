@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import Users from "../../../../../../modals/Users";
 import dbConnect from "../../../../../../dbConnect";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
  
 type SdkType = {
   isActive:boolean,
@@ -10,10 +9,7 @@ type SdkType = {
 
 export async function PATCH(req: NextRequest,{ params }: { params: Promise<{ SdkId: string}> }) {
 
-  try 
-    {
-
-      await verifyApiToken(); 
+  try {
       await dbConnect();
       const { SdkId } = await params;
       const { updatedBy} : SdkType = await req.json();

@@ -3,14 +3,12 @@ import Users from "../../../../modals/Users";
 import dbConnect from "../../../../dbConnect";
 import crypto from 'crypto';
 import bcrypt from "bcryptjs";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 export const PUT = async (request:NextRequest) =>{
 
 try 
 
     { 
-        await verifyApiToken();
         await dbConnect();
         const {token, sdkPwd, confPwd} = await request.json();
         const resetLink = crypto.createHash('sha256').update(token).digest('hex');

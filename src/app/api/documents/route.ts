@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import next from "next";
 import Users from "../../../../modals/Users";
-import { verifyApiToken } from "@/app/utils/verifyApiToken";
 
 type DocType = {
     sdkName: string;
@@ -25,9 +24,6 @@ type DocType = {
 
   export async function GET(req: NextRequest) {
     try {
-        // Connect to DB first
-
-        await verifyApiToken(); 
         await dbConnect();
 
         // Get userId from request query params
@@ -72,8 +68,6 @@ type DocType = {
 export async function POST(req: NextRequest) {
   
   try {
-
-    await verifyApiToken(); 
     await dbConnect();
     const {sdkDocType, sdkDocOwnr, sdkDocRel, sdkPan, sdkPanNbr, sdkIdProof, sdkIdNbr, sdkAdsProof, sdkAdsNbr, createdBy }: DocType = await req.json();
 

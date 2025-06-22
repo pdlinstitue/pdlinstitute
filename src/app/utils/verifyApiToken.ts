@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { encrypt, decrypt } from "@/app/utils/crypto";
 import {
   verifyAccessToken,
@@ -6,41 +5,49 @@ import {
   generateAccessToken,
 } from "@/app/utils/token";
 
-export async function verifyApiToken() {
-  const cookieStore = await cookies();
-  const encryptedAccess = cookieStore.get("accessToken")?.value;
-  const encryptedRefresh = cookieStore.get("refreshToken")?.value;
+// Optional: define return type
+interface VerifyResult {
+  user: any | null;
+  refreshed: boolean;
+  newAccessToken: string | null;
+}
 
-  // try {
-  //   if (!encryptedAccess) throw new Error("No access token");
-  //   const decryptedAccess = decrypt(encryptedAccess);
-  //   const user = verifyAccessToken(decryptedAccess);
-  //   return { user, refreshed: false };
-  // } catch (err) {
-  //   if (!encryptedRefresh) return { user: null, refreshed: false };
+export async function verifyApiToken(
+  encryptedAccess?: string,
+  encryptedRefresh?: string
+): Promise<VerifyResult> {
+  // Attempt to verify access token first
+  try {
+    if (!encryptedAccess) throw new Error("No access token");
 
-  //   try {
-  //     const decryptedRefresh = decrypt(encryptedRefresh);
-  //     const payload = verifyRefreshToken(decryptedRefresh);
+    const decryptedAccess = await decrypt(encryptedAccess);
+    const user = await verifyAccessToken(decryptedAccess);
 
-  //     if (typeof payload !== "object" || payload === null) {
-  //       return { user: null, refreshed: false };
-  //     }
+    return { user, refreshed: false, newAccessToken: null };
+  } catch (err) {
+    // Access token failed, try refresh token
+    if (!encryptedRefresh) {
+      return { user: null, refreshed: false, newAccessToken: null };
+    }
 
-  //     const newAccessToken = generateAccessToken(payload as object);
-  //     const newEncryptedAccess = encrypt(newAccessToken);
+    try {
+      const decryptedRefresh = await decrypt(encryptedRefresh);
+      const payload = await verifyRefreshToken(decryptedRefresh);
 
-  //     cookieStore.set("accessToken", newEncryptedAccess, {
-  //       httpOnly: true,
-  //       secure: process.env.NODE_ENV === "production",
-  //       sameSite: "lax",
-  //       path: "/",
-  //       maxAge: 60 * 15,
-  //     });
+      if (!payload || typeof payload !== "object") {
+        return { user: null, refreshed: false, newAccessToken: null };
+      }
 
-  //     return { user: payload, refreshed: true };
-  //   } catch {
-  //     return { user: null, refreshed: false };
-  //   }
-  //}
+      const newAccessToken = await generateAccessToken(payload);
+      const newEncryptedAccess = await encrypt(newAccessToken);
+
+      return {
+        user: payload,
+        refreshed: true,
+        newAccessToken: newEncryptedAccess,
+      };
+    } catch (err) {
+      return { user: null, refreshed: false, newAccessToken: null };
+    }
+  }
 }
