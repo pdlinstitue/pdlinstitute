@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
     );
 
     if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      //return NextResponse.redirect(new URL("/login", request.url));
     }
 
     const response = NextResponse.next();
