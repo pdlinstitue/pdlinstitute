@@ -51,7 +51,6 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-//   const [activeSdk, setActiveSdk] = useState<SadhakListProps[] | null>([]);
   const data = React.useMemo(() => activeSdkList ?? [], [activeSdkList]);
   const formatDate = (date: string) => {
     return format(new Date(date), "MMM dd, yyyy");
@@ -212,82 +211,31 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
     table.setPageIndex(page);
   };
 
-//   useEffect(() => {
-//     async function fetchSadhakData() {
-//       try {
-//         const res = await fetch(
-//           `${BASE_API_URL}/api/users/list?usrRole=${Cookies.get(
-//             "loggedInUserRole"
-//           )}`,
-//           {
-//             method: "GET", // Explicitly specify the HTTP method
-//             cache: "no-store",
-//           }
-//         );
+  const [loggedInUser, setLoggedInUser] = useState({
+      id: "",
+      usrName: "",
+      usrRole: "",
+      isAdmin: "",
+  });
 
-//         const sadhakData = await res.json();
-//         setActiveSdk(sadhakData.activeSdkList);
-//       } catch (error) {
-//         console.error("Error fetching sadhak data:", error);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     }
-//     fetchSadhakData();
-//   }, []);
-
-//   const [loggedInUser, setLoggedInUser] = useState({
-//     result: {
-//       _id: "",
-//       usrName: "",
-//       usrRole: "",
-//     },
-//   });
-
-//   useEffect(() => {
-//     try {
-//       const userId = Cookies.get("loggedInUserId") || "";
-//       const userName = Cookies.get("loggedInUserName") || "";
-//       const userRole = Cookies.get("loggedInUserRole") || "";
-//       setLoggedInUser({
-//         result: {
-//           _id: userId,
-//           usrName: userName,
-//           usrRole: userRole,
-//         },
-//       });
-//     } catch (error) {
-//       console.error("Error fetching loggedInUserData.");
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   }, []);
-
-    const [loggedInUser, setLoggedInUser] = useState({
-        id: "",
-        usrName: "",
-        usrRole: "",
-        isAdmin: "",
-    });
-
-    useEffect(() => {
-      try {
-      const cookie = Cookies.get("loggedInUser");
-      if (cookie) {
-          const parsed = JSON.parse(cookie);
-          setLoggedInUser({
-          id: parsed.id || "",
-          usrName: parsed.usrName || "",
-          usrRole: parsed.usrRole || "",
-          isAdmin: parsed.isAdmin || "", 
-          });
-      }
-      } catch (error) {
-        console.error("Error parsing loggedInUser cookie:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }, []);
+  useEffect(() => {
+    try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+        });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   if (isLoading) {
     return (

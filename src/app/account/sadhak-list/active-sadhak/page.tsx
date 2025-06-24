@@ -7,6 +7,8 @@ const ActiveSadhakList : React.FC = async () => {
 
   const cookieStore = await cookies();
   const userCookie = cookieStore.get('loggedInUser')?.value;
+  const accessToken = cookieStore.get('accessToken')?.value;
+  const refreshToken = cookieStore.get('refreshToken')?.value;
 
   if (!userCookie) {
     return <div>No user info found in cookies.</div>;
@@ -28,7 +30,7 @@ const ActiveSadhakList : React.FC = async () => {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
-        'X-Requested-By': 'ServerComponent',
+        'Cookie': `accessToken=${accessToken}; refreshToken=${refreshToken}`, // ✅ manually pass cookie
       },
     });
 
