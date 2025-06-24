@@ -24,7 +24,7 @@ const ViewSadhakById: React.FC<ISadhakParams> = async ({
       cache: "no-store",
       headers: {
         "Content-Type": "application/json",
-        Cookie: `accessToken=${accessToken}; refreshToken=${refreshToken}`, // ✅ manually pass cookie
+        "Cookie": `accessToken=${accessToken}; refreshToken=${refreshToken}`, // ✅ manually pass cookie
       },
     });
 
