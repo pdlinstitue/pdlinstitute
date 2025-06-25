@@ -2,9 +2,6 @@ import mongoose from "mongoose";
 import Users from "./Users";
 
 const documentsSchema = new mongoose.Schema({
-    sdkName:{
-        type:String
-    },
     sdkDocOwnr:{
         type:String
     },

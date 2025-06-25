@@ -31,31 +31,27 @@ const PanCard : React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [panData, setPanData] = useState<DocTypeProps[] | null>([]);
   const data = React.useMemo(() => panData ?? [], [panData]);
-  const [loggedInUser, setLoggedInUser] = useState({
+  let loggedInUser = {
     id: "",
     usrName: "",
     usrRole: "",
     isAdmin: "",
-  });
+  };
 
-  useEffect(() => {
   try {
     const cookie = Cookies.get("loggedInUser");
     if (cookie) {
-        const parsed = JSON.parse(cookie);
-        setLoggedInUser({
+      const parsed = JSON.parse(cookie);
+      loggedInUser = {
         id: parsed.id || "",
         usrName: parsed.usrName || "",
         usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-      });
+        isAdmin: parsed.isAdmin || "",
+      };
     }
-    } catch (error) {
-      console.error("Error parsing loggedInUser cookie:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  } catch (error) {
+    console.error("Error parsing loggedInUser cookie:", error);
+  }
 
   //changing the status color as per the status
   const StatusCell = ({ row }: { row: any }) => {
@@ -147,9 +143,9 @@ const PanCard : React.FC = () => {
         });
         setPanData(updatedDocList);
       } catch (error) {
-          console.error("Error fetching doc data:", error);
+        console.error("Error fetching doc data:", error);
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       }
     }
     fetchPanData();
