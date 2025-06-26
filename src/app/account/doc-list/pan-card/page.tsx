@@ -138,7 +138,7 @@ const PanCard : React.FC = () => {
           return { ...item, 
             sdkFstName: item.createdBy.sdkFstName ? item.createdBy.sdkFstName : 'N/A',
             sdkPhone: item.createdBy.sdkPhone ? item.createdBy.sdkPhone : 'N/A',
-            sdkRegNo: item.updatedBy.sdkRegNo ? item.updatedBy.sdkRegNo : 'N/A' 
+            sdkRegNo: item.createdBy.sdkRegNo ? item.createdBy.sdkRegNo : 'N/A' 
           };
         });
         setPanData(updatedDocList);
