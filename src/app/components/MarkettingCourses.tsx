@@ -98,7 +98,12 @@ const MarkettingCourses: React.FC = () => {
   }, []);
 
   if (isLoading) {
-    return <div className="text-center text-orange-700">Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500"></div>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
+    );
   }
 
   return (

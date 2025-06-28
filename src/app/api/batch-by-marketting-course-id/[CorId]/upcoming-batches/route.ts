@@ -3,9 +3,8 @@ import { Types } from 'mongoose';
 import dbConnect from '../../../../../../dbConnect';
 import Batches from '../../../../../../modals/Batches';
 
-export async function GET(req: NextRequest,{ params }: { params: Promise<{ CorId: string }>}) {
-  
-    try {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ CorId: string }> }) {
+  try {
     const { CorId } = await params;
 
     // Validate MongoDB ObjectId
@@ -20,8 +19,7 @@ export async function GET(req: NextRequest,{ params }: { params: Promise<{ CorId
       courseId: CorId,
       startDate: { $gte: now },
     })
-      .sort({ startDate: 1 }) // soonest first
-      .limit(10); // optional
+      .sort({ startDate: 1 }); 
 
     return NextResponse.json({ batchByCorId: upcomingBatches }, { status: 200 });
   } catch (err: any) {
