@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Container from "../components/Container";
-import Footer from "../components/footer/FooterPage";
 import NavMenu from "../components/navbar/navBar";
 import ContactUs from "./ContactForm";
+import Footer from "../components/footer/FooterPage";
 
 
 const MainContactPage = () => {
@@ -19,7 +19,7 @@ const MainContactPage = () => {
             <Container>
                 <ContactUs/>
             </Container>
-            <Footer/>
+            <Footer />
         </div>
     );
 }

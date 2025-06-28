@@ -20,6 +20,7 @@ type CoListType = {
 
 interface AddNewCourseProps {
   coName: string;
+  coSlug: string;
   coNick: string;
   coShort: string;
   prodType: string;
@@ -51,6 +52,7 @@ const AddNewCourse: React.FC = () => {
   const [preview, setPreview] = useState<string>("");
   const [data, setData] = useState<AddNewCourseProps>({
     coName: "",
+    coSlug: "",
     coNick: "",
     coShort: "",
     gglFmLink: "",
@@ -195,6 +197,8 @@ const AddNewCourse: React.FC = () => {
     try {
       if (!data.coName.trim()) {
         setErrorMessage("Course title is must.");
+      } else if (!data.coSlug.trim()) {
+        setErrorMessage("Course slug is must.");
       } else if (!data.coNick.trim()) {
         setErrorMessage("Nick name is must.");
       } else if (!data.coCat.trim()) {
@@ -220,6 +224,7 @@ const AddNewCourse: React.FC = () => {
           method: "POST",
           body: JSON.stringify({
             coName: data.coName,
+            coSlug: data.coSlug,
             coNick: data.coNick,
             coShort: data.coShort,
             gglFmLink: data.gglFmLink,
@@ -267,13 +272,13 @@ const AddNewCourse: React.FC = () => {
     <div>
       <form onSubmit={handleSubmit} className="formStyle w-full h-auto">
         <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1">
-            <div className="w-[600px] h-[360px] border-[1.5px] bg-gray-100">
+          <div className="flex flex-col gap-1 w-auto">
+            <div className="max-w-[580px] h-[360px] border-[1.5px] bg-gray-100">
               {preview ? (
                 <Image
                   src={preview}
                   alt="Course Cover"
-                  width={600}
+                  width={580}
                   height={360}
                   className="w-full h-full object-cover"
                 />
@@ -298,6 +303,16 @@ const AddNewCourse: React.FC = () => {
                 type="text"
                 name="coName"
                 value={data.coName}
+                onChange={handleChange}
+                className="inputBox"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Course Slug:<span className="text-red-600">*</span></label>
+              <input
+                type="text"
+                name="coSlug"
+                value={data.coSlug}
                 onChange={handleChange}
                 className="inputBox"
               />
@@ -338,9 +353,11 @@ const AddNewCourse: React.FC = () => {
               <label className="text-lg">Short Intro:<span className="text-red-600">*</span></label>
               <textarea
                 name="coShort"
+                maxLength={160}
+                placeholder="Enter your text (max 160 characters)"
                 value={data.coShort}
                 onChange={handleChange}
-                rows={3}
+                rows={2}
                 className="inputBox"
               />
             </div>

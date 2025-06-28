@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import Batches from "../../../../../../modals/Batches";
 import dbConnect from "../../../../../../dbConnect";
 
-export async function GET(req: Request,{ params }: { params: Promise<{ BthId: string }>}){
+export async function GET(req: NextRequest,{ params }: { params: Promise<{ BthId: string }>}){
 
     try {
       await dbConnect();

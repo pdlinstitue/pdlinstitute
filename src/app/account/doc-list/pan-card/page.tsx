@@ -74,7 +74,9 @@ const PanCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'Sadhak', accessorKey: 'sdkFstName'},
+    {header: 'First Name', accessorKey: 'sdkFstName'},
+    {header: 'Middle Name', accessorKey: 'sdkMdlName'},
+    {header: 'Last Name', accessorKey: 'sdkLstName'},
     {header: 'Sdk Id', accessorKey: 'sdkRegNo'},
     {header: 'Phone', accessorKey: 'sdkPhone'},
     {header: 'PAN', accessorKey: 'sdkPanNbr'},
@@ -137,6 +139,8 @@ const PanCard : React.FC = () => {
         const updatedDocList = docData?.panList?.map((item:any) => { 
           return { ...item, 
             sdkFstName: item.createdBy.sdkFstName ? item.createdBy.sdkFstName : 'N/A',
+            sdkMdlName: item.createdBy.sdkMdlName ? item.createdBy.sdkMdlName : 'N/A',
+            sdkLstName: item.createdBy.sdkLstName ? item.createdBy.sdkLstName : 'N/A',
             sdkPhone: item.createdBy.sdkPhone ? item.createdBy.sdkPhone : 'N/A',
             sdkRegNo: item.createdBy.sdkRegNo ? item.createdBy.sdkRegNo : 'N/A' 
           };

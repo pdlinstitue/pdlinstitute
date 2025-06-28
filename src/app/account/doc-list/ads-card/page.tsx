@@ -10,6 +10,7 @@ import { BiEditAlt } from 'react-icons/bi';
 import { HiMinus } from 'react-icons/hi';
 import { RxCross2 } from 'react-icons/rx';
 import { format } from 'date-fns';
+import Cookies from 'js-cookie';
 
 interface DocTypeProps  {
     _id?: string;
@@ -51,7 +52,9 @@ const AdsCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'Sadhak', accessorKey: 'sdkName'},
+    {header: 'First Name', accessorKey: 'sdkFstName'},
+    {header: 'Middle Name', accessorKey: 'sdkMdlName'},
+    {header: 'Last Name', accessorKey: 'sdkLstName'},
     {header: 'Sdk Id', accessorKey: 'sdkId'},
     {header: 'Card No', accessorKey: 'sdkAdsNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
@@ -70,6 +73,28 @@ const AdsCard : React.FC = () => {
     }, 
     
   ], []);
+
+  let loggedInUser = {
+      id: "",
+      usrName: "",
+      usrRole: "",
+      isAdmin: "",
+    };
+  
+    try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+        const parsed = JSON.parse(cookie);
+        loggedInUser = {
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "",
+        };
+      }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    }
   
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [filtered, setFiltered] = React.useState('');
@@ -105,22 +130,28 @@ const AdsCard : React.FC = () => {
     };
 
     useEffect(() => {
-    async function fetchIdData() {
-    try 
-      {
-        const res = await fetch(`${BASE_API_URL}/api/documents`, { cache: "no-store" });
-        const docData = await res.json();
-        // const updatedEveList = docData.docList.map((item:any) => { 
-        //   return { ...item, eveCatId: item.eveCatId.eveCatName };
-        // });  
-        setAdsData(docData?.adsList);      
-      } catch (error) {
-          console.error("Error fetching docData:", error);
-      } finally {
-          setIsLoading(false);
+    async function fetchAdsData() {
+      try 
+        {
+          const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.id}`, { cache: "no-store" });
+          const docData = await res.json();
+          const updatedDocList = docData?.adsList?.map((item:any) => { 
+            return { ...item, 
+              sdkFstName: item.createdBy.sdkFstName ? item.createdBy.sdkFstName : 'N/A',
+              sdkMdlName: item.createdBy.sdkMdlName ? item.createdBy.sdkMdlName : 'N/A',
+              sdkLstName: item.createdBy.sdkLstName ? item.createdBy.sdkLstName : 'N/A',
+              sdkPhone: item.createdBy.sdkPhone ? item.createdBy.sdkPhone : 'N/A',
+              sdkRegNo: item.createdBy.sdkRegNo ? item.createdBy.sdkRegNo : 'N/A' 
+            };
+          }); 
+          setAdsData(updatedDocList);      
+        } catch (error) {
+            console.error("Error fetching docData:", error);
+        } finally {
+            setIsLoading(false);
+        }
       }
-    }
-    fetchIdData();
+      fetchAdsData();
     }, []);
 
     if(isLoading){

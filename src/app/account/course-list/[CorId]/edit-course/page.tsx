@@ -3,6 +3,7 @@ import React, { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { use } from "react";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Loading from "@/app/account/Loading";
@@ -19,6 +20,7 @@ interface ICourseParams {
 }
 interface EditCourseProps {
   coName: string;
+  coSlug: string;
   coNick: string;
   coShort: string;
   gglFmLink: string;
@@ -56,6 +58,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [data, setData] = useState<EditCourseProps>({
     coName: "",
+    coSlug: "", // Added slug field
     coNick: "",
     coShort: "",
     gglFmLink: "",
@@ -226,6 +229,8 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
     try {
       if (!data.coName?.trim()) {
         setErrorMessage("Course title is must.");
+      } else if (!data.coSlug?.trim()) {
+        setErrorMessage("Course slug is must.");
       } else if (!data.coNick?.trim()) {
         setErrorMessage("Nick name is must.");
       } else if (!data.coCat?.trim()) {
@@ -253,6 +258,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             method: "PUT",
             body: JSON.stringify({
               coName: data.coName,
+              coSlug: data.coSlug, // Added slug field
               coNick: data.coNick,
               coShort: data.coShort,
               gglFmLink: data.gglFmLink,
@@ -303,13 +309,24 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col gap-1">
             <div className="w-full h-[350px] border-[1.5px] bg-gray-100">
-              {preview || data.coImg ? (
-                <img
-                  src={preview || `/api/image-upload?name=${data.coImg}`}
+              {data.coImg ? (
+                <Image
+                  src={`/api/image-upload?name=${data.coImg}`}
+                  alt="course"
+                  width={580}
+                  height={360}
+                  className="w-full h-full object-contain"
+                />
+              ) : preview ? (
+                <Image
+                  src={preview}
+                  width={580}
+                  height={360}
                   alt="course"
                   className="w-full h-full object-contain"
                 />
-              ) : null}
+              ) 
+              : null}
             </div>
             <div className="flex items-center gap-1">
               <input
@@ -329,7 +346,17 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
               <input
                 type="text"
                 name="coName"
-                value={data.coName}
+                value={data?.coName}
+                onChange={handleChange}
+                className="inputBox"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-lg">Course Slug:</label>
+              <input
+                type="text"
+                name="coSlug"
+                value={data?.coSlug}
                 onChange={handleChange}
                 className="inputBox"
               />
@@ -340,7 +367,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
                 <input
                   type="text"
                   name="coNick"
-                  value={data.coNick}
+                  value={data?.coNick}
                   onChange={handleChange}
                   className="inputBox"
                 />
@@ -349,7 +376,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
                 <label className="text-lg">Category:</label>
                 <select
                   name="coCat"
-                  value={data.coCat}
+                  value={data?.coCat}
                   onChange={handleChange}
                   className="inputBox h-[45px]"
                 >
@@ -370,9 +397,11 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
               <label className="text-lg">Short Intro:</label>
               <textarea
                 name="coShort"
-                value={data.coShort}
+                maxLength={160}
+                placeholder="Enter your text (max 160 characters)"
+                value={data?.coShort}
                 onChange={handleChange}
-                rows={3}
+                rows={2}
                 className="inputBox"
               />
             </div>
@@ -381,7 +410,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
                 <label className="text-lg">Elg Type:</label>
                 <select
                   name="coElgType"
-                  value={data.coElgType}
+                  value={data?.coElgType}
                   onChange={handleChange}
                   className="inputBox"
                 >
@@ -396,7 +425,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
                 <label className="text-lg">Elegibility:</label>
                 <select
                   name="coElg"
-                  value={data.coElg}
+                  value={data?.coElg}
                   onChange={handleChange}
                   className="inputBox"
                 >
@@ -410,8 +439,8 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
                           {item.coNick}
                         </option>
                       ))
-                    : data.coElgType === "Category"
-                    ? cat.map((item) => (
+                    : data?.coElgType === "Category"
+                    ? cat?.map((item) => (
                         <option key={item._id} value={item._id}>
                           {item.catName}
                         </option>
@@ -427,7 +456,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <label className="text-lg">DAYS:</label>
             <input
               name="durDays"
-              value={data.durDays}
+              value={data?.durDays}
               onChange={handleChange}
               type="number"
               className="inputBox"
@@ -437,7 +466,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <label className="text-lg">Min/-Day:</label>
             <input
               name="durHrs"
-              value={data.durHrs}
+              value={data?.durHrs}
               onChange={handleChange}
               type="number"
               className="inputBox"
@@ -449,7 +478,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <label className="text-lg">Course Type:</label>
             <select
               name="coType"
-              value={data.coType}
+              value={data?.coType}
               onChange={handleChange}
               className="inputBox"
             >
@@ -462,7 +491,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <label className="text-lg">Donation:</label>
             <input
               name="coDon"
-              value={data.coDon}
+              value={data?.coDon}
               onChange={handleChange}
               type="number"
               className="inputBox"
@@ -474,7 +503,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <label className="text-lg">WhatsApp Group - ENG:</label>
             <input
               name="coTeleGrp"
-              value={data.coTeleGrp}
+              value={data?.coTeleGrp}
               onChange={handleChange}
               type="url"
               className="inputBox"
@@ -484,7 +513,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <label className="text-lg">WhatsApp Group - HINDI:</label>
             <input
               name="coWhatGrp"
-              value={data.coWhatGrp}
+              value={data?.coWhatGrp}
               onChange={handleChange}
               type="url"
               className="inputBox"
@@ -494,7 +523,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
             <label className="text-lg">Google Form:</label>
             <input
               name="gglFmLink"
-              value={data.gglFmLink}
+              value={data?.gglFmLink}
               onChange={handleChange}
               type="url"
               className="inputBox"
@@ -505,7 +534,7 @@ const EditCourse: React.FC<ICourseParams> = ({ params }) => {
           <label className="text-lg">Description:</label>
           <textarea
             name="coDesc"
-            value={data.coDesc}
+            value={data?.coDesc}
             onChange={handleChange}
             rows={6}
             className="inputBox"

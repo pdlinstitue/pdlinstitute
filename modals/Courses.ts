@@ -11,6 +11,11 @@ const courseSchema = new mongoose.Schema({
         type: String, 
         required: [true, "Nick name is required."]
     },
+    coSlug:{
+        type: String,
+        required: [true, "Slug is required."],
+        unique: true
+    },
     coImg: {
         type: String
     },

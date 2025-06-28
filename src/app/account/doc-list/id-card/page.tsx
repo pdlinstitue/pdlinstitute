@@ -3,6 +3,7 @@ import DataTable from '@/app/components/table/DataTable';
 import {useReactTable, getCoreRowModel, getFilteredRowModel,FilterFn, getPaginationRowModel, getSortedRowModel, SortingState} from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
 import Loading from '../../Loading';
+import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
 import { BASE_API_URL } from '@/app/utils/constant';
 import { FiEye } from 'react-icons/fi';
@@ -43,6 +44,28 @@ const IdCard : React.FC = () => {
         </span>;
   };
 
+  let loggedInUser = {
+      id: "",
+      usrName: "",
+      usrRole: "",
+      isAdmin: "",
+    };
+  
+    try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+        const parsed = JSON.parse(cookie);
+        loggedInUser = {
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "",
+        };
+      }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    }
+
   //changing the date format using date-fns library
   const DateCell = ({ row }: { row: any }) => {
     const sdkAprDate = row.original?.sdkAprDate;
@@ -51,7 +74,9 @@ const IdCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'Sadhak', accessorKey: 'sdkFstName'},
+    {header: 'First Name', accessorKey: 'sdkFstName'},
+    {header: 'Middle Name', accessorKey: 'sdkMdlName'},
+    {header: 'Last Name', accessorKey: 'sdkLstName'},
     {header: 'Sdk Id', accessorKey: 'sdkRegNo'},
     {header: 'ID Number', accessorKey: 'sdkIdNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
@@ -107,12 +132,18 @@ const IdCard : React.FC = () => {
     async function fetchIdData() {
     try 
       {
-        const res = await fetch(`${BASE_API_URL}/api/documents`, { cache: "no-store" });
+        const res = await fetch(`${BASE_API_URL}/api/documents?usrId=${loggedInUser.id}`, { cache: "no-store" });
         const docData = await res.json();
-        // const updatedEveList = docData.docList.map((item:any) => { 
-        //   return { ...item, eveCatId: item.eveCatId.eveCatName };
-        // });
-        setIdData(docData?.idList);
+        const updatedDocList = docData?.idList?.map((item:any) => { 
+          return { ...item, 
+            sdkFstName: item.createdBy.sdkFstName ? item.createdBy.sdkFstName : 'N/A',
+            sdkMdlName: item.createdBy.sdkMdlName ? item.createdBy.sdkMdlName : 'N/A',
+            sdkLstName: item.createdBy.sdkLstName ? item.createdBy.sdkLstName : 'N/A',
+            sdkPhone: item.createdBy.sdkPhone ? item.createdBy.sdkPhone : 'N/A',
+            sdkRegNo: item.createdBy.sdkRegNo ? item.createdBy.sdkRegNo : 'N/A' 
+          };
+        });
+        setIdData(updatedDocList);
       } catch (error) {
           console.error("Error fetching doc data:", error);
       } finally {

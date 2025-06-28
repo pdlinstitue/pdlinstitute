@@ -5,6 +5,7 @@ import dbConnect from "../../../../../../dbConnect";
 type CoType = {
     _id?: string,
     coName: string, 
+    coSlug: string,
     coNick:string,
     coShort:string, 
     prodType:string, 
@@ -34,8 +35,8 @@ export async function PUT(req: NextRequest,{ params }: { params: Promise<{ CorId
     if (!corById) {
       return NextResponse.json({ success: false, msg: "No course found." }, { status: 404 });
     } else {  
-      const { coName, coNick, coShort, gglFmLink, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }: CoType = await req.json();
-      const corById = await Courses.findByIdAndUpdate(CorId, {coName, coNick, coShort, gglFmLink, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }, {runValidators:true});
+      const { coName, coSlug, coNick, coShort, gglFmLink, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }: CoType = await req.json();
+      const corById = await Courses.findByIdAndUpdate(CorId, {coName, coSlug, coNick, coShort, gglFmLink, coType, coElgType, coDon, coDesc, prodType, coCat, coElg, coWhatGrp, coTeleGrp, durDays, durHrs, coImg, updatedBy }, {runValidators:true});
       return NextResponse.json({ success: true, corById, msg: "Course updated successfully." }, { status: 200 });
     }
   } catch (error:any) {

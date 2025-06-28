@@ -1,14 +1,19 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Oswald } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 
-const inter = Inter({ subsets: ["latin"] });
+const oswald = Oswald({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"], // Choose weights you want
+  variable: "--font-oswald", // Optional: use CSS variable
+  display: "swap",
+});
+
 
 export const metadata: Metadata = {
   title: "PDL Institute | Spiritual Development & Universal Harmony",
-  description:
-    "PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
+  description:"PDL Institute is a non-governmental organization dedicated to fostering spiritual growth, inner transformation, and global harmony. Rooted in timeless spiritual principles, the Institute serves as a guiding light for individuals seeking deeper meaning, inner peace, and a more compassionate world.",
   keywords: [
     "Conscious Mind Development",
     "Subconscious Mind Training",
@@ -106,7 +111,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {    
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={oswald.className}>
         <Toaster
           toastOptions={{
             duration: 3000,

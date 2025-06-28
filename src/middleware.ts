@@ -3,16 +3,34 @@ import { verifyApiToken } from "./app/utils/verifyApiToken";
 import { decompressFromEncodedURIComponent } from 'lz-string';
 
 const PUBLIC_PATHS = ["/login", "/account/unauthorized"];
-const PUBLIC_API_PATHS = ["/api/auth/login", "/api/auth/logout"];
+const PUBLIC_API_PATHS = [
+  "/api/auth/login", 
+  "/api/auth/logout", 
+  "/api/categories", 
+  "/api/marketting-courses", 
+  "/api/marketting-courses/:CoSlug/view-marketting-course",
+  "/api/batch-by-marketting-course-id/:CorId/upcoming-batches"
+];
 
-export async function middleware(request: NextRequest) {
+function isPublicApiPath(pathname: string): boolean {
+  return PUBLIC_API_PATHS.some(pattern => {
+    const regex = new RegExp(
+      "^" + pattern
+        .replace(/:[^/]+/g, "[^/]+") // replace dynamic segments like :CoSlug
+        .replace(/\//g, "\\/") + "$"
+    );
+    return regex.test(pathname);
+  });
+}
+
+export async function middleware(request: NextRequest) {  
   const { pathname } = request.nextUrl;
   const encryptedAccess = request.cookies.get("accessToken")?.value;
   const encryptedRefresh = request.cookies.get("refreshToken")?.value;
   const allowedUrlsCookie = request.cookies.get("allowedUrls")?.value;
   const allowedUrls: string[] = allowedUrlsCookie ? JSON.parse(decompressFromEncodedURIComponent(allowedUrlsCookie)) : [];
 
-  if (PUBLIC_PATHS.includes(pathname) || PUBLIC_API_PATHS.includes(pathname)) {
+  if (PUBLIC_PATHS.includes(pathname) || isPublicApiPath(pathname)) {
     return NextResponse.next();
   }
 
