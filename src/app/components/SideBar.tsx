@@ -16,19 +16,18 @@ import * as RiIcons from "react-icons/ri";
 import * as PiIcons from "react-icons/pi";
 import * as FaIcons from "react-icons/fa";
 
-const SideBar: React.FC = () => {  
-  const userCookie = Cookies.get('loggedInUser');
+const SideBar: React.FC = () => {
+  const userCookie = Cookies.get("loggedInUser");
   const pathName = usePathname();
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [userData, setUserData] = useState<any>({});
-  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
 
   let parsed: any = {};
   if (userCookie) {
     parsed = JSON.parse(userCookie);
   }
-  
+
   useEffect(() => {
     const fetchMenuByRole = async () => {
       try {
@@ -65,11 +64,11 @@ const SideBar: React.FC = () => {
     fetchUserById();
   }, []);
 
-  const handleViewChange = (role: string, url: string) => {    
-    fetch('/api/auth/login', {
-      method: 'PUT',
+  const handleViewChange = (role: string, url: string) => {
+    fetch("/api/auth/login", {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ sdkRole: role }),
     }).then((response) => {
@@ -97,15 +96,14 @@ const SideBar: React.FC = () => {
     if (!trimmedName || !(trimmedName in allIcons)) return null;
 
     const IconComponent = allIcons[trimmedName as keyof typeof allIcons];
-      return IconComponent ? <IconComponent size={24} /> : null;
-    };
+    return IconComponent ? <IconComponent size={24} /> : null;
+  };
 
-    const handleToggle = (parentId: string) => {
-      setSelectedParentId(selectedParentId === parentId ? null : parentId);
-    };
+  const handleToggle = (parentId: string) => {
+    setSelectedParentId(selectedParentId === parentId ? null : parentId);
+  };
 
   const getOrderedMenu = () => {
-
     const parentsAndNeutrals = menuItems
       .filter((item) => !item.isChild)
       .sort((a, b) => a.menuOrder - b.menuOrder);
@@ -115,7 +113,6 @@ const SideBar: React.FC = () => {
 
     for (const item of parentsAndNeutrals) {
       result.push(item);
-
       if (item.isParent) {
         const childItems = children
           .filter((child) => child.parentId === item._id)
@@ -140,49 +137,61 @@ const SideBar: React.FC = () => {
           />
           <p className="text-white font-bold">PDL INSTITUTE</p>
         </div>
+
         <div className="flex flex-col gap-1">
           {orderedMenu.map((item) => {
-            if (!item.isChild && !item.isParent) {
+            const trimmedUrl = (item.menuUrl || "").trim();
+            const isActive = pathName === trimmedUrl;
+            const isParent = item.isParent;
+            const isNeutral = !item.isParent && !item.isChild;
+
+            const childItems = menuItems.filter(
+              (child) => child.isChild && child.parentId === item._id
+            );
+            const isAnyChildActive = childItems.some(
+              (child) => pathName === (child.menuUrl || "").trim()
+            );
+
+            if (isNeutral) {
               return (
                 <Link
                   key={item._id}
-                  href={item.menuUrl.trim()}
+                  href={trimmedUrl}
                   className={`group flex gap-2 p-2 rounded-sm ${
-                    pathName === item.menuUrl.trim()
+                    isActive
                       ? "bg-white text-black"
                       : "text-white bg-orange-500 hover:bg-white hover:text-black"
                   }`}
                 >
                   {renderIcon(item.menuIcon)}
-                  <p
-                    className={`hidden md:block font-semibold   ${
-                      pathName !== item.menuUrl.trim() && "group-hover:text-black"
-                    }`}
-                  >
+                  <p className="hidden md:block font-semibold">
                     {item.menuName.toUpperCase()}
                   </p>
                 </Link>
               );
             }
 
-            if (!item.isChild && item.isParent) {
+            if (isParent) {
+              const isSelected = selectedParentId === item._id;
               return (
                 <div key={item._id}>
                   <button
                     type="button"
                     onClick={() => handleToggle(item._id)}
-                    className="group flex gap-2 text-white bg-orange-500 hover:bg-white hover:text-black p-2 rounded-sm w-full"
+                    className={`group flex gap-2 p-2 rounded-sm w-full ${
+                      isAnyChildActive
+                        ? "bg-white text-black"
+                        : "text-white bg-orange-500 hover:bg-white hover:text-black"
+                    }`}
                   >
                     {renderIcon(item.menuIcon)}
-                    <p className="flex font-semibold group-hover:text-black">
+                    <p className="flex font-semibold">
                       {item.menuName.toUpperCase()}
                     </p>
                     <IoIosArrowDown
                       size={24}
-                      className={`flex ml-auto group-hover:text-black ${
-                        selectedParentId === item._id
-                          ? "rotate-180 duration-500"
-                          : ""
+                      className={`flex ml-auto ${
+                        isSelected ? "rotate-180 duration-500" : ""
                       }`}
                     />
                   </button>
@@ -190,23 +199,24 @@ const SideBar: React.FC = () => {
               );
             }
 
-            if (item.isChild) {
+            if (item.isChild && selectedParentId === item.parentId) {
               return (
-                selectedParentId === item.parentId && (
-                  <div
-                    key={item._id}
-                    className="flex flex-col w-full px-[35px]"
+                <div key={item._id} className="flex flex-col w-full px-[35px]">
+                  <Link
+                    href={trimmedUrl}
+                    className={`text-xs uppercase font-bold py-1 pl-2 pr-3 rounded-sm ${
+                      isActive
+                        ? "bg-orange-400 text-black"
+                        : "text-white hover:text-black hover:bg-orange-400"
+                    }`}
                   >
-                    <Link
-                      href={item.menuUrl.trim()}
-                      className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm"
-                    >
-                      - {item.menuName.toUpperCase()}
-                    </Link>
-                  </div>
-                )
+                    - {item.menuName.toUpperCase()}
+                  </Link>
+                </div>
               );
             }
+
+            return null;
           })}
 
           {(userData.isAdmin === "Yes" || userData.isVolunter === "Yes") && (
@@ -215,15 +225,17 @@ const SideBar: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleToggle("admin-volunter")}
-                  className="group flex gap-2 text-white bg-orange-500 hover:bg-white hover:text-black p-2 rounded-sm w-full"
+                  className={`group flex gap-2 p-2 rounded-sm w-full ${
+                    selectedParentId === "admin-volunter"
+                      ? "bg-white text-black"
+                      : "text-white bg-orange-500 hover:bg-white hover:text-black"
+                  }`}
                 >
                   {renderIcon("FaEye")}
-                  <p className="flex font-semibold group-hover:text-black">
-                    {"View As".toUpperCase()}
-                  </p>
+                  <p className="flex font-semibold">VIEW AS</p>
                   <IoIosArrowDown
                     size={24}
-                    className={`flex ml-auto group-hover:text-black ${
+                    className={`flex ml-auto ${
                       selectedParentId === "admin-volunter"
                         ? "rotate-180 duration-500"
                         : ""
@@ -231,8 +243,9 @@ const SideBar: React.FC = () => {
                   />
                 </button>
               </div>
+
               {parsed.usrRole !== userData.sdkRole &&
-                userData.isAdmin == "Yes" &&
+                userData.isAdmin === "Yes" &&
                 selectedParentId === "admin-volunter" && (
                   <div
                     key={"admin-volunter-child-1"}
@@ -241,7 +254,10 @@ const SideBar: React.FC = () => {
                     <button
                       type="button"
                       onClick={() =>
-                        handleViewChange(userData.sdkRole, "/account/admin-dashboard")
+                        handleViewChange(
+                          userData.sdkRole,
+                          "/account/admin-dashboard"
+                        )
                       }
                       className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"
                     >
@@ -249,6 +265,7 @@ const SideBar: React.FC = () => {
                     </button>
                   </div>
                 )}
+
               {parsed.usrRole !== "Sadhak" &&
                 selectedParentId === "admin-volunter" && (
                   <div
@@ -267,7 +284,7 @@ const SideBar: React.FC = () => {
                 )}
 
               {parsed.usrRole !== "Volunteer" &&
-                userData.isVolunter == "Yes" &&
+                userData.isVolunter === "Yes" &&
                 selectedParentId === "admin-volunter" && (
                   <div
                     key={"admin-volunter-child-3"}
@@ -275,10 +292,7 @@ const SideBar: React.FC = () => {
                   >
                     <button
                       onClick={() =>
-                        handleViewChange(
-                          "Volunteer",
-                          "/account/sadhak-dashboard"
-                        )
+                        handleViewChange("Volunteer", "/account/sadhak-dashboard")
                       }
                       className="text-white text-xs uppercase font-bold hover:text-black hover:bg-orange-400 py-1 pl-2 pr-3 rounded-sm text-left w-full"
                     >
