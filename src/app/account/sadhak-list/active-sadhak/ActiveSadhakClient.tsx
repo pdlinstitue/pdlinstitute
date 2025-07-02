@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useTransition } from "react";
 import DataTable from "../../../components/table/DataTable";
 import { FaUserCircle } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa6";
@@ -7,10 +7,6 @@ import {
   useReactTable,
   getCoreRowModel,
   getFilteredRowModel,
-  FilterFn,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
 } from "@tanstack/react-table";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -20,9 +16,8 @@ import { HiMinus } from "react-icons/hi";
 import { RxCross2 } from "react-icons/rx";
 import Loading from "../../Loading";
 import { TbPasswordFingerprint } from "react-icons/tb";
-import { BASE_API_URL } from "@/app/utils/constant";
 import { format } from "date-fns";
-import Cookies from "js-cookie";
+import { fetchPaginatedSadhaks } from "./action";
 
 interface SadhakListProps {
   sdkFstName: string;
@@ -43,15 +38,50 @@ interface SadhakListProps {
   sdkRole: string;
 }
 
-interface ActiveSdk{
-    activeSdkList:SadhakListProps[]
+interface ActiveSdk {
+  initialList: SadhakListProps[];
+  totalPages:number;
+  currentPage: number;
+  pageSize: number;
+  search?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  usrRole?: string;
 }
 
-const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
-
+const ActiveSadhakClient: React.FC<ActiveSdk> = ({ initialList, totalPages, currentPage, pageSize, search, accessToken, refreshToken, usrRole }) => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const data = React.useMemo(() => activeSdkList ?? [], [activeSdkList]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState(initialList || []);  
+  const [isPending, startTransition] = useTransition();  
+  const [totalPagesState, setTotalPages] = useState(totalPages);
+  const [currentPageState, setCurrentPage] = useState(currentPage);
+
+  const handlePageChange = (newPage: number) => {
+    startTransition(async () => {
+      setIsLoading(true);
+      const result = await fetchPaginatedSadhaks(newPage, pageSize, filtered, accessToken, refreshToken, usrRole);
+      setData(result.activeSdkList);
+      setPageInput(newPage);
+      setTotalPages(result.totalPages);
+      setCurrentPage(result.currentPage);
+      setIsLoading(false);
+    });
+  };
+
+  const handleSearchChange = (searchTerm: string) => {
+    startTransition(async () => {
+      setFiltered(searchTerm);
+      setIsLoading(true);
+      const result = await fetchPaginatedSadhaks(1, pageSize, searchTerm, accessToken, refreshToken, usrRole);
+      setData(result.activeSdkList);
+      setPageInput(1);
+      setTotalPages(result.totalPages);
+      setCurrentPage(result.currentPage);
+      setIsLoading(false);
+    });
+  };
+
   const formatDate = (date: string) => {
     return format(new Date(date), "MMM dd, yyyy");
   };
@@ -59,7 +89,7 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
     () => [
       {
         header: "Profile",
-        accessorKey: "sdkImg",
+        accessorKey: "sdkImg",        
         cell: ({ row }: { row: any }) => {
           const { sdkImg, _id } = row.original;
           const profileUrl = `/account/profile-setting/${_id}`;
@@ -98,7 +128,6 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
           </Link>
         ),
       },
-      // { header: "WhatsApp", accessorKey: "sdkWhtNbr" },
       { header: "Medical", accessorKey: "isMedIssue" },
       { header: "State", accessorKey: "sdkState" },
       { header: "Country", accessorKey: "sdkCountry" },
@@ -174,68 +203,21 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
     []
   );
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [filtered, setFiltered] = React.useState("");
-  const [pageInput, setPageInput] = React.useState(1);
-
-  const globalFilterFn: FilterFn<any> = (
-    row,
-    columnId: string,
-    filterValue
-  ) => {
-    return String(row.getValue(columnId))
-      .toLowerCase()
-      .includes(String(filterValue).toLowerCase());
-  };
+  const [filtered, setFiltered] = React.useState(search);
+  const [pageInput, setPageInput] = React.useState(currentPageState);
 
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    globalFilterFn: globalFilterFn,
-    state: {
-      sorting: sorting,
+    getCoreRowModel: getCoreRowModel(),    
+    manualPagination: true, // 👈 tells table not to paginate internally
+    pageCount: -1, // -1 = unknown page count; or set exact if known
+    state: {      
       globalFilter: filtered,
-      pagination: { pageIndex: pageInput - 1, pageSize: 100 },
-    },
-    onSortingChange: setSorting,
+    },    
     getFilteredRowModel: getFilteredRowModel(),
     onGlobalFilterChange: setFiltered,
   });
-
-  const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const page = e.target.value ? Number(e.target.value) - 1 : 0;
-    setPageInput(Number(e.target.value));
-    table.setPageIndex(page);
-  };
-
-  const [loggedInUser, setLoggedInUser] = useState({
-      id: "",
-      usrName: "",
-      usrRole: "",
-      isAdmin: "",
-  });
-
-  useEffect(() => {
-    try {
-    const cookie = Cookies.get("loggedInUser");
-    if (cookie) {
-        const parsed = JSON.parse(cookie);
-        setLoggedInUser({
-        id: parsed.id || "",
-        usrName: parsed.usrName || "",
-        usrRole: parsed.usrRole || "",
-        isAdmin: parsed.isAdmin || "", 
-        });
-    }
-    } catch (error) {
-      console.error("Error parsing loggedInUser cookie:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   if (isLoading) {
     return (
@@ -248,7 +230,7 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
   return (
     <div>
       <div className="flex gap-2 items-center justify-between mb-4">
-        {loggedInUser.usrRole !== "View-Admin" && (
+        {usrRole !== "View-Admin" && (
           <Link
             href="/account/add-new-sadhak"
             title="Add New Sadhak"
@@ -261,7 +243,7 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
           type="text"
           className="inputBox w-[300px]"
           placeholder="Search anything..."
-          onChange={(e) => setFiltered(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
         />
       </div>
       <div className="overflow-auto max-h-[412px]">
@@ -272,52 +254,42 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
           <button
             type="button"
             className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
-            onClick={() => {
-              setPageInput(1);
-              table.setPageIndex(0);
-            }}
+            onClick={() => handlePageChange(1)}
+            disabled={pageInput === 1}
           >
             {"<<"}
           </button>
           <button
             type="button"
             className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
-            onClick={() => {
-              setPageInput((prev) => Math.max(prev - 1, 1));
-              table.previousPage();
-            }}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => handlePageChange(Math.max(1, pageInput - 1))}
+            disabled={pageInput === 1}
           >
             Previous
           </button>
           <button
             type="button"
             className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
-            onClick={() => {
-              setPageInput((prev) => Math.min(prev + 1, table.getPageCount()));
-              table.nextPage();
-            }}
-            disabled={!table.getCanNextPage()}
+            onClick={() => handlePageChange(pageInput + 1)}
+            disabled={data.length < pageSize} // means last page
           >
             Next
           </button>
           <button
             type="button"
             className="px-2 py-1 rounded-sm border-[1.5px] border-black text-sm hover:bg-gray-100"
-            onClick={() => {
-              setPageInput(table.getPageCount());
-              table.setPageIndex(table.getPageCount() - 1);
-            }}
+            onClick={() => handlePageChange(totalPagesState)}
+            disabled={data.length < pageSize} // means last page
           >
             {">>"}
           </button>
         </div>
         <div className="flex mt-4 items-center justify-between">
           <div className="flex flex-col">
-            <p className="italic">Total Pages: &nbsp; {table.getPageCount()}</p>
+            <p className="italic">Total Pages: &nbsp; {totalPagesState}</p>
             <p className="italic">
               You are on page: &nbsp;{" "}
-              {(table.options.state.pagination?.pageIndex ?? 0) + 1}
+              {currentPageState} of {totalPagesState}
             </p>
           </div>
           <div className="flex gap-1 items-center">
@@ -326,9 +298,12 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
               type="number"
               className="px-2 py-1 rounded-lg border-[1.5px] border-black w-[70px] inline"
               value={pageInput}
-              onChange={handlePageChange}
-              min={1}
-              max={table.getPageCount()}
+              onChange={(e) => {
+                const newPage = Number(e.target.value);
+                setPageInput(newPage);
+                if (newPage >= 1) handlePageChange(newPage);
+              }}
+              disabled={data.length < pageSize}
             />
           </div>
         </div>
@@ -337,4 +312,4 @@ const ActiveSadhak: React.FC<ActiveSdk> = ({activeSdkList}) => {
   );
 };
 
-export default ActiveSadhak;
+export default ActiveSadhakClient;
