@@ -2,13 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-h1{
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 2.5rem;
-  color: #1f2937;
-  font-family: 'Oswald', sans-serif;
+h1, label, option, span, li, a {
+  font-family: var(--font-oswald), sans-serif;
 }
+
+h2 {
+  font-family: var(--font-oswald), sans-serif;
+}
+
+h3 {
+  font-family: var(--font-oswald), sans-serif;
+}
+
+label {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.875rem;
+}
+
 
 .btnLeft{
   padding: 7.5px 16px;

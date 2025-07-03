@@ -107,7 +107,7 @@ const MarkettingCourses: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className='px-9 md:px-0'>
       <Container>
         <h1 className="text-3xl font-bold text-orange-600 my-6 text-center">
           Mind Development Training
@@ -163,14 +163,14 @@ const MarkettingCourses: React.FC = () => {
                 className="flex flex-col border p-9 rounded-lg shadow-lg transition-all duration-500 ease-in-out hover:shadow-2xl hover:scale-105 cursor-pointer"
               >
                 <Image
-                  src={course.coImg}
+                  src={`/api/image-upload?name=${course.coImg}`}
                   alt={course.coName}
                   width={300}
                   height={160}
                   className="w-full object-cover bg-gray-200 rounded-md"
                 />
                 <h2 className="text-xl font-semibold text-center bg-gray-200 p-2">{course.coName}</h2>
-                <p className="text-gray-700 text-sm my-2">{course.coShort}</p>
+                <p className="text-gray-700 text-sm text-justify my-2">{course.coShort}</p>
                 <div className="flex text-sm items-center justify-between">
                   <p className="text-gray-600">
                     <span className="font-semibold">Category:</span> {course.coCat}

@@ -5,9 +5,9 @@ import Batches from '../../../../../../modals/Batches';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ CorId: string }> }) {
   try {
+
     const { CorId } = await params;
 
-    // Validate MongoDB ObjectId
     if (!Types.ObjectId.isValid(CorId)) {
       return NextResponse.json({ error: 'Invalid course ID' }, { status: 400 });
     }
@@ -16,10 +16,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ CorI
 
     const now = new Date();
     const upcomingBatches = await Batches.find({
-      courseId: CorId,
-      startDate: { $gte: now },
-    })
-      .sort({ startDate: 1 }); 
+      corId: CorId,
+      bthStart: { $gte: now },
+    }).sort({ startDate: 1 }); 
 
     return NextResponse.json({ batchByCorId: upcomingBatches }, { status: 200 });
   } catch (err: any) {

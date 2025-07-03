@@ -394,8 +394,8 @@ const AddNewBatch: React.FC = () => {
               onChange={handleChange}
             >
               <option className="text-center">--- Select Language ---</option>
-              <option value="ENG">English</option>
-              <option value="HIN">Hindi</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
             </select>
           </div>
         </div>

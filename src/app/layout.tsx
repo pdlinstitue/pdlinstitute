@@ -5,11 +5,10 @@ import { Toaster } from "react-hot-toast";
 
 const oswald = Oswald({
   subsets: ["latin"],
-  weight: ["400", "500", "700"], // Choose weights you want
-  variable: "--font-oswald", // Optional: use CSS variable
+  weight: ["700"],
+  variable: "--font-oswald",
   display: "swap",
 });
-
 
 export const metadata: Metadata = {
   title: "PDL Institute | Spiritual Development & Universal Harmony",
@@ -111,7 +110,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {    
   return (
     <html lang="en">
-      <body className={oswald.className}>
+      <body className={oswald.variable}>
         <Toaster
           toastOptions={{
             duration: 3000,

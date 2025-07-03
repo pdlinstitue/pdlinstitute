@@ -8,6 +8,7 @@ const PUBLIC_API_PATHS = [
   "/api/auth/logout", 
   "/api/categories", 
   "/api/marketting-courses", 
+  "/api/image-upload",
   "/api/marketting-courses/:CoSlug/view-marketting-course",
   "/api/batch-by-marketting-course-id/:CorId/upcoming-batches",
   "/api/marketting-course-category/:CatId"
@@ -25,6 +26,7 @@ function isPublicApiPath(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {  
+  
   const { pathname } = request.nextUrl;
   const encryptedAccess = request.cookies.get("accessToken")?.value;
   const encryptedRefresh = request.cookies.get("refreshToken")?.value;
