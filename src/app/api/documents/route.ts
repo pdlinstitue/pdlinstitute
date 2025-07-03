@@ -22,9 +22,10 @@ type DocType = {
 
 export async function GET(req: NextRequest) {
   try {
+    
     await dbConnect();
-
     const userId = req.nextUrl.searchParams.get("usrId");
+
     if (!userId) {
       return NextResponse.json({ success: false, msg: "User ID is required." }, { status: 400 });
     }
@@ -38,10 +39,7 @@ export async function GET(req: NextRequest) {
       .populate("createdBy", "sdkFstName sdkMdlName sdkLstName sdkPhone sdkRegNo")
       .populate("updatedBy", "sdkFstName");
 
-    const filteredDocs = docList.filter((doc: any) => {
-      if (user.isAdmin === "Yes") return true;
-      return doc.createdBy?._id?.toString() === userId;
-    });
+    const filteredDocs = docList.filter((doc: any) => user.isAdmin === "Yes"|| doc.createdBy?._id?.toString() === userId);
 
     const panList = filteredDocs.filter((item: any) => item.sdkDocType === "Pan");
     const idList = filteredDocs.filter((item: any) => item.sdkDocType === "Id");

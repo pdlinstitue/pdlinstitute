@@ -121,6 +121,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
               padding: "6px",
               width: "auto",
               textAlign: "center",
+              fontFamily: "var(--font-oswald), sans-serif",
+              fontSize: "0.875rem",
+              fontStyle: "italic",
             },
           }}
         />

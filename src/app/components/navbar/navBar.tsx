@@ -23,8 +23,8 @@ const NavMenu : React.FC = () => {
                         </Link> 
                     </div> 
                     <div className="flex gap-9"> 
-                        <Link href="/" className="hover:text-orange-500 hover:font-bold ">HOME</Link> 
-                        <Link href="/contact" className="hover:text-orange-500 hover:font-bold ">CONTACT</Link> 
+                        <Link href="/" className="hover:text-orange-500 text-lg ">HOME</Link> 
+                        <Link href="/contact" className="hover:text-orange-500  text-lg ">CONTACT</Link> 
                     </div> 
                     <LogMenu />
                 </div>

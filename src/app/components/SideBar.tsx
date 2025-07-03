@@ -164,9 +164,9 @@ const SideBar: React.FC = () => {
                   }`}
                 >
                   {renderIcon(item.menuIcon)}
-                  <p className="hidden md:block font-semibold">
+                  <span className="hidden md:block font-semibold">
                     {item.menuName.toUpperCase()}
-                  </p>
+                  </span>
                 </Link>
               );
             }
@@ -185,9 +185,9 @@ const SideBar: React.FC = () => {
                     }`}
                   >
                     {renderIcon(item.menuIcon)}
-                    <p className="flex font-semibold">
+                    <span className="flex font-semibold">
                       {item.menuName.toUpperCase()}
-                    </p>
+                    </span>
                     <IoIosArrowDown
                       size={24}
                       className={`flex ml-auto ${
@@ -232,7 +232,7 @@ const SideBar: React.FC = () => {
                   }`}
                 >
                   {renderIcon("FaEye")}
-                  <p className="flex font-semibold">VIEW AS</p>
+                  <span className="flex font-semibold">VIEW AS</span>
                   <IoIosArrowDown
                     size={24}
                     className={`flex ml-auto ${

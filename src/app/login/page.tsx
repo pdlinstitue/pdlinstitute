@@ -107,17 +107,17 @@ const LoginPage : React.FC = () => {
                   Login
               </button>
               <div className="flex flex-col items-center">
-              <div className="flex gap-2 items-center">
-                  <p className="text-sm">Dont have an account?</p> 
+              <div className="flex flex-col gap-1 items-center">
+                  <p className="text-md italic">Don't have an account yet?</p> 
                   <Link href="/register" className="text-sm text-blue-500">
                       Register
                   </Link>
               </div>
-              <div className="text-sm"> 
+              {/* <div className="text-sm"> 
                   <Link href="/forgot-password" className='text-blue-500'>
                       Forgot password?
                   </Link>
-              </div>
+              </div> */}
               </div>
           </form>
         </div>

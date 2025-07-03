@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-h1, label, option, span, li, a {
+h1, label, option, span, li {
   font-family: var(--font-oswald), sans-serif;
 }
 
@@ -19,6 +19,23 @@ label {
   font-size: 0.875rem;
 }
 
+button {
+  font-family: var(--font-oswald), sans-serif;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+td {
+  font-family: var(--font-sans-serif), arial;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+a {
+  font-family: var(--font-oswald), sans-serif;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
 
 .btnLeft{
   padding: 7.5px 16px;
@@ -28,7 +45,8 @@ label {
   cursor: pointer;
   text-align: center;
   font-weight: bold;
-  font-size: 18px;
+  text-transform: uppercase;
+  font-size: .875rem;
   border-radius: 4px;
 }
 
@@ -45,7 +63,8 @@ label {
   cursor: pointer;
   text-align: center;
   font-weight: bold;
-  font-size: 18px;
+  text-transform: uppercase;
+  font-size: .875rem;
   border-radius: 4px;
 }
 .btnRight:hover{
