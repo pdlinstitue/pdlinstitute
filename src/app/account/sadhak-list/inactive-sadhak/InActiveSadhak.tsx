@@ -41,7 +41,17 @@ const InActiveSadhak : React.FC <InActiveSadhakProps> = ({inActiveUserList}) => 
     const formatDate = (date: string) => { return format(new Date(date), 'MMM dd\, yyyy')};
     const data = React.useMemo(() => inActiveUserList ?? [], [inActiveUserList]);
     const columns = React.useMemo(() => [
-      { header: 'Sadhak Name', accessorKey: 'sdkFstName'},
+      {
+        header: "Sadhak Name",
+        accessorFn: (row: any) => {
+          const first = row.sdkFstName || "";
+          const middle = row.sdkMdlName || "";
+          const last = row.sdkLstName || "";
+          return [first, middle, last].filter(Boolean).join(" ");
+        },
+        id: "sdkFullName",
+        cell: ({ getValue }:any) => getValue(),
+      },
       { header: 'Sdk ID', accessorKey: 'sdkRegNo'},
       { header: 'DOR', 
         accessorKey: 'createdAt',

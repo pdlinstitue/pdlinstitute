@@ -169,7 +169,7 @@ const MarkettingCourses: React.FC = () => {
                   height={160}
                   className="w-full object-cover bg-gray-200"
                 />
-                <h2 className="text-lg font-semibold text-white text-center bg-orange-600 my-1 p-1">{course.coName}</h2>
+                <h2 className="text-lg font-semibold text-white text-center bg-orange-600 my-1 p-2">{course.coName}</h2>
                 <p className="text-gray-700 text-sm text-justify my-2">{course.coShort}</p>
                 <div className="flex text-sm items-center justify-between">
                   <p className="text-gray-600">

@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     let enrList = await Enrollments.find(filter)
       .populate("corId", "coName coNick coType")
       .populate("bthId", "bthName bthStart")
-      .populate("sdkId", "sdkFstName sdkPhone sdkRegNo")
+      .populate("sdkId", "sdkFstName sdkMdlName sdkLstName sdkPhone sdkRegNo")
       .populate("createdBy", "sdkFstName")
       .lean();
 
@@ -81,6 +81,7 @@ export async function GET(req: NextRequest) {
         const classByBatch: any = await Classes.findOne({
           bthId: enr?.bthId?._id,
         }).lean();
+        
         const totalClasses = classByBatch?.clsName?.length || 0;
         const classIds = classByBatch?.clsName?.map((a: any) => a._id) || [];
 

@@ -79,8 +79,15 @@ const CompleteCourse: React.FC = () => {
         ),
       },
       {
-        header: "Sadhak",
-        accessorKey: "sdkFstName",
+        header: "Sadhak Name",
+        accessorFn: (row: any) => {
+          const first = row.sdkFstName || "";
+          const middle = row.sdkMdlName || "";
+          const last = row.sdkLstName || "";
+          return [first, middle, last].filter(Boolean).join(" ");
+        },
+        id: "sdkFullName",
+        cell: ({ getValue }:any) => getValue(),
       },
       {
         header: "SDK ID",
@@ -90,7 +97,11 @@ const CompleteCourse: React.FC = () => {
         header: "Presence(%)",
         accessorKey: "sdkPresent",
       },
-      { header: "Status", accessorKey: "isCompleted", cell: StatusCell },
+      { 
+        header: "Status", 
+        accessorKey: "isCompleted", 
+        cell: StatusCell 
+      },
       {
         header: "Action",
         accessorKey: "action",
@@ -146,13 +157,16 @@ const CompleteCourse: React.FC = () => {
       );
       const enrDataList = await res.json();
       const updatedEnrDataList = enrDataList.enrList.map((item: any) => {
-        return {
-          ...item,
-          sdkFstName: item.sdkId.sdkFstName,
-          sdkPresent: item.batchAttendance,
-          sdkRegNo: item.sdkId.sdkRegNo,
-        };
-      });
+      const sdk = item.sdkId || {};
+      return {
+        ...item,
+        sdkFstName: sdk.sdkFstName || "",
+        sdkMdlName: sdk.sdkMdlName || "",
+        sdkLstName: sdk.sdkLstName || "",
+        sdkPresent: item.batchAttendance ?? 0,
+        sdkRegNo: sdk.sdkRegNo || "",
+      };
+    });
       setEnrData(updatedEnrDataList);
     } catch (error) {
       console.log("error fetching enrData" + error);

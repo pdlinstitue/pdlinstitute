@@ -50,6 +50,7 @@ interface ActiveSdk {
 }
 
 const ActiveSadhakClient: React.FC<ActiveSdk> = ({ initialList, totalPages, currentPage, pageSize, search, accessToken, refreshToken, usrRole }) => {
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(initialList || []);  
@@ -112,7 +113,17 @@ const ActiveSadhakClient: React.FC<ActiveSdk> = ({ initialList, totalPages, curr
           );
         },
       },
-      { header: "Sadhak", accessorKey: "sdkFstName" },
+      {
+        header: "Sadhak Name",
+        accessorFn: (row: any) => {
+          const first = row.sdkFstName || "";
+          const middle = row.sdkMdlName || "";
+          const last = row.sdkLstName || "";
+          return [first, middle, last].filter(Boolean).join(" ");
+        },
+        id: "sdkFullName",
+        cell: ({ getValue }:any) => getValue(),
+      },
       { header: "Sdk ID", accessorKey: "sdkRegNo" },
       {
         header: "DOR",
@@ -128,7 +139,7 @@ const ActiveSadhakClient: React.FC<ActiveSdk> = ({ initialList, totalPages, curr
           </Link>
         ),
       },
-      { header: "Medical", accessorKey: "isMedIssue" },
+      { header: "Med", accessorKey: "isMedIssue" },
       { header: "State", accessorKey: "sdkState" },
       { header: "Country", accessorKey: "sdkCountry" },
       {

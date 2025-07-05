@@ -52,9 +52,17 @@ const AdsCard : React.FC = () => {
   };
   
   const columns = React.useMemo(() => [
-    {header: 'First Name', accessorKey: 'sdkFstName'},
-    {header: 'Middle Name', accessorKey: 'sdkMdlName'},
-    {header: 'Last Name', accessorKey: 'sdkLstName'},
+    {
+      header: "Sadhak Name",
+      accessorFn: (row: any) => {
+        const first = row.sdkFstName || "";
+        const middle = row.sdkMdlName || "";
+        const last = row.sdkLstName || "";
+        return [first, middle, last].filter(Boolean).join(" ");
+      },
+      id: "sdkFullName",
+      cell: ({ getValue }:any) => getValue(),
+    },
     {header: 'Sdk Id', accessorKey: 'sdkId'},
     {header: 'Card No', accessorKey: 'sdkAdsNbr'},
     {header: 'Owner', accessorKey: 'sdkDocOwnr'},
@@ -137,9 +145,9 @@ const AdsCard : React.FC = () => {
           const docData = await res.json();
           const updatedDocList = docData?.adsList?.map((item:any) => { 
             return { ...item, 
-              sdkFstName: item.createdBy.sdkFstName ? item.createdBy.sdkFstName : 'N/A',
-              sdkMdlName: item.createdBy.sdkMdlName ? item.createdBy.sdkMdlName : 'N/A',
-              sdkLstName: item.createdBy.sdkLstName ? item.createdBy.sdkLstName : 'N/A',
+              sdkFstName: item.createdBy.sdkFstName,
+              sdkMdlName: item.createdBy.sdkMdlName,
+              sdkLstName: item.createdBy.sdkLstName,
               sdkPhone: item.createdBy.sdkPhone ? item.createdBy.sdkPhone : 'N/A',
               sdkRegNo: item.createdBy.sdkRegNo ? item.createdBy.sdkRegNo : 'N/A' 
             };
