@@ -143,12 +143,12 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
       <Container>
         <div className="flex flex-col p-9 md:p-0 md:mt-16">
           {/* Hero Section */}
-          <div className="relative w-full h-auto md:h-[400px] overflow-hidden rounded-xl shadow-lg mb-9">
+          <div className="relative w-full h-auto rounded-xl shadow-lg mb-9">
             <Image
               src={`/api/image-upload?name=${courseById.coImg}`}
               alt="Course Banner"
               width={1320}
-              height={400}
+              height={600}
             />
           </div>
 
