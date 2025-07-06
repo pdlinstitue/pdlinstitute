@@ -2,6 +2,7 @@ import Documents from "../../../../modals/Documents";
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "../../../../dbConnect";
 import Users from "../../../../modals/Users";
+import {cookies} from "next/headers";
 
 type DocType = {
   sdkDocType: string;
@@ -22,7 +23,13 @@ type DocType = {
 
 export async function GET(req: NextRequest) {
   try {
-    
+    var cookie = await cookies();
+    var loggedInUser = cookie.get("loggedInUser")?.value;
+    let userRole = "";
+    if (loggedInUser) {
+      userRole = JSON.parse(loggedInUser)?.usrRole;
+    }
+
     await dbConnect();
     const userId = req.nextUrl.searchParams.get("usrId");
 
@@ -39,7 +46,7 @@ export async function GET(req: NextRequest) {
       .populate("createdBy", "sdkFstName sdkMdlName sdkLstName sdkPhone sdkRegNo")
       .populate("updatedBy", "sdkFstName");
 
-    const filteredDocs = docList.filter((doc: any) => user.isAdmin === "Yes"|| doc.createdBy?._id?.toString() === userId);
+    const filteredDocs = docList.filter((doc: any) => userRole === "Super-Admin" || userRole === "View-Admin" || userRole === "Admin" || doc.createdBy?._id?.toString() === userId);
 
     const panList = filteredDocs.filter((item: any) => item.sdkDocType === "Pan");
     const idList = filteredDocs.filter((item: any) => item.sdkDocType === "Id");
