@@ -20,7 +20,7 @@ const Footer : React.FC = () => {
               </Link>
             </FooterList>
             <FooterList>
-              <h3 className="uppercase text-xl font-bold">QUICK LINKS</h3>
+              <h3 className="uppercase text-xl font-bold">OTHERS</h3>
               <Link href="/#" className="text-sm">Donate Us</Link>
               <Link href="/#" className="text-sm">Refund Policy</Link>
               <Link href="/#" className="text-sm">Privacy Policy</Link>
@@ -30,11 +30,11 @@ const Footer : React.FC = () => {
               <h3 className="uppercase text-xl font-bold">CONTACT US</h3>
               <div className="flex gap-2 items-center">
                   <MdOutlineMailOutline size={28} className="text-white"/>
-                  <p>coachdeepak@gmail.com</p>
+                  <p>contact2pdl@gmail.com</p>
               </div>
               <div className="flex gap-2 items-center">
                   <ImLocation2 size={28} className="text-white"/>
-                  <p>Noida Extension, Noida-201301.</p>
+                  <p>Amravati, Maharashtra.</p>
               </div>
             </FooterList>
             <FooterList>
