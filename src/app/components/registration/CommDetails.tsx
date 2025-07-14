@@ -78,20 +78,34 @@ const CommDetails : React.FC = () => {
   };
 
 
-  useEffect(()=>{
-    async function fetchCountryList(){
-      try {
-        const res = await fetch(`${BASE_API_URL}/api/countries`);
-        const countryData = await res.json();
-        setCountryList(countryData.ctrList);
-      } catch (error) {
-        console.error("Error fetching country data:", error);
-      }  finally {
-        setIsLoading(false);
+  useEffect(() => {
+  async function fetchCountryList() {
+    try {
+      const res = await fetch(`${BASE_API_URL}/api/countries`, {
+        method: "GET",
+        redirect: "follow",
+        headers: {
+          "Accept": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
       }
+
+      const countryData = await res.json();
+      setCountryList(countryData.ctrList || []);
+      console.log(res.status); // 307
+      console.log(res.headers.get("location")); // URL where it's redirecting
+
+    } catch (error) {
+      console.error("Error fetching country data:", error);
+    } finally {
+      setIsLoading(false);
     }
-    fetchCountryList();
-  },[])
+  }
+  fetchCountryList();
+}, []);
 
   useEffect(()=>{
     async function fetchStateList(){
@@ -133,8 +147,8 @@ const CommDetails : React.FC = () => {
     </div>
   }
   return (
-    <div className='max-w-[600px]'>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-1'>
+    <div className='w-auto'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-1 w-[600px]'>
           <div className='flex flex-col gap-2'>
             <label>Country:<span className='text-red-500'>*</span></label>
             <select className='inputBox w-auto' name='sdkCountry' value={userData.sdkCountry} onChange={handleChange}>
