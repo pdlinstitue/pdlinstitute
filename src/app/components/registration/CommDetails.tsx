@@ -147,8 +147,8 @@ const CommDetails : React.FC = () => {
     </div>
   }
   return (
-    <div className='w-auto'>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-1 w-[600px]'>
+    <div className='max-w-[600px] md:w-[600px]'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-1'>
           <div className='flex flex-col gap-2'>
             <label>Country:<span className='text-red-500'>*</span></label>
             <select className='inputBox w-auto' name='sdkCountry' value={userData.sdkCountry} onChange={handleChange}>
