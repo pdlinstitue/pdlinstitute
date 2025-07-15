@@ -11,7 +11,10 @@ const PUBLIC_API_PATHS = [
   "/api/image-upload",
   "/api/marketting-courses/:CoSlug/view-marketting-course",
   "/api/batch-by-marketting-course-id/:CorId/upcoming-batches",
-  "/api/marketting-course-category/:CatId"
+  "/api/marketting-course-category/:CatId",
+  "/api/countries",
+  "/api/states",
+  "/api/cities",
 ];
 
 function isPublicApiPath(pathname: string): boolean {
