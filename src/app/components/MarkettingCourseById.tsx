@@ -118,7 +118,7 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
           throw new Error("Failed to fetch course category");
         }
         const data = await response.json();
-        setCourseCategory(data.mktCoCategory);
+        setCourseCategory(data?.mktCoCategory);
       } catch (error) {
         console.error("Error fetching course category:", error);
       } finally {
@@ -157,7 +157,7 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
                 Course Overview
           </h2>
           <div className="text-gray-700 text-justify w-full mx-auto mb-3">
-            {courseById.coDesc}
+            {courseById?.coDesc}
           </div>
           <div className="grid md:grid-cols-2 gap-10 items-start">
             {/* Left Content */}
@@ -166,20 +166,20 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
                 <div className="bg-orange-100 p-4 rounded-lg shadow-sm">
                   <h3 className="font-semibold text-orange-700">Duration</h3>
                   <p>
-                    {courseById.durDays} Days / {courseById.durHrs} Hours
+                    {courseById?.durDays} Days / {courseById?.durHrs} Minutes
                   </p>
                 </div>
                 <div className="bg-orange-100 p-4 rounded-lg shadow-sm">
                   <h3 className="font-semibold text-orange-700">Donation</h3>
-                  <p>₹{courseById.coDon}</p>
+                  <p>₹{courseById?.coDon}</p>
                 </div>
                 <div className="bg-orange-100 p-4 rounded-lg shadow-sm">
                   <h3 className="font-semibold text-orange-700">Category</h3>
-                  <p>{courseCategory.catName}</p>
+                  <p>{courseCategory?.catName}</p>
                 </div>
                 <div className="bg-orange-100 p-4 rounded-lg shadow-sm">
                   <h3 className="font-semibold text-orange-700">Type</h3>
-                  <p>{courseById.coType}</p>
+                  <p>{courseById?.coType}</p>
                 </div>
               </div>
             </div>
@@ -189,7 +189,7 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
               <div className="bg-orange-100 p-4 rounded-lg shadow-sm">
                   <h3 className="font-semibold text-orange-700">Elegibility</h3>
                   <p>
-                    {courseById.eligibilityName || courseById.coElg} 
+                    {courseById?.eligibilityName || courseById?.coElg} 
                   </p>
                 </div>
 
@@ -216,7 +216,7 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
               </div>
             ) : (
               <div className="flex flex-col md:flex-row gap-1 justify-center w-auto">
-                {batchDetails.map((batch, index) => (
+                {batchDetails?.map((batch, index) => (
                   <div
                     key={index}
                     className="bg-white shadow-lg rounded-lg p-6 border border-orange-100 max-w-lg w-full"
@@ -227,13 +227,13 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
                           <span className="font-semibold text-orange-600">
                             Batch Name:
                           </span>{" "}
-                          {batch.bthName}
+                          {batch?.bthName}
                         </p>
                         <p>
                           <span className="font-semibold text-orange-600">
                             Shift:
                           </span>{" "}
-                          {batch.bthShift}
+                          {batch?.bthShift}
                         </p>
                         <p>
                           <span className="font-semibold text-orange-600">
@@ -253,7 +253,7 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
                           <span className="font-semibold text-orange-600">
                             End Date:
                           </span>{" "}
-                          {batch.formattedEndDate}
+                          {batch?.formattedEndDate}
                         </p>
                         <p>
                           <span className="font-semibold text-orange-600">
@@ -261,12 +261,12 @@ const MarkettingCourseById: React.FC<ICorParams> = ({ courseById }) => {
                           </span>{" "}
                           {batch.bthMode}
                         </p>
-                        {batch.bthMode !== "Online" && batch.bthLoc && (
+                        {batch?.bthMode !== "Online" && batch.bthLoc && (
                           <p>
                             <span className="font-semibold text-orange-600">
                               Location:
                             </span>{" "}
-                            {batch.bthLoc}
+                            {batch?.bthLoc}
                           </p>
                         )}
                       </div>
