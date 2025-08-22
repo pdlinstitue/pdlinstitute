@@ -1,5 +1,6 @@
 import Users from "../../../../../modals/Users";
 import dbConnect from "../../../../../dbConnect";
+import {escapeRegex} from "../../../utils/escapeRegex";
 import { NextRequest, NextResponse } from "next/server";
 
 type SdkType = {
@@ -26,10 +27,6 @@ type SdkType = {
   sdkRole: string;
   createdBy?: string;
 };
-
-export function escapeRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
 
 export async function GET(req: NextRequest) {
   try {
