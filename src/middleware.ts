@@ -15,6 +15,8 @@ const PUBLIC_API_PATHS = [
   "/api/countries",
   "/api/states",
   "/api/cities",
+  "/api/users/phoneexists",
+  "/api/users/emailexists"
 ];
 
 function isPublicApiPath(pathname: string): boolean {

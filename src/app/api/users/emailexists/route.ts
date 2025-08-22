@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
         if (existingEmail) {
             return NextResponse.json(
-                { success: true, data: existingEmail, msg: "Email already exists", isEmailValid:false },
+                { success: true, msg: "Email already exists", isEmailValid:false },
                 { status: 200 }
             );
         } else {

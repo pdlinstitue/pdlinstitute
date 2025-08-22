@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
         if (existingPhone) {
             return NextResponse.json(
-                { success: true, data: existingPhone, msg: "Phone already exists", isPhoneValid: false },
+                { success: true, msg: "Phone already exists", isPhoneValid: false },
                 { status: 200 }
             );
         } else {

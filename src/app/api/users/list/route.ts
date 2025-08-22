@@ -27,6 +27,10 @@ type SdkType = {
   createdBy?: string;
 };
 
+export function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -75,7 +79,9 @@ export async function POST(req: NextRequest) {
 
     // Search filter
     if (search) {
-      const regex = new RegExp(search, "i"); // case-insensitive
+      const safeSearch = escapeRegex(search);
+      const regex = new RegExp(safeSearch, "i"); // safe & case-insensitive
+
       filter.$or = [
         { sdkFstName: regex },
         { sdkMdlName: regex },

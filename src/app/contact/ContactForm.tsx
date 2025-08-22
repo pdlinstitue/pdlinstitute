@@ -78,10 +78,25 @@ const ContactUs = () => {
         <div className="flex flex-col">
           <div className="flex flex-col gap-3 mb-6">
             <h1 className="font-bold text-4xl">Let's Talk...</h1>
-            <p className="">
-              Connect with us to begin your journey of spiritual growth, mind
-              mastery, and conscious living. We're here to guide you every step
-              of the way.
+            <p>
+              Discover your inner light. Connect with us to begin your journey
+              toward mindful living and holistic transformation.
+            </p>
+            <p>
+              Awaken your consciousness. Tap into emotional clarity and
+              spiritual depth—let’s start your journey together.
+            </p>
+            <p>
+              Seeking inner peace and balance? Reach out today and take the
+              first step toward conscious emotional and spiritual evolution.
+            </p>
+            <p>
+              Ready to realign your mind, heart, and soul? Say hello—we’re here
+              to guide your transformation with purpose.
+            </p>
+            <p>
+              Begin your path to mindful mastery. Message us to unlock spiritual
+              insights and emotional harmony.
             </p>
           </div>
           <div className="flex flex-col gap-3 mb-6">

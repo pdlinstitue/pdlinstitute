@@ -89,7 +89,7 @@ const ContactDetails: React.FC = () => {
   };  
 
   useEffect(() => {
-    if (userData.sdkPhoneCntCode && userData.sdkPhone) {
+    if (userData.sdkPhoneCntCode && userData.sdkPhone && userData.sdkPhone.length >= 10) {
       handleValidPhone();
     }
   }, [userData.sdkPhoneCntCode, userData.sdkPhone]);
@@ -117,9 +117,14 @@ const ContactDetails: React.FC = () => {
         setErrorMessage("Error checking email validity: "+ error);
       });
   };
+  
+  function isValidEmail(email: string): boolean {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    return regex.test(email.trim());
+  }
 
   useEffect(() => {
-    if (userData.sdkEmail) {
+    if (userData.sdkEmail && isValidEmail(userData.sdkEmail)) {
       handleValidEmail();
     }
   }, [userData.sdkEmail]);
