@@ -24,58 +24,85 @@ const DisableSadhak : React.FC <ISdkParams>= ({params}) => {
   const { SdkId } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const [sadhakName, setSadhakName] = useState<SdkNameProps>({sdkFstName:'', disabledBy:''});
-
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
-    }
-  };
   
-    useEffect(() => { 
-    async function fetchSadhakById() { 
-    try 
-        { 
-            const res = await fetch(`${BASE_API_URL}/api/users/${SdkId}/view-sadhak`, {cache: "no-store"}); 
-            const sadhakData = await res.json(); 
-            setSadhakName(sadhakData.sdkById);      
-        } catch (error) { 
-            console.error("Error fetching SadhakData:", error); 
+  const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+  try {
+    const cookie = Cookies.get("loggedInUser");
+    if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+        id: parsed.id || "",
+        usrName: parsed.usrName || "",
+        usrRole: parsed.usrRole || "",
+        isAdmin: parsed.isAdmin || "", 
+      });
+    }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+  
+    useEffect(() => {
+        async function fetchSadhakById() {
+        try {
+            const res = await fetch(
+            `${BASE_API_URL}/api/users/${SdkId}/view-sadhak`,
+            { cache: "no-store" }
+            );
+            const sadhakData = await res.json();
+            setSadhakName(sadhakData.sdkById);
+        } catch (error) {
+            console.error("Error fetching SadhakData:", error);
         } finally {
             setIsLoading(false);
         }
-    } fetchSadhakById(); 
+        }
+        fetchSadhakById();
     }, []);
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    try 
-        {
-            const response = await fetch(`${BASE_API_URL}/api/users/${SdkId}/disable-sadhak`, {
-                method: 'PATCH',
-                body: JSON.stringify({
-                    disabledBy:loggedInUser.result._id
-                })
-            });
-
-            const post = await response.json();
-
-            if (post.success === false) {
-                toast.error(post.msg);
-            } else {
-                toast.success(post.msg);
-                router.push('/account/sadhak-list/active-sadhak');
+    const handleSubmit = async (
+        e: FormEvent<HTMLFormElement>
+    ): Promise<void> => {
+        e.preventDefault();
+        try {
+        const response = await fetch(
+            `${BASE_API_URL}/api/users/${SdkId}/disable-sadhak`,
+            {
+            method: "PATCH",
+            body: JSON.stringify({
+                disabledBy: loggedInUser.id,
+            }),
             }
+        );
+
+        const post = await response.json();
+
+        if (post.success === false) {
+            toast.error(post.msg);
+        } else {
+            toast.success(post.msg);
+            router.push("/account/sadhak-list/active-sadhak");
+        }
         } catch (error) {
-            toast.error('Error disabling sadhak.');
+        toast.error("Error disabling sadhak.");
         }
     };
 
-    if(isLoading){
-        return <div>
-            <Loading/>
+    if (isLoading) {
+        return (
+        <div>
+            <Loading />
         </div>
+        );
     }
 
   return (

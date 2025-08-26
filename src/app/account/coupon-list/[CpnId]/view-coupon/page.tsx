@@ -46,34 +46,7 @@ const ViewCoupon: React.FC<ICpnParams> = ({ params }) => {
     updatedBy: "",
   });
   const [manageBox, setManageBox] = React.useState<string[]>([]);
-  const [couponFor, setCouponFor] = useState("");
-
-  const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
-  });
-
-  useEffect(() => {
-    try {
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: {
-          _id: userId,
-          usrName: userName,
-          usrRole: userRole,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching loggedInUserData.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const [couponFor, setCouponFor] = useState("");  
 
   useEffect(() => {
     async function fetchCourseData() {

@@ -205,7 +205,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
     async function fetchBatchesByCoId() {
       try {                
         const response = await fetch(
-          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch?sdkId=${Cookies.get("loggedInUserId")}&isReEnroll=${isReEnroll}`
+          `${BASE_API_URL}/api/my-courses/${CorId}/view-batch?sdkId=${loggedInUser.id}&isReEnroll=${isReEnroll}`
         );
         const data = await response.json();
         setBatchList(data.bthListByCourseId);
@@ -216,7 +216,7 @@ const EnrollCourse: React.FC<IEnrollCourseParams> = ({ params }) => {
       }
     }
     fetchBatchesByCoId();
-  }, []);
+  }, [loggedInUser.id]);
 
   useEffect(() => {
     async function fetchBatchDataById() {

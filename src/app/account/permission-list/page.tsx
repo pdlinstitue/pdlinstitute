@@ -48,12 +48,30 @@ const PermissionList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activity, setActivity] = useState("-");
   const [loggedInUser, setLoggedInUser] = useState({
-    result: {
-      _id: "",
-      usrName: "",
-      usrRole: "",
-    },
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
   });
+
+  useEffect(() => {
+    try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchInitialData() {
@@ -73,13 +91,6 @@ const PermissionList: React.FC = () => {
       } finally {
         setIsLoading(false);
       }
-
-      const userId = Cookies.get("loggedInUserId") || "";
-      const userName = Cookies.get("loggedInUserName") || "";
-      const userRole = Cookies.get("loggedInUserRole") || "";
-      setLoggedInUser({
-        result: { _id: userId, usrName: userName, usrRole: userRole },
-      });
     }
 
     fetchInitialData();
@@ -189,8 +200,8 @@ const PermissionList: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...permitAllowed,
-          createdBy: loggedInUser.result._id,
-          updatedBy: loggedInUser.result._id,
+          createdBy: loggedInUser.id,
+          updatedBy: loggedInUser.id,
         }),
       });
 

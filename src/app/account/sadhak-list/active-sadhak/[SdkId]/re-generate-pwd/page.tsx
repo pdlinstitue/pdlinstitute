@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { TfiReload } from "react-icons/tfi";
 import { MdOutlineCopyright } from "react-icons/md";
-import React, { ChangeEvent, FormEvent, use, useState } from 'react';
+import React, { ChangeEvent, FormEvent, use, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 interface IRegenPwdParams {
@@ -43,13 +43,32 @@ const RegeneratePassword : React.FC<IRegenPwdParams>= ({params}) => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [regPwd, setRegPwd] = useState<ChangePwdProps>({sdkRegPwd:'', updatedBy:'', sdkRegPwdExpiry:new Date});
 
-  const loggedInUser = {
-    result:{
-      _id:Cookies.get("loggedInUserId"), 
-      usrName:Cookies.get("loggedInUserName"),
-      usrRole:Cookies.get("loggedInUserRole"),
+  const [isLoading, setIsLoading] = useState(true);
+  const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    usrName: "",
+    usrRole: "",
+    isAdmin: "",
+  });
+
+  useEffect(() => {
+    try {
+      const cookie = Cookies.get("loggedInUser");
+      if (cookie) {
+        const parsed = JSON.parse(cookie);
+        setLoggedInUser({
+          id: parsed.id || "",
+          usrName: parsed.usrName || "",
+          usrRole: parsed.usrRole || "",
+          isAdmin: parsed.isAdmin || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error parsing loggedInUser cookie:", error);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -85,7 +104,7 @@ const RegeneratePassword : React.FC<IRegenPwdParams>= ({params}) => {
         body: JSON.stringify({
           sdkRegPwd: regPwd.sdkRegPwd,
           sdkRegPwdExpiry,
-          updatedBy: loggedInUser.result._id
+          updatedBy: loggedInUser.id
         }),
       });
 
